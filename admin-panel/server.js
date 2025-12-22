@@ -91,7 +91,7 @@ seedArticles();
 // 4. Sections Table
 let DB_SECTIONS = [
   { id: 'sec-feed', type: 'article-feed', isPinned: true, title: null, coverImage: null, preface: null, issueNumber: null, routeArticleId: null },
-  { id: 'sec-main', type: 'main-row', isPinned: false, title: null, coverImage: IMAGES[0], preface: "Yeni sayıya hoş geldiniz...", issueNumber: '45', routeArticleId: 'art-0' },
+  { id: 'sec-main', type: 'main-row', isPinned: false, title: null, coverImage: IMAGES[0], preface: "sunuyu giriniz...", issueNumber: '45', routeArticleId: 'art-0' },
   { id: 'sec-ord', type: 'ordinary-row', isPinned: false, title: null, coverImage: null, preface: null, issueNumber: null, routeArticleId: null },
   { id: 'sec-spot', type: 'spot-row', isPinned: false, title: null, coverImage: null, preface: null, issueNumber: null, routeArticleId: null },
   { id: 'sec-cat-1', type: 'category-row', isPinned: false, title: 'Felsefe', coverImage: null, preface: null, issueNumber: null, routeArticleId: null },
