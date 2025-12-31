@@ -31,12 +31,13 @@ const CloseButton = ({ onClick }: { onClick: () => void }) => {
 // 2. Menu Button
 const MenuButton = ({ onClick, isWhite = false }: { onClick: () => void; isWhite?: boolean }) => {
   const barColor = isWhite ? 'bg-white' : 'bg-black';
+  const hoverClass = isWhite ? 'hover:bg-white/20' : 'hover:bg-black/5';
 
   return (
     <button
       type="button"
       onClick={onClick}
-      className="bg-transparent p-2 hover:bg-white/10 rounded-md transition-colors"
+      className={`bg-transparent p-2 rounded-md transition-colors duration-200 ${hoverClass}`}
     >
       <div className={`flex flex-col items-center justify-center h-6 w-6 space-y-1`}>
         <span className={`block h-0.5 w-6 ${barColor}`}></span>
@@ -90,7 +91,7 @@ const SocialIcons = ({ isWhite = false }: { isWhite?: boolean }) => {
         <a
           key={index}
           href={link.href}
-          className={`${isWhite ? 'text-white hover:text-white/70' : 'text-black hover:text-gray-600'} transition-colors p-1`}
+          className={`${isWhite ? 'text-white hover:bg-white/10' : 'text-black hover:bg-black/5'} rounded-md transition-all duration-200 p-2 flex items-center justify-center`}
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -103,8 +104,6 @@ const SocialIcons = ({ isWhite = false }: { isWhite?: boolean }) => {
 
 // 4. Logo
 const Logo = ({ isWhite = false }: { isWhite?: boolean }) => {
-  // If you have these files in your public folder, these paths should work.
-  // Otherwise, ensure the images are available at these paths.
   const logoSrc = isWhite ? logo_white : logo;
   
   return (
@@ -118,18 +117,26 @@ const Logo = ({ isWhite = false }: { isWhite?: boolean }) => {
   );
 };
 
-// 5. Mobile Menu (Includes FooterColumn)
+// 5. Mobile Menu Components
 interface FooterColumnProps {
   title: string;
-  variant: string;
+  variant?: string;
   content: React.ReactNode;
 }
 
-const FooterColumn = ({ title, variant, content }: FooterColumnProps) => {
+// GÜNCELLENDİ: Footer.tsx tasarımına birebir uyumlu yapı
+const FooterColumn = ({ title, variant = "", content }: FooterColumnProps) => {
   return (
-    <div className={`${variant}`}>
-      <h3 className="font-semibold mb-4 text-white">{title}</h3>
-      {content}
+    <div className={`w-full ${variant}`}>
+      {/* Footer'daki h3 stili: text-stone-500 text-[13px] tracking-[1px] leading-4 font-labilvariable md:leading-[19px] mt-5 */}
+      {/* Not: Turuncu arka plan üzerinde stone-500 okunmayacağı için hiyerarşiyi korumak adına text-white/70 kullanıldı. */}
+      <h3 className="text-white/70 text-[13px] tracking-[1px] leading-4 font-labilvariable md:leading-[19px] mt-5">
+        {title}
+      </h3>
+      {/* Footer'daki içerik stili: mt-5 text-white text-[13px] leading-[20.8px] md:text-[15px] md:leading-[26px] */}
+      <div className="mt-5 text-white text-[13px] leading-[20.8px] md:text-[15px] md:leading-[26px]">
+        {content}
+      </div>
     </div>
   );
 };
@@ -137,8 +144,11 @@ const FooterColumn = ({ title, variant, content }: FooterColumnProps) => {
 const MobileMenu = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
   if (!isOpen) return null;
 
+  // Footer'daki link sınıfı
+  const linkClass = "block mb-1 hover:text-white/70 transition-colors";
+
   return (
-    <div className="fixed inset-0 z-50 bg-[rgb(199,78,38)] overflow-y-auto">
+    <div className="fixed inset-0 z-50 bg-[rgb(199,78,38)] overflow-y-auto font-bradford">
       {/* Header */}
       <div className="px-4 sm:px-8 md:px-16 lg:px-24 xl:px-[140px]">
         <div className="relative flex items-center justify-between h-20 max-w-[1200px] mx-auto">
@@ -158,72 +168,67 @@ const MobileMenu = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
       </div>
 
       {/* Menu Content */}
-      <div className="px-4 sm:px-8 md:px-16 lg:px-24 xl:px-[140px] max-w-[1200px] mx-auto">
-        <div className="box-border caret-transparent tracking-[0.108px] mt-20 pb-20 md:tracking-[0.09px] grid grid-cols-1 md:grid-cols-5 gap-8 md:gap-4">
+      <div className="px-4 sm:px-8 md:px-16 lg:px-24 xl:px-[140px]">        {/* Footer grid yapısı ve spacing değerleri aynen uygulandı */}
+        <div className="mt-20 pb-20 grid grid-cols-1 md:grid-cols-5 gap-8">
           <FooterColumn
             title="Genç Hayat"
-            variant=""
             content={
-              <div className="text-[13px] box-border caret-transparent leading-[20.8px] md:text-[15px] md:leading-[26px]">
-                <p className="mb-2">
-                  <a href="/hakkimizda" className="text-white hover:text-white/70 transition-colors" onClick={onClose}>Hakkımızda</a>
-                </p>
-                <p className="mb-2">
-                  <a href="/iletisim" className="text-white hover:text-white/70 transition-colors" onClick={onClose}>İletişim</a>
-                </p>
-              </div>
+              <>
+                <a href="/hakkimizda" className={linkClass} onClick={onClose}>Hakkımızda</a>
+                <a href="/iletisim" className={linkClass} onClick={onClose}>İletişim</a>
+              </>
             }
           />
           <FooterColumn
             title="Kategoriler"
-            variant="border-white/30 pt-5 border-t md:pt-0 md:border-t-0"
+            // Footer.tsx'te olduğu gibi mobil görünümde üst çizgi ayrımı için variant kullanıldı
+            variant="pt-5 md:pt-0"
             content={
-              <div className="text-[13px] box-border caret-transparent leading-[20.8px] md:text-[15px] md:leading-[26px]">
-                <p className="mb-2"><a href="/guncel" className="text-white hover:text-white/70" onClick={onClose}>Güncel</a></p>
-                <p className="mb-2"><a href="/tarih" className="text-white hover:text-white/70" onClick={onClose}>Tarih</a></p>
-                <p className="mb-2"><a href="/kuram" className="text-white hover:text-white/70" onClick={onClose}>Kuram</a></p>
-                <p className="mb-2"><a href="/felsefe" className="text-white hover:text-white/70" onClick={onClose}>Felsefe</a></p>
-                <p className="mb-2"><a href="/kultur-sanat" className="text-white hover:text-white/70" onClick={onClose}>Kültür-Sanat</a></p>
-                <p className="mb-2"><a href="/dunya" className="text-white hover:text-white/70" onClick={onClose}>Dünya</a></p>
-                <p className="mb-2"><a href="/spor" className="text-white hover:text-white/70" onClick={onClose}>Spor</a></p>
-              </div>
+              <>
+                <a href="/guncel" className={linkClass} onClick={onClose}>Güncel</a>
+                <a href="/tarih" className={linkClass} onClick={onClose}>Tarih</a>
+                <a href="/kuram" className={linkClass} onClick={onClose}>Kuram</a>
+                <a href="/felsefe" className={linkClass} onClick={onClose}>Felsefe</a>
+                <a href="/kultur-sanat" className={linkClass} onClick={onClose}>Kültür-Sanat</a>
+                <a href="/dunya" className={linkClass} onClick={onClose}>Dünya</a>
+                <a href="/spor" className={linkClass} onClick={onClose}>Spor</a>
+              </>
             }
           />
           <FooterColumn
             title="Tematik"
-            variant="border-white/30 pt-5 border-t md:pt-0 md:border-t-0"
+            variant="pt-5 md:pt-0"
             content={
-              <div className="text-[13px] box-border caret-transparent leading-[20.8px] md:text-[15px] md:leading-[26px]">
-                <p className="mb-2"><a href="/bir-olay-bir" className="text-white hover:text-white/70" onClick={onClose}>Bir Olay Bir</a></p>
-                <p className="mb-2"><a href="/kavram" className="text-white hover:text-white/70" onClick={onClose}>Kavram</a></p>
-                <p className="mb-2"><a href="/portre" className="text-white hover:text-white/70" onClick={onClose}>Portre</a></p>
-                <p className="mb-2"><a href="/nato" className="text-white hover:text-white/70" onClick={onClose}>NATO</a></p>
-              </div>
+              <>
+                <a href="/bir-olay-bir-kavram" className={linkClass} onClick={onClose}>Bir Olay Bir Kavram</a>
+                <a href="/portre" className={linkClass} onClick={onClose}>Portre</a>
+                <a href="/nato" className={linkClass} onClick={onClose}>NATO</a>
+              </>
             }
           />
           <FooterColumn
             title="Dosyalar"
-            variant="border-white/30 pt-5 border-t md:pt-0 md:border-t-0"
+            variant="pt-5 md:pt-0"
             content={
-              <div className="text-[13px] box-border caret-transparent leading-[20.8px] md:text-[15px] md:leading-[26px]">
-                <p className="mb-2"><a href="/cumhuriyet" className="text-white hover:text-white/70" onClick={onClose}>Cumhuriyet</a></p>
-                <p className="mb-2"><a href="/8-mart" className="text-white hover:text-white/70" onClick={onClose}>8 Mart</a></p>
-                <p className="mb-2"><a href="/antiemperyalizm" className="text-white hover:text-white/70" onClick={onClose}>Antiemperyalizm</a></p>
-                <p className="mb-2"><a href="/anadil" className="text-white hover:text-white/70" onClick={onClose}>Anadil</a></p>
-              </div>
+              <>
+                <a href="/cumhuriyet" className={linkClass} onClick={onClose}>Cumhuriyet</a>
+                <a href="/8-mart" className={linkClass} onClick={onClose}>8 Mart</a>
+                <a href="/antiemperyalizm" className={linkClass} onClick={onClose}>Antiemperyalizm</a>
+                <a href="/anadil" className={linkClass} onClick={onClose}>Anadil</a>
+              </>
             }
           />
           <FooterColumn
             title="Sayılar"
-            variant="border-white/30 pt-5 border-t md:pt-0 md:border-t-0"
+            variant="pt-5 md:pt-0"
             content={
-              <div className="text-[13px] box-border caret-transparent leading-[20.8px] md:text-[15px] md:leading-[26px]">
-                <p className="mb-2"><a href="/497-sayi" className="text-white hover:text-white/70" onClick={onClose}>497. Sayı</a></p>
-                <p className="mb-2"><a href="/496-sayi" className="text-white hover:text-white/70" onClick={onClose}>496. Sayı</a></p>
-                <p className="mb-2"><a href="/495-sayi" className="text-white hover:text-white/70" onClick={onClose}>495. Sayı</a></p>
-                <p className="mb-2"><a href="/494-sayi" className="text-white hover:text-white/70" onClick={onClose}>494. Sayı</a></p>
-                <p className="mb-2"><a href="/daha-eski-sayilar" className="text-white hover:text-white/70" onClick={onClose}>Daha eski sayılar</a></p>
-              </div>
+              <>
+                <a href="/497-sayi" className={linkClass} onClick={onClose}>497. Sayı</a>
+                <a href="/496-sayi" className={linkClass} onClick={onClose}>496. Sayı</a>
+                <a href="/495-sayi" className={linkClass} onClick={onClose}>495. Sayı</a>
+                <a href="/494-sayi" className={linkClass} onClick={onClose}>494. Sayı</a>
+                <a href="/daha-eski-sayilar" className={linkClass} onClick={onClose}>Daha eski sayılar</a>
+              </>
             }
           />
         </div>
@@ -238,7 +243,6 @@ interface SiteHeaderProps {
   isTransparent?: boolean;
 }
 
-// Varsayılan olarak isTransparent false (klasik görünüm) yapıldı.
 export const SiteHeader = ({ isTransparent: initialTransparent = false }: SiteHeaderProps) => {
   const [isVisible, setIsVisible] = useState(true);
   const [isTop, setIsTop] = useState(true);
@@ -253,7 +257,6 @@ export const SiteHeader = ({ isTransparent: initialTransparent = false }: SiteHe
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
       
-      // Determine if at top
       if (currentScrollY < 10) {
         setIsTop(true);
         setIsVisible(true);
@@ -261,12 +264,11 @@ export const SiteHeader = ({ isTransparent: initialTransparent = false }: SiteHe
         setIsTop(false);
       }
 
-      // Hide/Show on scroll logic
       if (currentScrollY > 10) {
         if (currentScrollY < lastScrollY) {
-          setIsVisible(true); // Scrolling UP
+          setIsVisible(true);
         } else if (currentScrollY > lastScrollY && currentScrollY > 80) {
-          setIsVisible(false); // Scrolling DOWN
+          setIsVisible(false);
         }
       }
 
@@ -277,22 +279,21 @@ export const SiteHeader = ({ isTransparent: initialTransparent = false }: SiteHe
     return () => window.removeEventListener('scroll', handleScroll);
   }, [lastScrollY]);
 
-  // Logic: Transparent only if requested, at top, and NOT hovered
-  const isEffectiveTransparent = initialTransparent && isTop && !isHovered;
+
+  const isEffectiveTransparent = !initialTransparent && isTop && !isHovered;
 
   return (
     <>
       <header 
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
         style={{ 
-          backgroundColor: isEffectiveTransparent ? 'transparent' : '#ffffff',
-          borderColor: isEffectiveTransparent ? 'transparent' : '#e5e7eb',
           color: isEffectiveTransparent ? '#ffffff' : '#000000',
           boxShadow: isEffectiveTransparent ? 'none' : '0 1px 2px 0 rgba(0, 0, 0, 0.05)'
         }}
-        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ease-in-out border-b ${
-          isVisible ? 'translate-y-0' : '-translate-y-full'
+        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ease-in-out ${
+          isVisible ? 'translate-y-0' : '-translate-y-full'}  ${
+          isTop ? 'hover:bg-white' : 'bg-white'
         }`}
       >
         <div className="px-4 sm:px-8 md:px-16 lg:px-24 xl:px-[140px]">
@@ -313,7 +314,6 @@ export const SiteHeader = ({ isTransparent: initialTransparent = false }: SiteHe
         </div>
       </header>
 
-      {/* Full Screen Menu Overlay */}
       <MobileMenu isOpen={isMenuOpen} onClose={handleMenuClose} />
     </>
   );

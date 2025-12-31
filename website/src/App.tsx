@@ -1,9 +1,15 @@
 import { useState } from "react";
 import { Footer } from "./sections/Footer";
-import { MainContent } from "./sections/MainContent";
-import SiteHeader from "./sections/SiteHeader";
-import { DiscoverFeed } from "./sections/MainContent/sections/FeedSection/DiscoverFeed";
-import { DiscoverContext } from "./sections/MainContent/sections/FeedSection/DiscoverContext";
+import { MainContent } from "./pages/MainPage";
+import SiteHeader from "./sections/Components/SiteHeader";
+import { FloatingNavbar } from "./sections/Components/Components";
+import { ShareFloatingButton } from "./sections/Components/Components";
+import { DiscoverFeed } from "./pages/MainPage/MainContent/FeedSection/DiscoverFeed";
+import { DiscoverContext } from "./pages/MainPage/MainContent/FeedSection/DiscoverContext";
+import ArticleDetail from "./pages/ArticleDetail";
+import { FeaturedArticleDetail } from "./pages/FeaturedArticleDetail";
+import { CategoryPage } from "./pages/CategoryPage";
+import { IssuesPage } from "./pages/IssuePage";
 
 
 export const App = () => {
@@ -15,19 +21,21 @@ export const App = () => {
 
   return (
     <DiscoverContext.Provider value={{ isOpen: isDiscoverOpen, openDiscover, closeDiscover }}>
-      {/* Düzeltme: 
-        1. 'body' etiketi yerine 'div' kullanıldı (React içinde body kullanımı önerilmez).
-        2. 'min-h-screen', 'flex', 'flex-col' ile tam sayfa düzeni sağlandı.
-        3. Gereksiz 'tracking', 'leading', 'indent' gibi stiller kaldırıldı.
-        4. Arka plan rengi 'bg-white' olarak ayarlandı.
-      */}
       <div className="min-h-screen w-full flex flex-col font-bradford text-zinc-800 bg-white">
         
         <SiteHeader isTransparent={false} />
         
         {/* Main içeriği büyüyerek footer'ı aşağı iter */}
         <main className="flex-grow flex flex-col w-full">
-          <MainContent />
+
+          <div className="relative box-border caret-transparent tracking-[0.108px] z-[1] md:tracking-[0.09px]">
+                <div className="box-border caret-transparent tracking-[0.108px] md:tracking-[0.09px]">
+                  <FloatingNavbar />
+                  <SiteHeader isTransparent = {true}/>
+                  <CategoryPage />
+                </div>
+          </div>
+              
         </main>
 
         <Footer />

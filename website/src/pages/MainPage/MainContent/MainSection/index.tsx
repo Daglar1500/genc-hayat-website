@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import gh_cover from '../../../../public/gh.jpg';
+import gh_cover from '../../../../public/gh-kapak/gh.jpg';
 import rotaImage from '../../../../public/pusula.png';
 
 export const MainSection = () => {

@@ -27,7 +27,7 @@ const DesktopMenu = () => {
         {['Güncel', 'Tarih', 'Kuram', 'Felsefe', 'Kültür-Sanat', 'Dünya', 'Spor'].map((item) => (
           <a
             key={item}
-            href={`/${item.toLowerCase().replace('ü', 'u').replace('ö', 'o').replace('ı', 'i').replace('ş', 's').replace('ç', 'c')}`}
+            href={`/category/${item.toLowerCase().replace('ü', 'u').replace('ü', 'u').replace('ö', 'o').replace('ı', 'i').replace('ş', 's').replace('ç', 'c')}`}
             className="box-border caret-transparent block min-h-0 min-w-0 text-nowrap px-2.5 py-[5px] md:min-h-[auto] md:min-w-[auto] hover:bg-black/10 rounded-md transition-colors"
           >
             {item}
@@ -117,3 +117,39 @@ export const FloatingNavbar = () => {
     </div>
   );
 };
+
+export const ShareFloatingButton = () => {
+  const [isShareOpen, setIsShareOpen] = React.useState(false);
+  
+  return (
+    // Share button fixed to bottom right.
+    // The FloatingNavbar now respects this space by stopping short of the right edge on mobile.
+    <div className="fixed bottom-4 right-4 md:bottom-8 md:right-8 z-50 flex flex-col items-end gap-3">
+        <div className={`flex flex-col gap-2 transition-all duration-300 origin-bottom ${isShareOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-90 translate-y-4 pointer-events-none'}`}>
+          <button className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white shadow-lg border border-gray-200 flex items-center justify-center text-gray-700 hover:bg-black hover:text-white hover:border-black transition-colors">
+            <span className="sr-only">Twitter</span>
+            <svg className="w-4 h-4 md:w-5 md:h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
+          </button>
+          <button className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white shadow-lg border border-gray-200 flex items-center justify-center text-gray-700 hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-colors">
+            <span className="sr-only">Facebook</span>
+            <svg className="w-4 h-4 md:w-5 md:h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+          </button>
+          <button className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white shadow-lg border border-gray-200 flex items-center justify-center text-gray-700 hover:bg-green-500 hover:text-white hover:border-green-500 transition-colors">
+            <span className="sr-only">Copy Link</span>
+             <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+          </button>
+        </div>
+
+        <button 
+          onClick={() => setIsShareOpen(!isShareOpen)}
+          className={`w-12 h-12 md:w-[57px] md:h-[57px] rounded-full shadow-xl flex items-center justify-center text-white transition-colors duration-300 ${isShareOpen ? 'bg-black rotate-45' : 'bg-black hover:bg-gray-800 rotate-0'}`}
+        >
+           {isShareOpen ? (
+              <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+           ) : (
+             <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
+           )}
+        </button>
+      </div>
+  );
+}
