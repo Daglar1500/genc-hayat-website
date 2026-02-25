@@ -1,76 +1,34 @@
 import { useDiscover } from "./DiscoverContext";
-import logoRed from '../../../../public/logo-red.jpg';
-import logoEvrensel from '../../../../public/evrensel.jpg';
-import logo from '../../../../public/logo.png';
 import { useState, useEffect } from "react";
+import { MOCK_ARTICLES } from "../../../../data/MockArticles";
+import { media } from "../../../MainPage/ArticleCard";
+import { FEED_ARTICLES } from "../../../../data/MockArticles";
 
+// Tarih formatlayıcı
+const getTimeAgo = (date: Date) => {
+  const diff = new Date().getTime() - date.getTime();
+  const minutes = Math.floor(diff / 60000);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
 
-
-// --- Shared Data ---
-
-export const FEED_ITEMS = [
-  {
-    id: 1,
-    title: "Türkiye'de Gençlerin Karşılaştığı Sosyal Medya Bağımlılığı",
-    author: "Zeynep Yılmaz",
-    source: "Genç Hayat",
-    location: "İstanbul, Türkiye",
-    timeAgo: "2s",
-    imageUrl: "https://admin.itsnicethat.com/images/xgU-SDY-OWhfm5GeFswA9al_huk=/104505/format-webp|width-720/5783cf887fa44ce7c600493a.jpg",
-    logo: logoRed,
-    excerpt: "Sosyal medyanın gençler üzerindeki etkisi her geçen gün artıyor. Yapılan son araştırmalar, ekran süresinin artmasıyla birlikte anksiyete ve odaklanma sorunlarının da paralel olarak yükseldiğini gösteriyor. Peki bu dijital labirentten çıkış yolu nerede?",
-    href: "#"
-  },
-  {
-    id: 2,
-    title: "Üniversite Öğrencilerinin Kariyer Kaygıları ve Çözüm Önerileri",
-    author: "Mehmet Demir",
-    source: "Genç Hayat",
-    location: "Ankara, Türkiye",
-    timeAgo: "5dk",
-    imageUrl: "https://admin.itsnicethat.com/images/UYewhWw5_FJgCQJrANwckLyfBkM=/269630/format-webp|width-720/image_-_2171372.jpeg",
-    logo: logoEvrensel,
-    excerpt: "Mezuniyet yaklaşırken artan gelecek kaygısı, birçok öğrencinin potansiyelini tam olarak yansıtmasını engelliyor. Uzmanlar, erken dönem staj programları ve mentorluk desteğinin bu süreci yönetmede kilit rol oynadığını belirtiyor.",
-    href: "#"
-  },
-  {
-    id: 3,
-    title: "Gençlerin Mental Sağlığı: Stres Yönetimi Teknikleri",
-    author: "Elif Kaya",
-    source: "Genç Hayat",
-    location: "İzmir, Türkiye",
-    timeAgo: "15dk",
-    imageUrl: "https://admin.itsnicethat.com/images/emnRhOo2koR9RUVZc036ZExPpjw=/269593/format-webp|width-720/AAAABRtKl9umUKcf2ZO42cyqhAXyiIEiQTuorgmPWe7gWP-0uA42mQDYY8lGU9yywKhlbq75sU.jpg",
-    logo: logoRed,
-    excerpt: "Modern yaşamın hızı ve akademik beklentiler, gençlerin mental sağlığını zorluyor. Doğru nefes egzersizleri, düzenli spor ve sanatsal aktiviteler, stresle başa çıkmada basit ama etkili yöntemler sunuyor.",
-    href: "#"
-  },
-  {
-    id: 4,
-    title: "Dijital Çağda Gençlerin Okuma Alışkanlıkları",
-    author: "Caner Öztürk",
-    source: "Genç Hayat",
-    location: "Bursa, Türkiye",
-    timeAgo: "1s",
-    imageUrl: "https://admin.itsnicethat.com/images/YyAh-EnEg_3ppe64kU2xqL8UWN0=/270783/format-webp|width-720/image_-_1365896.jpeg",
-    logo: logo,
-    excerpt: "Basılı kitaplardan e-kitaplara ve sesli kitaplara geçiş, okuma alışkanlıklarını kökten değiştiriyor. Ancak format ne olursa olsun, hikayelerin gücü gençleri etkilemeye devam ediyor.",
-    href: "#"
-  }
-];
+  if (days > 0) return `${days}g önce`;
+  if (hours > 0) return `${hours}s önce`;
+  if (minutes > 0) return `${minutes}dk önce`;
+  return "Şimdi";
+};
 
 // --- Sub-Components ---
 
-// 1. FeedHeader
+// 2. FeedHeader
 export const FeedHeader = () => {
   const { openDiscover } = useDiscover();
 
   return (
     <div className="bg-zinc-100 flex items-center justify-between p-4 mb-px">
       <h2 className="text-[11px] md:text-[13px] font-medium flex gap-2 leading-[15.4px] md:leading-[18.2px]">
-          Genç Hayat Akışı
+        Genç Hayat Akışı
         <span className="text-stone-500/70">
-          11s önce güncellendi
+          Canlı
         </span>
       </h2>
       <button
@@ -83,7 +41,7 @@ export const FeedHeader = () => {
         </span>
         <span className="bg-zinc-800 text-white w-4 h-4 flex items-center justify-center">
           <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor">
-            <path d="M3 2l4 3-4 3V2z"/>
+            <path d="M3 2l4 3-4 3V2z" />
           </svg>
         </span>
       </button>
@@ -91,42 +49,49 @@ export const FeedHeader = () => {
   );
 };
 
-// 2. FeedCard
-type FeedCardProps = {
+// 3. FeedCard & Tipler
+export type FeedCardProps = {
   href: string;
-  imageUrl: string;
-  imageAlt: string;
+  media: media;
   title: string;
   source: string;
   timeAgo: string;
+  description?: string; // Hata almamak için burayı opsiyonel (?) string yaptık
 };
 
 export const FeedCard = (props: FeedCardProps) => {
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full animate-in fade-in slide-in-from-right-4 duration-700 ease-in-out">
       <a
         href={props.href}
         className="bg-zinc-100 hover:bg-red-600/10 transition-colors duration-200 flex h-full group"
       >
+        {/* Görsel Alanı */}
         <div className="relative aspect-square min-w-[93px] md:aspect-[120/109] md:min-w-[120px] h-full">
           <div className="h-0 w-full overflow-hidden">
             <div className="absolute inset-0">
               <img
-                alt={props.imageAlt}
-                src={props.imageUrl}
+                alt={props.media.alt}
+                src={props.media.src}
                 className="absolute inset-0 w-full h-full object-cover"
               />
             </div>
           </div>
         </div>
+
+        {/* Metin Alanı */}
         <div className="p-3 md:p-4 flex flex-col justify-between w-full font-medium">
           <p className="text-zinc-800 text-[13px] leading-[18.2px] group-hover:text-red-600 transition-colors duration-200 line-clamp-3 overflow-hidden">
             {props.title}
           </p>
-          <div className="flex justify-between gap-2">
+
+          <div className="flex justify-between items-center gap-2">
+            {/* Kaynak (Yazı Olarak) */}
             <span className="text-stone-500 text-[11px] leading-[15.4px] block">
               {props.source}
             </span>
+
+            {/* Zaman */}
             <span className="text-stone-500/40 text-[11px] leading-[15.4px] block">
               {props.timeAgo}
             </span>
@@ -137,38 +102,83 @@ export const FeedCard = (props: FeedCardProps) => {
   );
 };
 
-// 3. FeedCarousel
-export const FeedCarousel = () => {
-  const getVisibleItems = () => {
-    if (typeof window === 'undefined') return FEED_ITEMS;
-    
-    const width = window.innerWidth;
-    if (width < 640) return FEED_ITEMS.slice(0, 1); // Mobile: 1 card
-    if (width < 1024) return FEED_ITEMS.slice(0, 2); // Tablet: 2 cards
-    if (width < 1280) return FEED_ITEMS.slice(0, 3); // Medium: 3 cards
-    return FEED_ITEMS; // Large: 4 cards
-  };
+// --- DATA MERGE LOGIC (2 Mock - 1 Feed) ---
+// Bu veriyi burada hazırlayıp export ediyoruz ki DiscoverFeed de aynısını kullansın.
 
-  const [visibleItems, setVisibleItems] = useState(getVisibleItems());
+// 1. Standart Format
+const formattedMocks = MOCK_ARTICLES.map(m => ({
+  href: m.href,
+  media: m.firstMedia!,
+  title: m.title,
+  source: "Genç Hayat",
+  timeAgo: getTimeAgo(m.publishedDate),
+  description: m.description // Mock datadan gelen description (undefined olabilir)
+}));
+
+const formattedFeeds = FEED_ARTICLES.map(f => ({
+  href: f.href,
+  media: f.media,
+  title: f.title,
+  source: f.source,
+  timeAgo: f.timeAgo,
+  description: f.description || f.title // Feed datada description yoksa title kullan
+}));
+
+// 2. Birleştirme (2 Mock, 1 Feed döngüsü)
+export const COMBINED_FEED_DATA: FeedCardProps[] = [];
+let mIndex = 0;
+let fIndex = 0;
+
+while (mIndex < formattedMocks.length || fIndex < formattedFeeds.length) {
+  if (mIndex < formattedMocks.length) COMBINED_FEED_DATA.push(formattedMocks[mIndex++]);
+  if (mIndex < formattedMocks.length) COMBINED_FEED_DATA.push(formattedMocks[mIndex++]);
+  if (fIndex < formattedFeeds.length) COMBINED_FEED_DATA.push(formattedFeeds[fIndex++]);
+}
+
+// 4. FeedCarousel
+export const FeedCarousel = () => {
+  const [itemsToShow, setItemsToShow] = useState(4);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
     const handleResize = () => {
-      setVisibleItems(getVisibleItems());
+      if (typeof window === 'undefined') return;
+      const width = window.innerWidth;
+      if (width < 640) setItemsToShow(1);
+      else if (width < 1024) setItemsToShow(2);
+      else if (width < 1280) setItemsToShow(3);
+      else setItemsToShow(4);
     };
 
+    handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // 3 Saniyelik Otomatik Geçiş
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % COMBINED_FEED_DATA.length);
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const visibleItems = [];
+  for (let i = 0; i < itemsToShow; i++) {
+    const index = (currentIndex + i) % COMBINED_FEED_DATA.length;
+    visibleItems.push(COMBINED_FEED_DATA[index]);
+  }
+
   return (
     <div className="overflow-hidden">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-0 h-auto">
-        {visibleItems.map((item) => (
+        {visibleItems.map((item, i) => (
           <FeedCard
-            key={item.id}
+            // Key, animasyonun düzgün çalışması için benzersiz olmalı
+            key={`${item.title}-${i}-${currentIndex}`}
             href={item.href}
-            imageUrl={item.imageUrl}
-            imageAlt={item.title}
+            media={item.media}
             title={item.title}
             source={item.source}
             timeAgo={item.timeAgo}

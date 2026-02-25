@@ -29,6 +29,19 @@
   font-style: normal;
 }
 
+@font-face {
+  font-family: 'TT Interphases Mono';
+  src: url('./fonts/TTInterphasesMono-Regular.woff2') format('woff2'); /* Dosya yolunu kendinize göre düzenleyin */
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'TT Interphases Mono';
+  src: url('./fonts/TTInterphasesMono-Bold.woff2') format('woff2');
+  font-weight: bold;
+  font-style: normal;
+}
+
 @tailwind base;
 
 @layer base {

@@ -6,13 +6,14 @@ export const Label = ({ label }: { label: string }) => (
       {label}
     </span>
   </div>
-); 
+);
 
 
 export class Labelo {
   public name: string;
   public href: string;
   public type: "none" | "category" | "tag" | "thematic" | "featured";
+  public color: number; // Renk artık number tipinde (Hex)
 
   constructor(
     type: "none" | "category" | "tag" | "thematic" | "featured",
@@ -20,15 +21,55 @@ export class Labelo {
   ) {
     this.name = name;
     this.type = type;
-    
+
+    // Varsayılan renk (Kırmızı - Red-600: #DC2626)
+    let assignedColor = 0xDC2626;
+
+    // Kategoriye özel Hex renk atamaları (0x ile başlar)
+    if (type === "category") {
+      switch (name.toLowerCase()) {
+        case "tarih":
+          assignedColor = 0xEAB308; // Sarı (Yellow-500)
+          break;
+        case "güncel":
+          assignedColor = 0xA855F7; // Mor (Purple-500)
+          break;
+        case "kuram":
+          assignedColor = 0x3B82F6; // Mavi (Blue-500)
+          break;
+        case "felsefe":
+          assignedColor = 0x14B8A6; // Turkuaz (Teal-500)
+          break;
+        case "kültür-sanat":
+          assignedColor = 0xEC4899; // Pembe (Pink-500)
+          break;
+        case "dünya":
+          assignedColor = 0x6366F1; // İndigo (Indigo-500)
+          break;
+        case "spor":
+          assignedColor = 0x22C55E; // Yeşil (Green-500)
+          break;
+        default:
+          assignedColor = 0xDC2626; // Varsayılan
+      }
+    }
+
+    this.color = assignedColor;
+
     const slug = name.toLowerCase().replace(/\s+/g, "-");
-    this.href = `/${type}/${slug}`;
+    if (type === "tag") {
+      this.href = `/category?tag=${encodeURIComponent(name)}`;
+    } else if (type === "category") {
+      this.href = `/category?category=${encodeURIComponent(name)}`;
+    } else {
+      this.href = `/${type}/${slug}`;
+    }
   }
 }
 
 
 export const LabeloDefault: Labelo[] = [
-  new Labelo("none", "default"),
+  new Labelo("category", "default"),
   new Labelo("category", "güncel"),
   new Labelo("category", "tarih"),
   new Labelo("category", "kuram"),
@@ -202,7 +243,7 @@ export type ArticleCard = {
   firstMedia?: media;
   twoLabelShown?: Labelo[];
   tags?: Array<Labelo>;
-  category: Labelo; 
+  category: Labelo;
   content: block | block[];
 };
 
@@ -218,8 +259,8 @@ export const ArticleCardElement = (card: ArticleCard) => {
   }
 
   const renderTwoLabel = () => {
-    const allLabels = [ 
-      card.category,  
+    const allLabels = [
+      card.category,
       ...(card.tags || [])
     ];
 
@@ -237,13 +278,13 @@ export const ArticleCardElement = (card: ArticleCard) => {
               key={index}
               className="box-border caret-transparent inline-block tracking-[0.108px] text-left mr-1 mb-1 md:tracking-[0.09px]"
             >
-            <a 
-              href={tagOrCategory.href}
-              data-tag={tagOrCategory.name} // <--- BU SATIR EKLENDİ
-              className="cursor-pointer"
-            >
-              <Label label={tagOrCategory.name} />
-            </a>
+              <a
+                href={tagOrCategory.href}
+                data-tag={tagOrCategory.name} // <--- BU SATIR EKLENDİ
+                className="cursor-pointer"
+              >
+                <Label label={tagOrCategory.name} />
+              </a>
             </li>
           ))}
 
@@ -257,7 +298,7 @@ export const ArticleCardElement = (card: ArticleCard) => {
                 }}
                 className="relative box-border caret-transparent block tracking-[0.108px] md:tracking-[0.09px] cursor-pointer"
               >
-                 <Label label="..." />
+                <Label label="..." />
               </button>
             </li>
           )}
@@ -296,7 +337,7 @@ export const ArticleCardElement = (card: ArticleCard) => {
 
   return (
     <div className="box-border caret-transparent float-left tracking-[0.108px] w-full md:tracking-[0.09px] ">
-      <div className="bg-gray-50 box-border caret-transparent tracking-[0.108px] mr-px mb-px pb-4 md:tracking-[0.09px]">
+      <div className="bg-white box-border caret-transparent tracking-[0.108px] mr-px mb-px pb-4 md:tracking-[0.09px]">
         <div className="box-border caret-transparent tracking-[0.108px] md:tracking-[0.09px]">
           <a
             href={card.href}
@@ -304,42 +345,42 @@ export const ArticleCardElement = (card: ArticleCard) => {
           >
             {renderMedia()}
           </a>
-          
+
           <div className="box-border caret-transparent block tracking-[0.108px] pt-3 md:tracking-[0.09px] px-5 md:px-0">
             <a href={card.href} className="block group">
-                {/* TITLE */}
-                <h3 className="text-lg box-border caret-transparent tracking-[1px] leading-6 font-labilvariable md:leading-[23px] hover:text-red-600 transition-colors duration-200">
+              {/* TITLE */}
+              <h3 className="text-lg box-border caret-transparent tracking-[1px] leading-6 font-labilvariable md:leading-[23px] hover:text-red-600 transition-colors duration-200">
                 <span className="box-border caret-transparent leading-6 md:leading-[23px]">
-                    {card.title}
+                  {card.title}
                 </span>
-                </h3>
-                
-                {/* METADATA SECTION */}
-                <div className="text-stone-500 text-[11px] box-border caret-transparent tracking-[1px] leading-4 mt-2.5 font-labilvariable md:font-labil flex flex-col gap-0.5">
-                  
-                  {/* Author */}
-                  <span className="text-black font-medium">
-                    {card.author}
-                  </span>
+              </h3>
 
-                  {/* Location (Combines Place + Location) */}
-                  {(card.place || card.location) && (
-                    <span className="text-stone-400 italic">
-                      {[card.place, card.location].filter(Boolean).join(", ")}
-                    </span>
-                  )}
-                  
-                  {/* Date • Issue Number */}
-                  <span className="text-stone-400">
-                      {card.publishedDate?.toLocaleDateString('tr-TR', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric'
-                      })}
-                      {' • '}
-                      Sayı {card.issueNumber}
+              {/* METADATA SECTION */}
+              <div className="text-stone-500  box-border caret-transparent tracking-[1px] leading-4 mt-2.5 font-labilvariable md:font-labil flex flex-col gap-0.5">
+
+                {/* Author */}
+                <span className="text-black font-medium text-[14px]">
+                  {card.author}
+                </span>
+
+                {/* Location (Combines Place + Location) */}
+                {(card.place || card.location) && (
+                  <span className="text-stone-600 italic text-[12px]">
+                    {card.place || card.location}
                   </span>
-                </div>
+                )}
+
+                {/* Date • Issue Number */}
+                <span className="text-stone-600 text-[12px]">
+                  {card.publishedDate?.toLocaleDateString('tr-TR', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
+                  {' • '}
+                  Sayı {card.issueNumber}
+                </span>
+              </div>
             </a>
 
             {/* Labels */}

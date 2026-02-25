@@ -1,5 +1,5 @@
 import { ArticleCard, Labelo, block, text, media, LabeloDefault } from "./MainPage/ArticleCard";
-
+import { FeedCardProps } from "./MainPage/MainContent/FeedSection";
 
 // Helper to safely find label
 const getLabel = (name: string, type: "category" | "tag" = "category") => {
@@ -24,12 +24,12 @@ export const MOCK_ARTICLES: ArticleCard[] = [
       src: "https://i0.wp.com/therollingtape.com/wp-content/uploads/2025/11/Pluribus_Photo_010205-H-2025.jpeg"
     },
     tags: [ 
-      LabeloDefault.find(x => x.name === "kültür-sanat")!, 
       LabeloDefault.find(x => x.name === "sinema")!, 
       LabeloDefault.find(x => x.name === "dizi")!,
-      LabeloDefault.find(x => x.name === "psikoloji")!
+      LabeloDefault.find(x => x.name === "psikoloji")!,
+      LabeloDefault.find(x => x.name === "dijital kültür")!
     ],
-    category: LabeloDefault.find(x => x.name === "kultur-sanat")!,
+    category: LabeloDefault.find(x => x.name === "kültür-sanat")!,
     content: [
       {
         blockContent: {
@@ -173,27 +173,9 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   
   // --- KÜLTÜR-SANAT (7 Adet) ---
   {
-    href: "/articles/pluribus-soguk-savas",
-    title: "Pluribus: Soğuk Savaş’tan dijital çağa kolektivizm kâbusları",
-    description: "Dizinin asıl açtığı soru, şu: “İnsanlığın gerçekten kurtulması için, hepimizin aynı zihinle düşünmesi mi gerekiyor?”",
-    author: "Fırat Aslan",
-    place: "Psikoloji Bölümü",
-    location: "Boğaziçi Üniversitesi",
-    issueNumber: 504,
-    publishedDate: new Date("2025-11-20"),
-    firstMedia: {
-      href: "/articles/pluribus-soguk-savas",
-      type: "image",
-      src: "https://i0.wp.com/therollingtape.com/wp-content/uploads/2025/11/Pluribus_Photo_010205-H-2025.jpeg"
-    },
-    category: getLabel("kültür-sanat", "category"),
-    tags: [getLabel("sinema", "tag"), getLabel("dizi", "tag"), getLabel("psikoloji", "tag")],
-    content: [{ blockContent: { type: "text", textContent: "Vince Gilligan’ın Apple TV’de yayınlanan yeni dizisi Pluribus..." } }]
-  },
-  {
     href: "/articles/oguz-atay-yeniden",
     title: "Oğuz Atay’ı Yeniden Okumak: Tutunamayanlar’ın Güncelliği",
-    description: "Bugünün prekaryası, Atay’ın 'tutunamayanlar'ını kendi aynasında görüyor.",
+    description: "Bugünün prekaryası, Atay’ın 'tutunamayanlar'ını kendi aynasında görerek toplumsal uyumsuzluğun modern tezahürlerini sorguluyor. Selim Işık'ın 70'li yıllarda yaşadığı aydın bunalımı, günümüzün ekonomik ve kültürel belirsizlikleri içinde sıkışan bireylerin hikayesiyle şaşırtıcı benzerlikler taşıyor. Bu inceleme, romanın sadece edebi bir eser değil, aynı zamanda toplumsal bir teşhis olarak nasıl hala geçerliliğini koruduğunu tartışıyor.",
     author: "Selin Kaya",
     place: "Karşılaştırmalı Edebiyat",
     location: "İstanbul Bilgi Üniversitesi",
@@ -211,7 +193,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/sinema-ve-tasra",
     title: "Taşra Sıkıntısından Evrensel Bunalıma: Nuri Bilge Sineması",
-    description: "Ahlat Ağacı'ndan Kuru Otlar Üstüne'ye taşranın değişmeyen makus talihi.",
+    description: "Nuri Bilge Ceylan sinemasının değişmez izleği olan taşra sıkıntısı, yerel bir sorun olmaktan çıkıp evrensel bir varoluş sancısına dönüşüyor. Ahlat Ağacı'ndan Kuru Otlar Üstüne'ye uzanan filmografisinde yönetmen, taşranın boğucu atmosferini karakterlerin içsel çatışmalarıyla ustaca harmanlıyor. Yazımızda, yönetmenin görsel dili ve anlatım teknikleri üzerinden taşranın makus talihinin sinematografik yansımalarını analiz ediyoruz.",
     author: "Berk Güneş",
     place: "Radyo TV Sinema",
     location: "Marmara Üniversitesi",
@@ -229,7 +211,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/bagimsiz-muzik",
     title: "Kadıköy Sound'dan Dijital Platformlara Alternatif Müzik",
-    description: "Bağımsız müzisyenler algoritmaların arasında kaybolmadan nasıl hayatta kalıyor?",
+    description: "Bağımsız müzisyenler, dijital platformların ve acımasız algoritmaların arasında sanatlarını icra etmeye çalışırken büyük bir varoluş mücadelesi veriyor. Spotify listelerine girme baskısı ve sahnede kalma zorunluluğu arasında sıkışan genç sanatçılar, alternatif yollar arayarak kendi kitlelerini yaratmaya çabalıyor. Bu araştırma, Kadıköy'ün yeraltı sahnelerinden dijital dünyanın vitrinlerine uzanan bu zorlu yolculuğun dinamiklerini ele alıyor.",
     author: "Ece Yılmaz",
     place: "Kültür Yönetimi",
     location: "İstanbul Bilgi Üniversitesi",
@@ -247,7 +229,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/sokak-sanati",
     title: "Duvarlar Konuşuyor: Politik Bir Eylem Olarak Graffiti",
-    description: "Karaköy sokaklarından Berlin duvarına, sprey boyanın isyanı.",
+    description: "Karaköy'ün dar sokaklarından Berlin Duvarı'nın yıkıntılarına kadar graffiti, sprey boyanın isyanı olarak kent dokusuna kazınmaya devam ediyor. Sokak sanatı, sadece estetik bir dışavurum değil, aynı zamanda kamusal alanın mülkiyetini ve kullanımını sorgulayan politik bir eylem biçimi olarak öne çıkıyor. Banksy gibi figürlerin popüler kültürün bir parçası haline gelmesiyle birlikte, bu sanat dalının ticarileşme ve özgünlüğünü koruma ikilemini tartışıyoruz.",
     author: "Caner Erkin",
     place: "Güzel Sanatlar Fakültesi",
     location: "Mimar Sinan GSÜ",
@@ -256,7 +238,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     firstMedia: {
       href: "/articles/sokak-sanati",
       type: "image",
-      src: "https://images.unsplash.com/photo-1499781350541-7783f6c6a0c8?q=80&w=1600"
+      src: "https://cooltourspain.com/wp-content/uploads/2020/04/grafiti-art-915x488.jpg"
     },
     category: getLabel("kültür-sanat"),
     tags: [getLabel("sokak sanatı", "tag"), getLabel("kent yaşamı", "tag"), getLabel("sanat eleştirisi", "tag")],
@@ -265,7 +247,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/tiyatro-direniyor",
     title: "Alternatif Sahneler ve Ödeneksiz Tiyatro Gerçeği",
-    description: "Kadıköy ve Beyoğlu'nun küçük sahnelerinde büyük hikayeler anlatılıyor.",
+    description: "Pandemi sonrası dönemde tiyatroların ayakta kalma savaşı sürerken, Kadıköy ve Beyoğlu'nun küçük sahnelerinde büyük ve cesur hikayeler anlatılmaya devam ediyor. Ödeneksiz tiyatrolar, ekonomik zorluklara ve sansür baskısına rağmen kolektif üretim modelleriyle sanatı halka ulaştırmanın yollarını arıyor. Bu yazı, sahne arkasındaki görünmeyen emeği ve tiyatrocuların dayanışma ağlarını mercek altına alıyor.",
     author: "Nazlı Çelik",
     place: "Tiyatro Eleştirmenliği",
     location: "İstanbul Üniversitesi",
@@ -274,7 +256,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     firstMedia: {
       href: "/articles/tiyatro-direniyor",
       type: "image",
-      src: "https://images.unsplash.com/photo-1507676184212-d0370baf236d?q=80&w=1600"
+      src: "https://blog.sarar.com/wp-content/uploads/istanbul-tiyatro-festivali-kapak.png"
     },
     category: getLabel("kültür-sanat"),
     tags: [getLabel("tiyatro", "tag"), getLabel("kültürel üretim", "tag"), getLabel("emek mücadelesi", "tag")],
@@ -283,7 +265,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/cagdas-sanat",
     title: "Bienal Eleştirisi: Sanat Kimin İçin?",
-    description: "Beyaz küp galerilerin dışına taşan sanat, halkla buluşabiliyor mu?",
+    description: "Beyaz küp galerilerin steril ortamından dışarı taşmaya çalışan çağdaş sanat, gerçekten halkla buluşabiliyor mu yoksa sadece elit bir zümreye mi hitap ediyor? Büyük sermaye gruplarının sponsorluğunda gerçekleşen bienaller, sanatın eleştirel gücünü törpülerken, bağımsız sanatçılar bu çelişki içinde kendilerine yer bulmaya çalışıyor. Sanatın metalaşması ve kamusal erişilebilirliği üzerine eleştirel bir bienal okuması yapıyoruz.",
     author: "Selin Artuk",
     place: "Sanat Tarihi",
     location: "Hacettepe Üniversitesi",
@@ -292,7 +274,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     firstMedia: {
       href: "/articles/cagdas-sanat",
       type: "image",
-      src: "https://images.unsplash.com/photo-1571115764595-644a1f56a55c?q=80&w=1600"
+      src: "https://sanatormani.com/wp-content/uploads/2022/12/bianel-nedir-sanatormani.jpg"
     },
     category: getLabel("kültür-sanat"),
     tags: [getLabel("sergi", "tag"), getLabel("sanat eleştirisi", "tag"), getLabel("kapitalizm", "tag")],
@@ -304,7 +286,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/beton-ve-bellek",
     title: "Beton ve Bellek: İstanbul’un Kaybolan Meydanları",
-    description: "Meydanlar sadece boşluklar değil, demokratik karşılaşma alanlarıdır.",
+    description: "İstanbul’un meydanları sadece kentsel boşluklar değil, aynı zamanda toplumsal hafızanın ve demokratik karşılaşmaların yaşandığı hayati alanlardır. Son yirmi yılda hızlanan kentsel dönüşüm projeleriyle birlikte, bu meydanların betona gömülmesi ve ticarileştirilmesi kentlilerin yaşam alanlarını daraltıyor. Bu makale, Taksim'den Üsküdar'a uzanan meydan düzenlemelerinin ardındaki politik tercihleri ve kent hakkı mücadelesini irdeliyor.",
     author: "Zeynep Yılmaz",
     place: "Şehir ve Bölge Planlama",
     location: "İTÜ",
@@ -322,7 +304,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/iklim-krizi-greenwashing",
     title: "Yeşil Aklama (Greenwashing) Yalanları",
-    description: "Şirketlerin 'sürdürülebilirlik' raporları, gezegeni kurtarmak için mi?",
+    description: "Büyük şirketlerin yayımladığı 'sürdürülebilirlik' raporları, gezegeni kurtarmayı mı hedefliyor yoksa çevreye verdikleri zararı şık ambalajlarla gizlemeyi mi? Karbon ayak izini bireysel tüketicilere yükleyen hakim söylem, endüstriyel kirliliğin asıl sorumlularını gözden kaçırmamıza neden oluyor. Yeşil aklama stratejilerinin perde arkasını aralıyor ve iklim kriziyle mücadelenin gerçekçi yollarını tartışıyoruz.",
     author: "Ece Vural",
     place: "Ekoloji Topluluğu",
     location: "Muğla",
@@ -331,7 +313,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     firstMedia: {
       href: "/articles/iklim-krizi-greenwashing",
       type: "image",
-      src: "https://images.unsplash.com/photo-1611273426761-53c8577a20fa?q=80&w=1600"
+      src: "https://i0.wp.com/www.ykp.org.cy/wp-content/uploads/2011/04/story.jpg"
     },
     category: getLabel("güncel"),
     tags: [getLabel("iklim krizi", "tag"), getLabel("doğa talanı", "tag"), getLabel("kapitalizm", "tag")],
@@ -340,7 +322,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/barinma-krizi",
     title: "Öğrenci Evinden Çıkamamak: Barınma Krizi",
-    description: "Büyükşehirlerde kiralar uçarken, öğrenciler kampüslere sığamıyor.",
+    description: "Büyükşehirlerde kiraların astronomik seviyelere ulaşmasıyla birlikte üniversite öğrencileri kampüslere ve şehirlere sığamaz hale geldi. KYK yurtlarının yetersiz kapasitesi ve özel yurtların fahiş fiyatları, öğrencileri sağlıksız ve güvencesiz barınma koşullarına itiyor. Öğrenci hareketinin gündemine oturan barınma sorununun ekonomik ve sosyal boyutlarını, öğrencilerin yaşadığı mağduriyetler üzerinden ele alıyoruz.",
     author: "Mehmet Demir",
     place: "Sosyoloji",
     location: "ODTÜ",
@@ -358,7 +340,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/goc-yollari",
     title: "Sınırdaki Hayatlar: Göç ve Entegrasyon",
-    description: "Türkiye'nin göçmen politikası ve toplumsal yansımaları.",
+    description: "Türkiye'nin göçmen politikası, sadece sınır güvenliği meselesi değil, aynı zamanda toplumsal uyum ve insan hakları ekseninde ele alınması gereken çok katmanlı bir sorundur. Mültecilerin kayıt dışı ekonomi içindeki konumu ve yaşadıkları sömürü, göçmen karşıtlığı üzerinden yükselen siyasi söylemlerle daha da karmaşık bir hal alıyor. Bu yazı, göç olgusunu insani ve sosyolojik bir perspektiften değerlendirerek entegrasyon tartışmalarına ışık tutuyor.",
     author: "Ayşe Yılmaz",
     place: "Uluslararası İlişkiler",
     location: "Galatasaray Üniversitesi",
@@ -367,7 +349,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     firstMedia: {
       href: "/articles/goc-yollari",
       type: "image",
-      src: "https://images.unsplash.com/photo-1488330890490-c291ecb62571?q=80&w=1600"
+      src: "https://perspektif.eu/wp-content/uploads/2025/05/Goc-1024x683.jpg"
     },
     category: getLabel("güncel"),
     tags: [getLabel("göç", "tag"), getLabel("insan hakları", "tag"), getLabel("sosyoloji", "tag")],
@@ -376,7 +358,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/dijital-bagimlilik",
     title: "Ekran Süresi ve Kayıp Gençlik",
-    description: "Sosyal medya algoritmaları dikkatimizi nasıl çalıyor?",
+    description: "Sosyal medya algoritmaları, dopamin döngüsünü tetikleyerek dikkatimizi çalmak ve bizi ekranlara hapsetmek üzerine kusursuzca tasarlanmış durumda. Sonsuz kaydırma tuzağına düşen genç kuşaklar, dijital bağımlılığın getirdiği odaklanma sorunları ve sosyal izolasyonla mücadele ediyor. Teknolojinin psikolojimiz üzerindeki etkilerini inceleyen bu yazı, dijital detoks ve bilinçli kullanım üzerine öneriler sunuyor.",
     author: "Dr. Ali Vural",
     place: "Psikoloji",
     location: "Üsküdar Üniversitesi",
@@ -394,7 +376,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/kadin-cinayetleri",
     title: "İstanbul Sözleşmesi ve Sonrası",
-    description: "Kadın mücadelesi sokakta devam ederken yasal güvenceler ne durumda?",
+    description: "Kadın mücadelesi sokaklarda ve meydanlarda tüm hızıyla devam ederken, yasal güvencelerin erozyona uğraması şiddetle mücadeleyi sekteye uğratıyor. İstanbul Sözleşmesi'nden çıkılmasının yarattığı hukuki boşluk ve 6284 sayılı kanunun uygulanmasındaki sorunlar, kadınların yaşam hakkını doğrudan tehdit ediyor. Bu dosya, hukuki süreçlerin işleyişini ve kadın hareketinin taleplerini detaylı bir şekilde inceliyor.",
     author: "Elif Sönmez",
     place: "Hukuk Fakültesi",
     location: "Ankara Üniversitesi",
@@ -403,7 +385,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     firstMedia: {
       href: "/articles/kadin-cinayetleri",
       type: "image",
-      src: "https://images.unsplash.com/photo-1596280803450-48d538622c95?q=80&w=1600"
+      src: "https://sarkac.org/wp-content/uploads/2021/07/İstanbul-Sözleşmesi-Yaşatir-640x427-1.jpg"
     },
     category: getLabel("güncel"),
     tags: [getLabel("kadın mücadelesi", "tag"), getLabel("hukuk", "tag"), getLabel("siyaset", "tag")],
@@ -412,7 +394,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/issizlik",
     title: "Diplomalı İşsizler Ordusu",
-    description: "Üniversite mezunları neden iş bulamıyor? Eğitim ve istihdam kopukluğu.",
+    description: "Üniversite mezunu gençlerin iş bulma ümidi her geçen gün azalırken, eğitim sistemi ile istihdam piyasası arasındaki kopukluk derinleşiyor. Genç işsizliği oranlarının tarihi zirvelere ulaştığı bu dönemde, diplomalar birer kağıt parçasına dönüşme riskiyle karşı karşıya kalıyor. Neoliberal politikaların yarattığı güvencesizlik ortamında gençlerin gelecek kaygısını ve çözüm arayışlarını veriler ışığında tartışıyoruz.",
     author: "Can Berk",
     place: "İktisat",
     location: "Yıldız Teknik Üniversitesi",
@@ -430,7 +412,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/gida-krizi",
     title: "Tarladan Sofraya Enflasyon",
-    description: "Gıda fiyatlarındaki artışın arkasında yatan tarım politikaları.",
+    description: "Gıda fiyatlarındaki durdurulamaz artış, sadece bir enflasyon sorunu değil, yıllardır uygulanan yanlış tarım politikalarının acı bir sonucudur. İthalata dayalı tarım modeli, yerli üreticiyi toprağından koparırken tüketicinin de gıdaya erişimini zorlaştırıyor. Tarladan sofraya uzanan tedarik zincirindeki kopuşları ve sürdürülebilir bir gıda politikası için yapılması gerekenleri uzman görüşleriyle ele alıyoruz.",
     author: "Ahmet Çiftçi",
     place: "Ziraat Mühendisliği",
     location: "Ege Üniversitesi",
@@ -451,7 +433,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/modernlesme-sancilari",
     title: "Erken Cumhuriyet'te Taşra ve Merkez Gerilimi",
-    description: "Ankara'nın inşası sadece bir başkent projesi değil, bir toplum mühendisliğiydi.",
+    description: "Ankara'nın inşası sadece yeni bir başkent projesi değil, aynı zamanda modernleşme hamlesinin Anadolu'ya yayılmasını hedefleyen kapsamlı bir toplum mühendisliği girişimiydi. Yakup Kadri'nin 'Yaban' romanında da işlendiği gibi, aydın ile köylü arasındaki mesafe ve çatışma, Cumhuriyet'in ilk yıllarındaki toplumsal dönüşümün en sancılı yönlerinden birini oluşturuyordu. Bu çalışma, merkezden taşraya uzanan modernleşme dalgasının yarattığı kültürel gerilimleri tarihsel bir perspektifle inceliyor.",
     author: "Elif Demir",
     place: "Tarih Bölümü",
     location: "Tarih Vakfı",
@@ -460,7 +442,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     firstMedia: {
       href: "/articles/modernlesme-sancilari",
       type: "image",
-      src: "https://images.unsplash.com/photo-1588663459145-8a2b5b376d8b?q=80&w=1600"
+      src: "https://saltonline.org/directus/media/thumbnails/4-izmir-isci-esnaf-kurumlar-mitingi-tahminen-1930larn-ikinci-yars-1-1-jpg-780-5000-false.jpg"
     },
     category: getLabel("tarih"),
     tags: [getLabel("cumhuriyet dönemi", "tag"), getLabel("siyasi tarih", "tag"), getLabel("sosyoloji", "tag")],
@@ -469,7 +451,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/68-hareketi",
     title: "Türkiye'de 68 Kuşağı: Bir Ütopya Arayışı",
-    description: "Deniz Gezmiş ve arkadaşlarının mirası bugün nasıl okunmalı?",
+    description: "Deniz Gezmiş ve arkadaşlarının öncülük ettiği 68 kuşağı hareketi, Türkiye'nin siyasi tarihinde bağımsızlık ve devrim idealleriyle özdeşleşen silinmez bir iz bıraktı. Üniversite işgalleriyle başlayan ve antiemperyalist bir mücadeleye dönüşen bu süreç, gençliğin toplumsal muhalefetteki rolünü yeniden tanımladı. O dönemin tanıklıkları ve belgeleri ışığında, 68 hareketinin mirasının bugün nasıl okunması gerektiğini ve günümüz gençliğine neler söylediğini tartışıyoruz.",
     author: "Orhan Aydın",
     place: "Siyaset Bilimi",
     location: "Mülkiye",
@@ -487,7 +469,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/osmanli-modernlesmesi",
     title: "Tanzimat'tan Meşrutiyet'e Batılılaşma",
-    description: "Osmanlı aydınının Doğu-Batı ikilemi.",
+    description: "Osmanlı aydınının Doğu ile Batı arasında sıkışmışlığı, İmparatorluğun son dönemindeki modernleşme çabalarının hem itici gücü hem de en büyük açmazı olmuştur. Tanzimat Fermanı ile başlayan ve Meşrutiyet ile hız kazanan anayasal hareketler, devletin kurtuluşu için aranan reçetelerin çeşitliliğini gözler önüne seriyor. Jön Türkler'den İttihatçılara uzanan bu fikri süreklilik içinde, Osmanlı modernleşmesinin entelektüel köklerine iniyoruz.",
     author: "Prof. Dr. İlber K.",
     place: "Tarih",
     location: "Galatasaray Lisesi",
@@ -496,7 +478,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     firstMedia: {
       href: "/articles/osmanli-modernlesmesi",
       type: "image",
-      src: "https://images.unsplash.com/photo-1565060169194-118430f8983c?q=80&w=1600"
+      src: "https://apiko.ayk.gov.tr/uploads/2/imagesFile/15229.jpg?size=775x888"
     },
     category: getLabel("tarih"),
     tags: [getLabel("osmanlı dönemi", "tag"), getLabel("düşünce tarihi", "tag"), getLabel("kültür", "tag")],
@@ -505,7 +487,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/koy-enstituleri",
     title: "Yarım Kalmış Bir Mucize: Köy Enstitüleri",
-    description: "Anadolu'nun aydınlanma projesi neden kapatıldı?",
+    description: "Anadolu'nun aydınlanma projesi olarak hayata geçirilen Köy Enstitüleri, sadece bir eğitim hamlesi değil, aynı zamanda kırsal kalkınmayı hedefleyen devrimci bir modeldi. Tonguç Baba ve Hasan Ali Yücel'in vizyonuyla kurulan bu okullar, öğrencilerine sadece teorik bilgi değil, hayatı dönüştürecek pratik beceriler de kazandırıyordu. Enstitülerin kapatılma süreci ve bu yarım kalmış mucizenin Türk eğitim sisteminde yarattığı boşluğu derinlemesine inceliyoruz.",
     author: "Ayşe Öğretmen",
     place: "Eğitim Fakültesi",
     location: "Gazi Üniversitesi",
@@ -523,7 +505,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/isci-sinifi-tarihi",
     title: "15-16 Haziran ve İşçi Sınıfının Uyanışı",
-    description: "Türkiye tarihinin en büyük işçi eylemi bize ne anlatıyor?",
+    description: "Türkiye işçi sınıfı tarihinin en büyük kitlesel eylemi olan 15-16 Haziran 1970 olayları, sendikal hakların kısıtlanmasına karşı verilen örgütlü bir cevap olarak tarihe geçti. DİSK'in kapatılmasına karşı İstanbul ve Kocaeli sokaklarını dolduran yüz binlerce işçi, sınıf bilincinin gücünü tüm ülkeye gösterdi. Bu dosya, o gün yaşananları, işçilerin taleplerini ve bu direnişin Türkiye siyasetindeki uzun erimli etkilerini ele alıyor.",
     author: "Kemal İşler",
     place: "Çalışma Ekonomisi",
     location: "Kocaeli Üniversitesi",
@@ -541,7 +523,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/soguk-savas-turkiye",
     title: "NATO'ya Giriş ve Türkiye'nin Yönü",
-    description: "Soğuk Savaş dinamikleri Türkiye'nin iç siyasetini nasıl şekillendirdi?",
+    description: "İkinci Dünya Savaşı sonrası şekillenen yeni dünya düzeninde Türkiye'nin tercihi, Soğuk Savaş dinamiklerini ve ülkenin iç siyasetini derinden etkiledi. Truman Doktrini ile başlayan ve Kore Savaşı'na asker gönderilmesiyle pekişen Batı bloku ile entegrasyon süreci, Türkiye'nin dış politikasında olduğu kadar toplumsal yapısında da dönüşümlere yol açtı. NATO üyeliğinin getirdiği askeri ve siyasi yükümlülüklerin tarihsel bilançosunu çıkarıyoruz.",
     author: "Mert Yılmaz",
     place: "Uluslararası İlişkiler",
     location: "Bilkent Üniversitesi",
@@ -559,7 +541,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/feminist-tarih",
     title: "Osmanlı'dan Cumhuriyete Kadın Hareketleri",
-    description: "Nezihe Muhiddin ve Kadınlar Halk Fırkası.",
+    description: "Türkiye'de kadın mücadelesinin kökleri sanılanın aksine Cumhuriyet öncesine, Osmanlı'nın son dönemindeki kadın derneklerine ve neşriyatına kadar uzanıyor. Nezihe Muhiddin öncülüğünde kurulan Kadınlar Halk Fırkası gibi girişimler, kadınların siyasi hak taleplerinin ne kadar eskiye dayandığını kanıtlıyor. Bu yazı, seçme ve seçilme hakkına giden yolda kadınların verdiği zorlu mücadeleyi ve tarih yazımında görmezden gelinen kadın öncüleri gün yüzüne çıkarıyor.",
     author: "Zeynep Suda",
     place: "Kadın Çalışmaları",
     location: "İstanbul Üniversitesi",
@@ -568,7 +550,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     firstMedia: {
       href: "/articles/feminist-tarih",
       type: "image",
-      src: "https://images.unsplash.com/photo-1594833246732-e09211d04403?q=80&w=1600"
+      src: "https://i0.wp.com/www.akademiktarihtr.com/wp-content/uploads/2019/02/mesrutiyettencumhuriyete.jpg?resize=650%2C381&ssl=1"
     },
     category: getLabel("tarih"),
     tags: [getLabel("kadın mücadelesi", "tag"), getLabel("tarih", "tag"), getLabel("siyaset", "tag")],
@@ -580,7 +562,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/algoritmik-halusinasyonlar",
     title: "Algoritmik Halüsinasyonlar: Gerçeğin Sonu mu?",
-    description: "Yapay zeka modellerinin 'halüsinasyon' görmesi teknik bir hata mı, yoksa yeni bir ontoloji mi?",
+    description: "Yapay zeka modellerinin inandırıcı ama gerçek dışı bilgiler üretmesi olarak tanımlanan 'halüsinasyonlar', sadece teknik bir hata değil, aynı zamanda yeni bir ontolojik soruna işaret ediyor. Generative AI araçlarının yaygınlaşmasıyla birlikte hakikat ve kurgu arasındaki sınır giderek bulanıklaşırken, gerçeğin neliği üzerine felsefi tartışmalar yeniden alevleniyor. Bu makalede, Baudrillard'ın simülasyon kuramı ışığında algoritmik gerçekliğin doğasını sorguluyoruz.",
     author: "Dr. Kerem Soylu",
     place: "Felsefe Bölümü",
     location: "ODTÜ",
@@ -598,7 +580,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/spinoza-ozgurluk",
     title: "Spinoza ve Zorunluluğun Bilinci Olarak Özgürlük",
-    description: "Determinist bir evrende özgür irade mümkün mü?",
+    description: "Determinist bir evren anlayışına sahip olan Spinoza'ya göre, insan eylemleri de doğa yasalarının zorunlu bir sonucudur; peki bu durumda özgür irade mümkün müdür? Filozof, özgürlüğü nedensellik zincirinden kopuk bir keyfilik olarak değil, insanın kendi doğasını ve duygularını anlama kapasitesi, yani 'zorunluluğun bilinci' olarak tanımlar. Ethica'daki geometrik düzen içinde duyguların köleliğinden aklın özgürlüğüne giden yolu bu yazıda takip ediyoruz.",
     author: "Caner Filiz",
     place: "Felsefe",
     location: "Boğaziçi Üniversitesi",
@@ -616,7 +598,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/varolusculuk",
     title: "Sartre ve Camus Tartışması: Başkaldırı mı Devrim mi?",
-    description: "Varoluşçuluğun politik sınırları.",
+    description: "Varoluşçuluğun iki dev ismi Sartre ve Camus arasındaki dostluğun bitmesine neden olan polemik, aslında siyaset felsefesinin en temel sorularından birini barındırır: Amaç, araçları meşrulaştırır mı? Sartre, devrimci şiddeti ve örgütlü mücadeleyi savunurken, Camus başkaldıran insanın ahlaki sınırlarını ve yaşamın kutsallığını ön plana çıkarır. Bulantı ve Yabancı romanlarının izinden giderek, bu tarihsel tartışmanın politik ve etik boyutlarını yeniden değerlendiriyoruz.",
     author: "Selin Gür",
     place: "Sosyoloji",
     location: "Galatasaray Üniversitesi",
@@ -625,7 +607,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     firstMedia: {
       href: "/articles/varolusculuk",
       type: "image",
-      src: "https://images.unsplash.com/photo-1490129374591-acf192973167?q=80&w=1600"
+      src: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Sartre_1967_crop.jpg/250px-Sartre_1967_crop.jpg"
     },
     category: getLabel("felsefe"),
     tags: [getLabel("insan doğası", "tag"), getLabel("siyaset", "tag"), getLabel("yabancılaşma", "tag")],
@@ -634,7 +616,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/bilim-felsefesi-kuhn",
     title: "Paradigma Değişimleri: Kuhn ve Popper",
-    description: "Bilim kümülatif mi ilerler yoksa devrimsel kopuşlarla mı?",
+    description: "Bilimsel bilginin ilerleyişi, Popper'ın iddia ettiği gibi yanlışlamalar yoluyla kümülatif bir şekilde mi gerçekleşir, yoksa Kuhn'un öne sürdüğü gibi devrimsel paradigma değişimleriyle mi? Thomas Kuhn, 'Bilimsel Devrimlerin Yapısı' adlı eserinde bilimin sosyal ve tarihsel bağlamdan bağımsız olmadığını, kriz dönemlerinde yaşanan kopuşlarla ilerlediğini savunur. Bu yazı, bilim felsefesinin bu iki temel yaklaşımını karşılaştırarak bilimin nesnelliği tartışmasına katkı sunuyor.",
     author: "Dr. Ahmet Bilgin",
     place: "Bilim Tarihi",
     location: "İstanbul Üniversitesi",
@@ -652,7 +634,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/stoacilik-bugun",
     title: "Modern Dünyada Stoacılık: Bir Teselli mi?",
-    description: "Marcus Aurelius'un düşünceleri plaza çalışanlarına ne söylüyor?",
+    description: "Antik Roma'dan günümüze uzanan Stoacı felsefe, modern plaza çalışanlarından silikon vadisi girişimcilerine kadar geniş bir kitlede neden bu kadar popüler oldu? Marcus Aurelius'un 'kontrol edemediklerini dert etme' öğretisi, kişisel gelişim endüstrisi tarafından basit bir stres yönetimi tekniğine indirgenmiş durumda. Stoacılığın bugünkü popülaritesinin arkasındaki toplumsal nedenleri ve felsefenin otantik anlamını kaybettiği noktaları eleştirel bir gözle inceliyoruz.",
     author: "Berk Yılmaz",
     place: "Psikoloji",
     location: "Koç Üniversitesi",
@@ -661,7 +643,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     firstMedia: {
       href: "/articles/stoacilik-bugun",
       type: "image",
-      src: "https://images.unsplash.com/photo-1525127752301-99b0b6377224?q=80&w=1600"
+      src: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Paolo_Monti_-_Servizio_fotografico_%28Napoli%2C_1969%29_-_BEIC_6353768.jpg/250px-Paolo_Monti_-_Servizio_fotografico_%28Napoli%2C_1969%29_-_BEIC_6353768.jpg"
     },
     category: getLabel("felsefe"),
     tags: [getLabel("psikoloji", "tag"), getLabel("birey ve toplum", "tag"), getLabel("etik", "tag")],
@@ -670,7 +652,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/hegel-diyalektik",
     title: "Efendi-Köle Diyalektiği ve Tanınma Arzusu",
-    description: "Hegel'in Fenomenolojisi'nde bilincin serüveni.",
+    description: "Hegel'in 'Tinin Fenomenolojisi' eserindeki en çarpıcı bölümlerden biri olan efendi-köle diyalektiği, insan bilincinin oluşumunu karşılıklı tanınma mücadelesi üzerinden açıklar. Köle, emeğiyle doğayı dönüştürerek özgürleşirken, efendi kölenin emeğine bağımlı hale gelerek kendi statüsünün tutsağı olur. Bu felsefi metaforun, modern toplumdaki sınıf ilişkilerini ve kimlik politikalarını anlamak için sunduğu zengin kavramsal çerçeveyi analiz ediyoruz.",
     author: "Prof. Dr. Ali",
     place: "Felsefe",
     location: "Mimar Sinan",
@@ -688,7 +670,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/post-truth",
     title: "Hakikat Sonrası Çağda Doğruyu Aramak",
-    description: "Yalanın bu kadar hızlı yayıldığı bir çağda felsefenin görevi ne?",
+    description: "Yalanın gerçeklerden daha hızlı yayıldığı ve duyguların olguların önüne geçtiği 'post-truth' (hakikat sonrası) çağında, felsefenin hakikati savunma görevi her zamankinden daha hayati. Sosyal medyanın yankı odaları ve manipülasyon teknikleri, ortak bir gerçeklik zemininde buluşmamızı imkansız hale getiriyor. Bu yazı, hakikat kavramının uğradığı erozyonu ve eleştirel düşünmenin bu dezenformasyon çağındaki önemini vurguluyor.",
     author: "Ece Temelkuran",
     place: "İletişim",
     location: "Ankara",
@@ -709,7 +691,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/prekarya-manifestosu",
     title: "Görünmeyen Emek: Dijital Platformlarda Sömürü",
-    description: "Kuryelerden içerik moderatörlerine kadar uzanan yeni işçi sınıfı.",
+    description: "Dijital kapitalizmin yükselişiyle birlikte ortaya çıkan yeni işçi sınıfı prekarya, güvencesizlik ve belirsizlik üzerine kurulu bir çalışma rejiminin parçası haline geldi. Motokuryelerden içerik moderatörlerine kadar uzanan bu geniş kitle, algoritmaların yönetimi altında 'iş ortağı' adı altında esnek ama sömürüye açık koşullarda çalıştırılıyor. Bu manifesto niteliğindeki yazı, dijital platformlardaki görünmeyen emeği ifşa ederek yeni bir örgütlenme modelinin imkanlarını tartışıyor.",
     author: "Caner Yıldız",
     place: "Emek Çalışmaları",
     location: "Humboldt Üniversitesi",
@@ -727,7 +709,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/walter-benjamin",
     title: "Pasajlar'da Kaybolmak: Walter Benjamin'in Flaneur'ü",
-    description: "Modern kentin ilk gözlemcisi Benjamin ve AVM kültürü.",
+    description: "19. yüzyıl Paris'inin pasajlarında dolaşan flaneur, modern kentin ilk gözlemcisi olarak Walter Benjamin'in başyapıtı Pasajlar Projesi'nin merkezinde yer alır. Benjamin için tarih düz bir çizgide ilerleyen bir süreç değil, yıkıntıların ve parçaların bir araya geldiği bir kurgudur; flaneur ise bu yıkıntıların arasında hakikati arayan figürdür. Günümüzün AVM kültürüne ve tüketim mabetlerine Benjamin'in penceresinden bakarak, kentsel deneyimin dönüşümünü izliyoruz.",
     author: "Mehmet Erdem",
     place: "Sosyoloji",
     location: "Sorbonne",
@@ -745,7 +727,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/marksizm-ekoloji",
     title: "Metabolik Yarık: Marx ve Ekoloji",
-    description: "Kapitalizm doğayı nasıl tüketiyor? John Bellamy Foster okuması.",
+    description: "Genellikle sadece endüstriyel üretimi öncelediği düşünülen Marx, aslında kapitalizmin doğa ile insan arasındaki madde alışverişinde onarılmaz bir 'metabolik yarık' açtığını tespit etmiştir. John Bellamy Foster'ın öncülüğünde gelişen ekolojik Marksizm, kapitalist birikim rejiminin gezegenin sınırlarını nasıl zorladığını teorik bir zemine oturtuyor. Bu yazı, iklim krizini anlamak için Marksist ekolojinin sunduğu kavramsal araçları ve çözüm önerilerini irdeliyor.",
     author: "Selin Doğa",
     place: "Çevre Mühendisliği",
     location: "ODTÜ",
@@ -763,7 +745,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/frankfurt-okulu",
     title: "Kültür Endüstrisi ve Aydınlanmanın Diyalektiği",
-    description: "Adorno ve Horkheimer bugün yaşasa Netflix izler miydi?",
+    description: "Adorno ve Horkheimer'ın 'Aydınlanmanın Diyalektiği' eserinde ortaya attığı kültür endüstrisi kavramı, sanatın kitlesel üretim ve tüketim nesnesine dönüşerek eleştirel gücünü yitirmesini anlatır. Bugün Netflix dizilerinden pop müziğe kadar her alanda standartlaşan kültürel ürünler, izleyiciyi pasif bir tüketiciye dönüştürerek sistemin devamlılığını sağlar. Frankfurt Okulu'nun karamsar ama keskin eleştirilerinin dijital çağda hala ne kadar geçerli olduğunu tartışıyoruz.",
     author: "Berk Can",
     place: "Kültürel Çalışmalar",
     location: "Sabancı Üniversitesi",
@@ -781,7 +763,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/gramsci-hegemonya",
     title: "Hapishane Defterleri'nden Bugüne Hegemonya",
-    description: "Rıza nasıl üretilir? Sivil toplumun rolü.",
+    description: "Antonio Gramsci'nin faşist hapishanelerinde kaleme aldığı hegemonya kavramı, egemen sınıfın sadece zor yoluyla değil, aynı zamanda rıza üreterek iktidarını nasıl sürdürdüğünü açıklar. Sivil toplum, medya ve eğitim kurumları aracılığıyla inşa edilen bu rıza, karşı-hegemonya stratejileriyle kırılmadıkça devrimci bir dönüşüm mümkün değildir. Gramsci'nin 'organik aydın' ve 'tarihsel blok' kavramları ışığında, bugünün siyasi mücadelelerine stratejik bir bakış sunuyoruz.",
     author: "Ali Veli",
     place: "Siyaset Bilimi",
     location: "Ankara Üniversitesi",
@@ -799,7 +781,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/foucault-biyoiktidar",
     title: "Biyoiktidar ve Gözetim Toplumu",
-    description: "Panoptikon'dan dijital veriye: Bedenler nasıl yönetiliyor?",
+    description: "Michel Foucault'nun iktidar analizleri, modern devletin sadece toprakları değil, nüfusu ve bedenleri de yönetme arzusu üzerine kuruludur; buna 'biyoiktidar' adını verir. Panoptikon hapishane modelinden dijital veri gözetimine uzanan süreçte, iktidar mekanizmaları daha incelikli ve her yere nüfuz eden bir hal almıştır. Sağlık politikalarından dijital izlemeye kadar bedenlerimizin nasıl disipline edildiğini ve yönetildiğini Foucaultcu bir perspektifle ele alıyoruz.",
     author: "Zeynep T.",
     place: "Sosyoloji",
     location: "Boğaziçi",
@@ -817,7 +799,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/mekan-uretimi",
     title: "Lefebvre ve Mekanın Üretimi",
-    description: "Şehir planlaması ideolojiden bağımsız mıdır?",
+    description: "Henri Lefebvre'e göre mekan, sadece boş bir geometrik alan değil, toplumsal ilişkilerin üretildiği ve yeniden üretildiği politik bir üründür. Şehir planlamasından mimariye kadar her mekansal düzenleme, arkasında bir ideoloji ve sınıf çıkarı barındırır. Kent hakkı kavramının da fikir babası olan Lefebvre'in teorisi üzerinden, modern kentlerin nasıl sermayenin ihtiyaçlarına göre şekillendiğini ve buna karşı nasıl bir yaşam alanı kurgulanabileceğini tartışıyoruz.",
     author: "Mimar Sinan",
     place: "Mimarlık",
     location: "İTÜ",
@@ -838,7 +820,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/latin-amerika-solu",
     title: "Latin Amerika’da Yeni Sol Dalga ve Sınırları",
-    description: "Şili’den Brezilya’ya esen sol rüzgarlar, neoliberal tahribatı onarmaya yetecek mi?",
+    description: "Latin Amerika siyasetinde esen 'pembe dalga' rüzgarları, Şili'den Brezilya'ya sol iktidarları iş başına getirse de, bu yönetimler ciddi yapısal sorunlarla karşı karşıya. Neoliberal tahribatın derin izleri ve küresel ekonomik kriz, sol hükümetlerin vaatlerini gerçekleştirmesini zorlaştırırken, toplumsal muhalefet de beklentilerini yüksek tutuyor. Boric'in Şili'deki zaferinden Lula'nın dönüşüne kadar kıtadaki siyasi dengeleri ve solun sınırlarını analiz ediyoruz.",
     author: "Deniz Güney",
     place: "Uluslararası İlişkiler",
     location: "ODTÜ",
@@ -847,7 +829,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     firstMedia: {
       href: "/articles/latin-amerika-solu",
       type: "image",
-      src: "https://images.unsplash.com/photo-1533647488059-3a87679803d2?q=80&w=1600"
+      src: "https://sarkac.org/wp-content/uploads/2021/07/İstanbul-Sözleşmesi-Yaşatir-640x427-1.jpg"
     },
     category: getLabel("dünya"),
     tags: [getLabel("sosyalizm", "tag"), getLabel("dünya siyaseti", "tag"), getLabel("neoliberalizm", "tag")],
@@ -856,7 +838,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/cin-yukselisi",
     title: "Kuşak ve Yol: Çin'in Küresel Hegemonya Arayışı",
-    description: "ABD ve Çin arasındaki ticaret savaşları yeni bir soğuk savaş mı?",
+    description: "Çin'in 'Kuşak ve Yol' girişimi, sadece devasa bir altyapı projesi değil, aynı zamanda küresel ticaret yollarını ve jeopolitik dengeleri yeniden şekillendirme hamlesidir. ABD ile yaşanan ticaret savaşları ve teknolojik rekabet, dünyayı yeni bir Soğuk Savaş'ın eşiğine getirirken, Çin'in Afrika ve Asya'daki yatırımları etki alanını genişletiyor. Bu makale, Çin'in yükselişinin küresel kapitalizm içindeki anlamını ve olası jeopolitik sonuçlarını değerlendiriyor.",
     author: "Ahmet Asya",
     place: "Asya Çalışmaları",
     location: "Boğaziçi",
@@ -865,7 +847,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     firstMedia: {
       href: "/articles/cin-yukselisi",
       type: "image",
-      src: "https://images.unsplash.com/photo-1543191878-f65533d526cd?q=80&w=1600"
+      src: "https://kritikbakis.com/wp-content/uploads/2025/03/Cin-Halk-Cumhuriyeti.jpg"
     },
     category: getLabel("dünya"),
     tags: [getLabel("emperyalizm", "tag"), getLabel("ekonomi", "tag"), getLabel("dünya siyaseti", "tag")],
@@ -874,7 +856,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/avrupa-sagi",
     title: "Avrupa'da Aşırı Sağın Yükselişi",
-    description: "Mülteci krizi ve ekonomik durgunluk faşizmi hortlatıyor mu?",
+    description: "Avrupa genelinde yükselişe geçen aşırı sağ partiler, mülteci krizi ve ekonomik durgunluğu kullanarak kitlelerin öfkesini sandığa yansıtmayı başarıyor. İtalya'dan Fransa'ya, Hollanda'dan Almanya'ya kadar yayılan bu milliyetçi dalga, Avrupa Birliği'nin temel değerlerini ve geleceğini tehdit ediyor. Faşizmin yeni yüzünü ve popülist söylemlerin toplumda nasıl karşılık bulduğunu, son seçim sonuçları ve sosyolojik veriler ışığında inceliyoruz.",
     author: "Selin Avrupa",
     place: "Siyaset Bilimi",
     location: "Paris",
@@ -892,7 +874,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/filistin-meselesi",
     title: "Apartheid Rejimi ve Filistin Direnişi",
-    description: "Orta Doğu'da barış neden imkansız görünüyor?",
+    description: "Orta Doğu'nun kanayan yarası Filistin meselesi, İsrail'in sistematik işgal ve apartheid politikalarıyla çözümsüzlüğe sürüklenmeye devam ediyor. Gazze'deki insani kriz ve Batı Şeria'daki yerleşimci şiddeti, uluslararası toplumun sessizliğiyle birleşince bölgedeki barış umutlarını tüketiyor. Filistin halkının tarihsel direnişini, uluslararası hukukun ihlallerini ve küresel güçlerin ikiyüzlü tutumunu bu dosyada detaylandırıyoruz.",
     author: "Hasan Orta",
     place: "Orta Doğu Enstitüsü",
     location: "Sakarya Üniversitesi",
@@ -901,7 +883,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     firstMedia: {
       href: "/articles/filistin-meselesi",
       type: "image",
-      src: "https://images.unsplash.com/photo-1531885994236-40742d480628?q=80&w=1600"
+      src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQtl2xE7EwXBRW8heov6tKAn5Mt4fkqGX7tGg&s"
     },
     category: getLabel("dünya"),
     tags: [getLabel("ortadoğu", "tag"), getLabel("emperyalizm", "tag"), getLabel("insan hakları", "tag")],
@@ -910,7 +892,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/afrika-darbeler",
     title: "Sahel Bölgesinde Darbeler Zinciri",
-    description: "Fransız sömürgeciliğinin sonu mu geliyor?",
+    description: "Afrika'nın Sahel bölgesinde peş peşe yaşanan askeri darbeler, kıtada Fransa'nın sömürgeci geçmişine duyulan tepkinin ve değişen güç dengelerinin bir sonucu olarak okunmalı. Mali, Nijer ve Burkina Faso gibi ülkelerdeki rejim değişiklikleri, Batı karşıtı bir damarı beslerken, Rusya gibi yeni aktörlerin bölgedeki etkisini artırıyor. Afrika'nın 'ikinci bağımsızlık savaşı' olarak da nitelendirilen bu sürecin dinamiklerini ve olası sonuçlarını tartışıyoruz.",
     author: "Ali Afrika",
     place: "Uluslararası İlişkiler",
     location: "Ankara",
@@ -928,7 +910,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/rusya-ukrayna",
     title: "Uzayan Savaşın Küresel Etkileri",
-    description: "Enerji krizi ve değişen ittifaklar.",
+    description: "Rusya ve Ukrayna arasındaki savaş, sadece iki ülke arasındaki bir çatışma olmanın ötesine geçerek küresel enerji piyasalarını, gıda güvenliğini ve ittifak sistemlerini sarstı. NATO'nun genişleme stratejisi ve Rusya'nın güvenlik kaygıları ekseninde başlayan bu savaş, Avrupa'nın güvenlik mimarisini geri dönülemez bir şekilde değiştirdi. Savaşın ekonomik maliyetlerini ve barış masasının neden hala kurulamadığını jeopolitik bir analizle ele alıyoruz.",
     author: "Mehmet Slav",
     place: "Slav Dilleri",
     location: "İstanbul Üniversitesi",
@@ -937,7 +919,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     firstMedia: {
       href: "/articles/rusya-ukrayna",
       type: "image",
-      src: "https://images.unsplash.com/photo-1574689049743-349071c890d2?q=80&w=1600"
+      src: "https://ichef.bbci.co.uk/ace/ws/640/cpsprodpb/1195D/production/_116892027_gettyimages-143069358.jpg.webp"
     },
     category: getLabel("dünya"),
     tags: [getLabel("savaş", "tag"), getLabel("enerji", "tag"), getLabel("dünya siyaseti", "tag")],
@@ -946,7 +928,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/abd-secimleri",
     title: "Kutuplaşmış Amerika Sandık Başında",
-    description: "Trumpizm ve demokratların krizi.",
+    description: "ABD siyaseti, tarihinin en derin kutuplaşmalarından birini yaşarken, yaklaşan seçimler sadece Amerika'nın değil tüm dünyanın geleceğini etkileyecek kritik bir dönemeç niteliğinde. Trumpizmin popülist söylemleri ile Demokratların yaşadığı liderlik krizi arasında sıkışan seçmenler, demokrasinin kırılganlığını test ediyor. Kongre baskınından bugüne uzanan siyasi gerilimi ve Amerikan toplumundaki kültürel çatışmaları sandık analiziyle birleştiriyoruz.",
     author: "John Doe",
     place: "Amerikan Etütleri",
     location: "Washington",
@@ -955,7 +937,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     firstMedia: {
       href: "/articles/abd-secimleri",
       type: "image",
-      src: "https://images.unsplash.com/photo-1541872703-74c5963631df?q=80&w=1600"
+      src: "https://cdnuploads.aa.com.tr/uploads/Contents/2024/11/05/thumbs_b_c_98cb183e0d6dbb998e416b4fa79c0dd1.jpg"
     },
     category: getLabel("dünya"),
     tags: [getLabel("seçimler", "tag"), getLabel("popülizm", "tag"), getLabel("dünya siyaseti", "tag")],
@@ -964,7 +946,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/hindistan-modi",
     title: "Hindistan'da Milliyetçiliğin Yükselişi",
-    description: "Dünyanın en büyük demokrasisi otoriterleşiyor mu?",
+    description: "Dünyanın en büyük demokrasisi olarak bilinen Hindistan, Modi yönetimi altında giderek artan bir Hindu milliyetçiliği ve otoriterleşme eğilimi gösteriyor. Dini azınlıklara yönelik baskılar ve ifade özgürlüğünün kısıtlanması, ülkenin seküler anayasal yapısını tehdit ederken, ekonomik büyüme rakamları bu sosyal gerilimleri maskeliyor. Hindistan'ın iç siyasetindeki bu dönüşümün Asya'daki dengelere ve demokrasi tartışmalarına etkisini irdeliyoruz.",
     author: "Ravi K.",
     place: "Güney Asya Çalışmaları",
     location: "Delhi",
@@ -985,7 +967,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/endustriyel-futbol",
     title: "Endüstriyel Futbol ve Tribünlerin Sessizliği",
-    description: "Bilet fiyatları, Passolig uygulamaları ve yayın gelirleri...",
+    description: "Futbolun sadece bir oyun olmaktan çıkıp milyar dolarlık bir endüstriye dönüşmesi, tribün kültürünü ve taraftarlık ruhunu geri dönülmez bir şekilde değiştirdi. Yüksek bilet fiyatları, Passolig gibi denetim mekanizmaları ve yayın gelirlerine odaklı kulüp yönetimleri, futbolu halktan kopararak steril bir eğlence ürününe dönüştürüyor. Premier Lig modelinin küreselleşmesiyle birlikte sessizleşen tribünleri ve futbolun kaybettiği ruhu sorguluyoruz.",
     author: "Mert Çelik",
     place: "Spor Bilimleri",
     location: "Marmara Üniversitesi",
@@ -994,7 +976,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     firstMedia: {
       href: "/articles/endustriyel-futbol",
       type: "image",
-      src: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=1600"
+      src: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Football_in_Bloomington%2C_Indiana%2C_1995.jpg/1200px-Football_in_Bloomington%2C_Indiana%2C_1995.jpg"
     },
     category: getLabel("spor"),
     tags: [getLabel("kapitalizm", "tag"), getLabel("sosyoloji", "tag"), getLabel("yabancılaşma", "tag")],
@@ -1003,7 +985,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/kadin-voleybolu",
     title: "Filenin Sultanları: Bir Başarı Hikayesi",
-    description: "Kadın voleybolunun yükselişi topluma ne anlatıyor?",
+    description: "Türkiye Kadın Voleybol Milli Takımı'nın uluslararası arenada elde ettiği tarihi başarılar, sadece sportif bir zafer değil, aynı zamanda kadınların toplumsal hayattaki gücünün de bir simgesi. Avrupa şampiyonlukları ve olimpiyat madalyalarıyla taçlanan bu yolculuk, kız çocuklarına ilham verirken, sporun toplumsal cinsiyet eşitliği mücadelesindeki rolünü de gözler önüne seriyor. Filenin Sultanları'nın başarısının arkasındaki disiplin, emek ve takım ruhunu analiz ediyoruz.",
     author: "Selin Smaç",
     place: "Spor Yöneticiliği",
     location: "Celal Bayar Üniversitesi",
@@ -1012,7 +994,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     firstMedia: {
       href: "/articles/kadin-voleybolu",
       type: "image",
-      src: "https://images.unsplash.com/photo-1612872087720-48ca45e4c690?q=80&w=1600"
+      src: "https://cdnuploads.aa.com.tr/uploads/Contents/2021/08/20/thumbs_b_c_2baab00fc28624e3505d51d56d6c8f4e.jpg"
     },
     category: getLabel("spor"),
     tags: [getLabel("kadın mücadelesi", "tag"), getLabel("spor", "tag"), getLabel("başarı", "tag")],
@@ -1021,7 +1003,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/amator-branslar",
     title: "Futbolun Gölgesinde Amatör Branşlar",
-    description: "Olimpik sporcular sponsor bulmakta neden zorlanıyor?",
+    description: "Türkiye'de spor denince akla gelen ilk şey futbol olsa da, asıl olimpiyat başarısını getiren amatör branşlar ne yazık ki yeterli ilgiyi ve desteği göremiyor. Tesisleşme sorunları, sponsor eksikliği ve medya görünürlüğünün azlığı, yetenekli genç sporcuların potansiyellerini gerçekleştirmesinin önünde büyük bir engel oluşturuyor. Futbol hegemonyasının gölgesinde var olma savaşı veren amatör sporların ve sporcuların yaşadığı zorlukları gündeme taşıyoruz.",
     author: "Can Atlet",
     place: "Beden Eğitimi",
     location: "Gazi Üniversitesi",
@@ -1039,7 +1021,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/spor-ve-politika",
     title: "Tribünler Siyaset Yapar mı?",
-    description: "Gezi'den bugüne taraftar gruplarının toplumsal muhalefetteki yeri.",
+    description: "Gezi Direnişi'nden bugüne taraftar gruplarının toplumsal muhalefet içindeki aktif rolü, 'spor siyasetin dışındadır' ezberini çoktan bozdu. Çarşı grubundan üniversite tribünlerine kadar uzanan örgütlü taraftar yapıları, sadece takımlarını desteklemekle kalmıyor, aynı zamanda adalet ve demokrasi taleplerini de stadyumlarda haykırıyor. Tribünlerin birer kamusal alan olarak politik işlevini ve taraftar kültürünün sosyopolitik dinamiklerini inceliyoruz.",
     author: "Ulaş Tribün",
     place: "Sosyoloji",
     location: "Beşiktaş",
@@ -1048,7 +1030,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     firstMedia: {
       href: "/articles/spor-ve-politika",
       type: "image",
-      src: "https://images.unsplash.com/photo-1522778119026-d647f0565c6a?q=80&w=1600"
+      src: "https://reformsports.com/wp-content/uploads/2023/10/teleskopik-tribun-malzemeleri-nelerdir.jpg"
     },
     category: getLabel("spor"),
     tags: [getLabel("sokak kültürü", "tag"), getLabel("siyaset", "tag"), getLabel("demokrasi", "tag")],
@@ -1057,7 +1039,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/espor-yukselisi",
     title: "Espor: Spor mu Eğlence mi?",
-    description: "Dijital oyun dünyasının milyar dolarlık ekonomisi.",
+    description: "Dijital oyun dünyasının hızla büyümesiyle birlikte hayatımıza giren espor, stadyumları dolduran izleyicileri ve milyon dolarlık ödül havuzlarıyla geleneksel spora rakip oluyor. Fiziksel aktivite içermediği gerekçesiyle spor sayılıp sayılmayacağı tartışılsa da, gerektirdiği refleks, strateji ve takım oyunu, onu yeni nesil bir rekabet alanı haline getiriyor. Gençlik kültürünün merkezine yerleşen esporun ekonomisini ve geleceğini mercek altına alıyoruz.",
     author: "Berk Gamer",
     place: "Dijital Oyun Tasarımı",
     location: "Bahçeşehir Üniversitesi",
@@ -1075,7 +1057,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/doping-skandallari",
     title: "Daha Hızlı, Daha Güçlü, Daha İlaçlı?",
-    description: "Sporda doping gerçeği ve etik tartışmalar.",
+    description: "Modern sporun en büyük gölgesi olan doping, 'daha hızlı, daha yüksek, daha güçlü' sloganının sınırlarını zorlarken etik değerleri ve sporcu sağlığını tehdit ediyor. Devlet destekli doping programlarından bireysel hırslara kadar uzanan bu karanlık ağ, haksız rekabet yaratarak sporun adalet duygusunu zedeliyor. Rusya'nın olimpiyatlardan men edilmesine kadar varan skandallar üzerinden, sporda performans artırıcı maddelerin kullanımını ve etik tartışmaları ele alıyoruz.",
     author: "Dr. Canan Sağlık",
     place: "Spor Hekimliği",
     location: "Hacettepe",
@@ -1093,7 +1075,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
   {
     href: "/articles/mahalle-maci",
     title: "Kaybolan Bir Kültür: Mahalle Maçları",
-    description: "Kentsel dönüşümle birlikte betonlaşan sokaklar ve çocukluk.",
+    description: "Bir zamanlar çocukluğun vazgeçilmez bir parçası olan mahalle maçları, kentsel dönüşüm ve betonlaşan şehirler yüzünden tarihe karışıyor. Sokakların oyun alanı olmaktan çıkıp otoparklara dönüşmesi, sadece bir oyunu değil, komşuluk ilişkilerini ve sokak kültürünü de yok ediyor. 'Üç korner bir penaltı' devrinin kapanışını, değişen kent sosyolojisi ve çocukların oyun hakkı üzerinden hüzünlü bir nostaljiyle anlatıyoruz.",
     author: "Hakan Nostalji",
     place: "Kent Sosyolojisi",
     location: "Kadıköy",
@@ -1108,4 +1090,134 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     tags: [getLabel("kent yaşamı", "tag"), getLabel("çocukluk", "tag"), getLabel("sokak kültürü", "tag")],
     content: [{ blockContent: { type: "text", textContent: "Üç korner bir penaltı devri kapandı mı?..." } }]
   }
+];
+
+export const FEED_ARTICLES: FeedCardProps[] = [
+  {
+    href: "/haber/kyk-yurtlari-son-durum",
+    media: {
+      type: "image",
+      src: "https://images.unsplash.com/photo-1555848962-6e79363ec58f?auto=format&fit=crop&w=800&q=80", // Öğrenci yurdu/bina görseli
+      alt: "Öğrenci yurtları binası",
+      mediaLayout: "full-width"
+    },
+    title: "Barınma Sorunu ve Öğrencilerin Talepleri: Neler Değişmeli?",
+    description: "Üniversite öğrencilerinin en büyük sorunu haline gelen barınma krizi, yetersiz yurt kapasiteleri ve fahiş kira artışlarıyla giderek derinleşiyor. Öğrenciler, sağlıklı ve güvenli barınma hakları için kampüslerde ve sokaklarda taleplerini dile getirirken, yetkililerden somut adımlar bekliyor. Bu haber dosyasında, yurtlardaki son durumu, öğrencilerin yaşadığı mağduriyetleri ve çözüm önerilerini tüm boyutlarıyla ele alıyoruz.",
+    source: "Genç Hayat",
+    timeAgo: "2 saat önce",
+  },
+  {
+    href: "/haber/metal-iscileri-grev",
+    media: {
+      type: "image",
+      src: "https://www.evrensel.net/upload/dosya/312981.jpg",
+      alt: "Fabrika işçileri çalışırken",
+      mediaLayout: "text-width"
+    },
+    title: "Metal İşçileri Toplu Sözleşme Masasında: Grev Kapıda mı?",
+    description: "Yüksek enflasyon karşısında eriyen ücretlerini korumak isteyen on binlerce metal işçisi, toplu sözleşme görüşmelerinde işveren sendikasıyla karşı karşıya geliyor. Sendikaların taleplerinin kabul edilmemesi durumunda grev kararı alacaklarını duyurması, sanayi üretiminde tansiyonu yükseltiyor. Fabrikalarda süren eylemleri, işçilerin taleplerini ve olası bir grevin ekonomiye etkilerini sıcağı sıcağına takip ediyoruz.",
+    source: "Evrensel",
+    timeAgo: "5 saat önce",
+  },
+  {
+    href: "/haber/kadin-emegi-gorunmeyen-is",
+    media: {
+      type: "image",
+      src: "https://ekmekvegul.net/storage/images/TUUsguAj6blu0DjcQHOMhSVjaqjI5DRpLdmhbw0W.jpeg", // Kadın dayanışması/yürüyüş temsili
+      alt: "Kadınların yürüyüşü",
+    },
+    title: "Ev İçi Görünmeyen Emek ve Kadınların Mücadelesi",
+    description: "Kadınların ev içinde harcadığı karşılıksız emek, kapitalist sistemin çarklarının dönmesini sağlayan en büyük gizli sübvansiyonlardan biri olmaya devam ediyor. Temizlikten bakım işlerine kadar uzanan bu ağır yük, kadınların istihdama katılımını engellerken onları ekonomik bağımlılığa sürüklüyor. Bu dosya, 'görünmeyen emek' kavramını verilerle ortaya koyarak, kadınların eşitlik mücadelesindeki yerini vurguluyor.",
+    source: "Ekmek ve Gül",
+    timeAgo: "1 gün önce",
+  },
+  {
+    href: "/makale/diyalektik-materyalizm-uzerine",
+    media: {
+      type: "image",
+      src: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=800&q=80", // Kitaplar ve okuma
+      alt: "Kütüphanede kitaplar",
+      mediaLayout: "text-width"
+    },
+    title: "Diyalektik Materyalizm ve Günümüz Dünyasını Anlamak",
+    description: "Marx ve Engels'in geliştirdiği diyalektik materyalizm, sadece 19. yüzyılı değil, günümüzün karmaşık krizlerini anlamak için de güçlü bir yöntem sunuyor. Değişimin, çelişkinin ve hareketin bilimi olarak diyalektik, toplumsal olayları durağan değil, sürekli bir oluş ve yok oluş süreci içinde ele almamızı sağlıyor. Bu teorik inceleme, felsefi kavramları güncel politik ve ekonomik olaylarla ilişkilendirerek okura yeni bir bakış açısı kazandırıyor.",
+    source: "Teori ve Eylem",
+    timeAgo: "2 gün önce",
+  },
+  {
+    href: "/haber/lise-festivalleri-yasaklar",
+    media: {
+      type: "image", // GIF yerine çalışan bir konser görseli (Unsplash gif desteklemez, jpg koydum)
+      src: "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?auto=format&fit=crop&w=800&q=80", 
+      alt: "Festival kalabalığı",
+      mediaLayout: "full-width"
+    },
+    title: "Lise Festivallerine Yönelik Yasaklar ve Gençliğin Tepkisi",
+    description: "Son dönemde birçok lise festivalinin 'milli ve manevi değerlere aykırılık' gerekçesiyle iptal edilmesi, gençler arasında büyük bir tepki ve hayal kırıklığı yarattı. Sosyal ve kültürel etkinliklerin kısıtlanmasını yaşam tarzına müdahale olarak gören liseliler, forumlar ve sosyal medya aracılığıyla seslerini duyurmaya çalışıyor. Yasakların ardındaki zihniyeti ve gençliğin özgürlük taleplerini öğrencilerle konuşarak haberleştirdik.",
+    source: "Genç Hayat",
+    timeAgo: "3 gün önce",
+  },
+  {
+    href: "/haber/asgari-ucret-tartisilari",
+    media: {
+      type: "image",
+      src: "https://cdnuploads.aa.com.tr/uploads/Contents/2025/12/23/thumbs_b_c_83fdb8bec75c3adfaff9e2c2ba79eaa6.jpg?v=184956", // Market alışverişi/hesap
+      alt: "Market alışveriş sepeti"
+    },
+    title: "Asgari Ücret Tespit Komisyonu Toplanıyor: Beklentiler Ne?",
+    description: "Milyonlarca çalışanı doğrudan ilgilendiren asgari ücret görüşmeleri, yüksek enflasyonun gölgesinde ve geçim sıkıntısının had safhaya ulaştığı bir ortamda başlıyor. İşçi sendikaları, insan onuruna yaraşır bir ücret talep ederken, işveren tarafı maliyet artışlarını gerekçe göstererek temkinli yaklaşıyor. Komisyon masasında konuşulan rakamları, açlık ve yoksulluk sınırlarını ve sokağın nabzını bu haberde tutuyoruz.",
+    source: "Evrensel",
+    timeAgo: "4 gün önce",
+  },
+  {
+    href: "/haber/istanbul-sozlesmesi-vazgecmiyoruz",
+    media: {
+      type: "image",
+      src: "https://ekmekvegul.net/storage/images/EFFKJOdoL505vCTJZUYcNiuTcI0pbSMcOWP373gP.jpeg", // Eylem/Protesto kalabalığı
+      alt: "Meydandaki kalabalık",
+      mediaLayout: "full-width"
+    },
+    title: "İstanbul Sözleşmesi'nden Vazgeçmiyoruz: Alanlardan Mesajlar",
+    description: "İstanbul Sözleşmesi'nden çıkılmasının üzerinden geçen zamana rağmen kadınlar, kazanılmış haklarından vazgeçmemekte kararlı olduklarını her fırsatta haykırıyor. Türkiye'nin dört bir yanında düzenlenen eylemlerde bir araya gelen kadın örgütleri, sözleşmenin yeniden yürürlüğe girmesi için mücadeleyi büyüteceklerini vurguluyor. Alanlardan yükselen 'İstanbul Sözleşmesi Yaşatır' sloganlarının ardındaki direnci ve kararlılığı aktarıyoruz.",
+    source: "Ekmek ve Gül",
+    timeAgo: "5 gün önce",
+  },
+  {
+    href: "/makale/emperyalizm-ve-savas",
+    media: {
+      type: "image",
+      src: "https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&w=800&q=80", // Dünya haritası
+      alt: "Dünya haritası",
+    },
+    title: "Emperyalizm Çağında Savaş ve Barış Politikaları",
+    description: "Lenin'in emperyalizm tahlilinden yola çıkarak, bugün dünyanın farklı coğrafyalarında süren bölgesel savaşların ve vekalet savaşlarının ekonomi-politiğini inceliyoruz. Enerji kaynaklarının paylaşımı, pazar rekabeti ve silah endüstrisinin kâr hırsı, barışın önündeki en büyük engeller olarak varlığını koruyor. Bu makale, emperyalist rekabetin halklar üzerinde yarattığı yıkımı ve gerçek bir barışın ancak anti-emperyalist bir mücadeleyle mümkün olabileceğini savunuyor.",
+    source: "Teori ve Eylem",
+    timeAgo: "1 hafta önce",
+  },
+  {
+    href: "/kultur/yeni-cikan-filmler-inceleme",
+    media: {
+      type: "image",
+      src: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=800&q=80", // Sinema salonu
+      mediaLayout: "full-width",
+      alt: "Sinema salonu koltukları"
+    },
+    title: "Bu Ay Vizyona Giren Filmler ve Eleştirel Bir Bakış",
+    description: "Sinema salonlarında bu ay vizyona giren yerli ve yabancı yapımları, sadece teknik özellikleriyle değil, içerdiği toplumsal mesajlarla da ele alıyoruz. Bağımsız sinemanın özgün örneklerinden gişe rekorları kıran popüler filmlere kadar geniş bir yelpazeyi kapsayan seçkimiz, izleyiciye nitelikli bir rehber sunmayı amaçlıyor. Sanatın ticarileşmesi ve kültürel hegemonya tartışmaları ışığında, beyaz perdede neleri izlediğimizi sorguluyoruz.",
+    source: "Genç Hayat",
+    timeAgo: "1 hafta önce",
+  },
+  {
+    href: "/haber/cevre-mucadelesi-akbelen",
+    media: {
+      type: "image",
+      src: "https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=800&q=80", // Orman/Ağaçlar
+      alt: "Yeşil orman",
+      href: "/galeri/akbelen-fotograflari" 
+    },
+    title: "Doğa Talanına Karşı Köylülerin Direnişi Sürüyor",
+    description: "Akbelen Ormanı'nda kömür madeni sahasını genişletmek için yapılan ağaç kesimine karşı köylülerin ve çevrecilerin başlattığı nöbet eylemi kararlılıkla devam ediyor. Jandarma müdahalesine ve baskılara rağmen yaşam alanlarını savunan İkizköylüler, doğa talanının sadece ağaçları değil, bir kültürü ve geleceği de yok ettiğini haykırıyor. Bu haberde, direniş alanındaki atmosferi, hukuk mücadelesindeki son durumu ve köylü kadınların en ön saftaki mücadelesini paylaşıyoruz.",
+    source: "Evrensel",
+    timeAgo: "2 hafta önce",
+  },
 ];
