@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { ArticleCardElement } from "./MainPage/ArticleCard";
-import { ReptileCursor } from "../lib/ReptileCursor";
+
 import { MOCK_ARTICLES } from "../data/MockArticles";
 
 // --- KATEGORİ GÖRSELLERİ ---
@@ -27,7 +27,7 @@ export const CategoryPage = () => {
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
   const [selectedTags, setSelectedTags] = useState<string[]>(initialTag ? [initialTag] : []);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isTagFilterVisible, setIsTagFilterVisible] = useState(!!initialTag);
+  const [isTagFilterVisible, setIsTagFilterVisible] = useState(false);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -37,7 +37,10 @@ export const CategoryPage = () => {
     const tag = searchParams.get('tag');
     setSelectedCategory(cat);
     setSelectedTags(tag ? [tag] : []);
-    setIsTagFilterVisible(!!tag);
+    // Etiketle yönlendirilince tag paneli kapalı gelsin, sayfa en üste scroll edilsin
+    setIsTagFilterVisible(false);
+    setIsDropdownOpen(false);
+    window.scrollTo({ top: 0, behavior: 'instant' });
   }, [searchParams]);
 
   // Dropdown dışına tıklanınca kapanması için
@@ -74,11 +77,11 @@ export const CategoryPage = () => {
       );
     }
 
-    // B. Etiket Filtresi (AND Logic)
+    // B. Etiket Filtresi (OR Logic) — seçili etiketlerden herhangi birini taşıması yeterli
     if (selectedTags.length > 0) {
       filtered = filtered.filter(article => {
         const articleTagNames = article.tags?.map(t => t.name) || [];
-        return selectedTags.every(selectedTag => articleTagNames.includes(selectedTag));
+        return selectedTags.some(selectedTag => articleTagNames.includes(selectedTag));
       });
     }
 
@@ -117,7 +120,7 @@ export const CategoryPage = () => {
 
   return (
     <div className="font-bradford text-zinc-800 bg-white min-h-screen flex flex-col">
-      <ReptileCursor />
+
 
       <main className="flex-grow">
 
@@ -266,6 +269,7 @@ export const CategoryPage = () => {
                     publishedDate={article.publishedDate}
                     issueNumber={article.issueNumber}
                     content={article.content}
+                    type={article.type}
                     firstMedia={{
                       type: "image",
                       src: article.firstMedia?.src || "",

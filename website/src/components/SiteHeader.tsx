@@ -4,6 +4,7 @@ import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import logo from '../public/logo.png';
 import logo_white from '../public/logo_white.png';
 import { NAV_DATA } from './Footer';
+import { MOCK_ARTICLES } from '../data/MockArticles';
 
 
 // --- Sub-Components ---
@@ -92,6 +93,14 @@ export const SocialIcons = ({ isWhite = false }: { isWhite?: boolean }) => {
             icon: (
                 <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
                     <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.495 17.303c-.216.354-.668.468-1.023.252-2.803-1.714-6.328-2.1-10.487-1.15-.404.092-.806-.167-.898-.571-.093-.404.166-.805.57-.898 4.555-1.04 8.436-.607 11.592 1.316.354.216.468.667.252 1.023-.006.006-.013.013-.02.02zm1.47-3.272c-.27.446-.856.588-1.302.318-3.208-1.972-8.1-2.544-11.892-1.393-.498.15-1.026-.127-1.176-.625-.15-.498.127-1.026.625-1.176 4.33-1.313 9.765-.667 13.428 1.576.445.27.587.855.317 1.302zm.135-3.397c-3.846-2.284-10.19-2.495-13.867-1.377-.58.177-1.196-.154-1.373-.734-.177-.58.154-1.196.734-1.373 4.238-1.287 11.216-1.036 15.616 1.573.526.312.697.99.385 1.516-.312.525-.988.696-1.514.384z" />
+                </svg>
+            )
+        },
+        {
+            href: "https://letterboxd.com/genc_hayat/",
+            icon: (
+                <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+                    <path d="M0 12C0 5.373 5.373 0 12 0s12 5.373 12 12-5.373 12-12 12S0 18.627 0 12zm7.2-3.6h9.6v7.2H7.2V8.4zM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-4.8-3a4.8 4.8 0 1 1 9.6 0 4.8 4.8 0 0 1-9.6 0z" />
                 </svg>
             )
         }
@@ -340,6 +349,8 @@ const MobileMenu = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
                         <Link to="/dosyalar/8-mart" className={linkClass} onClick={onClose}>8 Mart</Link>
                         <Link to="/dosyalar/antiemperyalizm" className={linkClass} onClick={onClose}>Antiemperyalizm</Link>
                         <Link to="/dosyalar/anadil" className={linkClass} onClick={onClose}>Anadil</Link>
+                        <Link to="/dosyalar/25-kasim" className={linkClass} onClick={onClose}>25 Kasım</Link>
+                        <Link to="/dosyalar/mesem" className={linkClass} onClick={onClose}>MESEM</Link>
                     </MobileAccordion>
 
                     <MobileAccordion
@@ -371,7 +382,12 @@ const MobileMenu = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
 export const SiteHeader = () => {
     const location = useLocation();
     const isArticlePage = location.pathname.startsWith('/articles/');
-    const isTransparentPage = isArticlePage
+    // Slug'dan article tipini bul — sadece "featured" type sayfalarda transparent header
+    const articleSlug = isArticlePage ? location.pathname.replace('/articles/', '') : '';
+    const currentArticle = articleSlug ? MOCK_ARTICLES.find(a => a.href === `/articles/${articleSlug}`) : undefined;
+    const isFeaturedArticle = currentArticle?.type === 'featured';
+
+    const isTransparentPage = isFeaturedArticle
         || location.pathname.startsWith('/category')
         || location.pathname.startsWith('/dosyalar/')
         || location.pathname.startsWith('/tematik/');

@@ -207,7 +207,37 @@ export const LabeloDefault: Labelo[] = [
   new Labelo("tag", "mühendislik"),
   new Labelo("tag", "bilim"),
   new Labelo("tag", "temel bilimler"),
-  new Labelo("tag", "sosyal bilimler")
+  new Labelo("tag", "sosyal bilimler"),
+
+  // Eksik tag'ler - MockArticles'ta kullanılıyor
+  new Labelo("tag", "medya"),
+  new Labelo("tag", "siyaset"),
+  new Labelo("tag", "toplum"),
+  new Labelo("tag", "insan hakları"),
+  new Labelo("tag", "ekonomi"),
+  new Labelo("tag", "avrupa"),
+  new Labelo("tag", "savaş"),
+  new Labelo("tag", "enerji"),
+  new Labelo("tag", "popülizm"),
+  new Labelo("tag", "din ve toplum"),
+  new Labelo("tag", "asya"),
+  new Labelo("tag", "spor politikaları"),
+  new Labelo("tag", "olimpiyat"),
+  new Labelo("tag", "başarı"),
+  new Labelo("tag", "gençlik"),
+  new Labelo("tag", "çocukluk"),
+  new Labelo("tag", "spor"),
+  new Labelo("tag", "etik"),
+  new Labelo("tag", "sağlık"),
+  new Labelo("tag", "rekabet"),
+  new Labelo("tag", "tarih"),
+  new Labelo("tag", "aydınlanma"),
+  new Labelo("tag", "kültür"),
+  new Labelo("tag", "sendika"),
+  new Labelo("tag", "nato"),
+  new Labelo("tag", "sosyal medya"),
+  new Labelo("tag", "edebiyat"),
+  new Labelo("tag", "afrika"),
 ];
 
 
@@ -226,7 +256,7 @@ export type text = {
 };
 
 export type block = {
-  blockContent: text | media;
+  blockContent: text | media | ArticleCard;
   media?: media;
   blockLayout?: "right-side" | "left-side";
 };
@@ -234,6 +264,7 @@ export type block = {
 export type ArticleCard = {
   href: string;
   title: string;
+  type: ArticleCardType;
   description?: string;
   author: string;
   place?: string;
@@ -246,6 +277,27 @@ export type ArticleCard = {
   category: Labelo;
   content: block | block[];
 };
+
+export type ArticleCardType = "sunu" | "rota" | "featured" | "normal";
+
+export type Dosya = {
+  articleList: ArticleCard[];
+  coverMedia: media;
+  description: string;
+  title: string;
+  href: string;
+}
+
+export type Issue = {
+  title?: string;
+  number: number;
+  date: Date;
+  coverMedia?: media;
+  sunuArticle: ArticleCard;
+  rotaArticle: ArticleCard;
+  recomendedCards: ArticleCard[];
+  otherArticles: ArticleCard[];
+}
 
 export const ArticleCardElement = (card: ArticleCard) => {
   const [showAllLabels, setShowAllLabels] = useState(false);

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { Label } from "./MainPage/ArticleCard";
 import { MOCK_ARTICLES } from "../data/MockArticles";
 import { ShareFloatingButton } from "../components/ShareFloatingButton";
@@ -109,19 +109,21 @@ const EmbeddedArticleBox = ({ article }: { article: any }) => {
 // --- MAIN COMPONENT ---
 
 export const FeaturedArticleDetail = () => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [isShareOpen, setIsShareOpen] = useState(false);
+  const { slug } = useParams<{ slug: string }>();
+  // Find the exact article. (The href in MOCK_ARTICLES looks like /articles/slug)
+  const article = MOCK_ARTICLES.find(a => a.href === `/articles/${slug}`) || MOCK_ARTICLES[0];
+
+
   const [fontIndex, setFontIndex] = useState(1);
   const [randomArticle] = useState(() => {
-    const otherArticles = MOCK_ARTICLES.filter(a => a.href !== MOCK_ARTICLES[0].href); // Exclude current
+    const otherArticles = MOCK_ARTICLES.filter(a => a.href !== article.href); // Exclude current
     return otherArticles[Math.floor(Math.random() * otherArticles.length)];
   });
 
-  const article = MOCK_ARTICLES[0];
   const issueNumber = (article as any).issueNumber || 496;
 
-  // Öne Çıkan mı Sıradan mı Kontrolü
-  const isFeatured = (article as any).isFeatured ?? true;
+  // Öne Çıkan mı Sıradan mı Kontrolü — sadece "featured" type hero göster
+  const isFeatured = article.type === 'featured';
 
   const handleFontChange = (direction: 'increase' | 'decrease') => {
     if (direction === 'increase' && fontIndex < FONT_SIZES.length - 1) {
@@ -200,7 +202,7 @@ export const FeaturedArticleDetail = () => {
               <div className="w-full max-w-screen-2xl px-0 mt-2">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                   <div className="hidden lg:block lg:col-span-3"></div>
-                  <div className="col-span-1 lg:col-span-6">
+                  <div className="col-span-1 lg:col-span-6 px-4 lg:px-0">
                     <ImageCaption alt={altText} />
                   </div>
                 </div>
@@ -255,12 +257,11 @@ export const FeaturedArticleDetail = () => {
   if (!article) return null;
 
   return (
-    // GÜNCELLEME 1: pt-[100px] lg:pt-[140px] kaldırıldı (conditional yapıldı), Hero görseli doğal boyuna bırakıldı.
-    <div className={`font-bradford text-zinc-800 bg-white ${isFeatured ? '' : 'pt-[100px] lg:pt-[140px]'}`}>
+    <div className="font-bradford text-zinc-800 bg-white">
 
-      {/* --- HERO SECTION (Sadece Featured Article için) --- */}
+      {/* --- HERO SECTION — sadece desktop, featured article --- */}
       {isFeatured && (
-        <div className="w-full relative mb-10">
+        <div className="w-full relative hidden md:block">
           <img
             src={article.firstMedia?.src}
             alt={article.title}
@@ -270,8 +271,7 @@ export const FeaturedArticleDetail = () => {
         </div>
       )}
 
-      {/* GÜNCELLEME 2: Paddingler iki katına çıkarıldı (px-8 md:px-12 lg:px-24) */}
-      <main className="max-w-screen-2xl mx-auto px-4 lg:px-0 py-10 lg:py-16">
+      <main className="max-w-screen-2xl mx-auto px-4 lg:px-0 py-4 lg:py-10">
 
         {/* --- HEADER --- */}
         {isFeatured ? (
@@ -287,6 +287,17 @@ export const FeaturedArticleDetail = () => {
                 <p className="text-lg md:text-xl lg:text-3xl text-gray-600 font-serif italic leading-relaxed">
                   {article.description}
                 </p>
+              )}
+              {/* Mobile'da hero yerine inline görsel */}
+              {article.firstMedia?.src && (
+                <div className="block md:hidden w-full mt-6">
+                  <img
+                    src={article.firstMedia.src}
+                    alt={article.title}
+                    className="w-full h-auto object-cover shadow-sm"
+                  />
+                  <ImageCaption alt={article.title} />
+                </div>
               )}
             </header>
 
@@ -305,45 +316,68 @@ export const FeaturedArticleDetail = () => {
               </div>
             </div>
           </div>
+
         ) : (
-          // --- ORDINARY HEADER (İKİ EŞİT SÜTUN) ---
-          <div className="relative grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 mb-10 lg:mb-16 border-b border-gray-200 pb-8 lg:pb-10 items-start">
+          // --- NORMAL HEADER --- kategori, başlık, açıklama, görsel; meta sidebar'da
+          <div className="pt-20 lg:pt-24 pb-0">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+              <div className="hidden lg:block lg:col-span-1"></div>
 
-            {/* Sol: Başlık ve Açıklama */}
-            <header className="flex flex-col justify-center h-full">
-              {article.category && (
-                <div className="mb-4">
-                  <Label label={article.category.name} />
+              {/* META SIDEBAR — desktop'ta sol sütun, mobile'da content'in üstünde */}
+              <aside className="col-span-1 lg:col-span-2 flex flex-col items-start lg:items-end text-left lg:text-right order-2 lg:order-none">
+                <div className="flex flex-col gap-1 items-start lg:items-end mb-4 w-full">
+                  <div className="text-sm lg:text-base font-bold text-black">{article.author}</div>
+                  {article.place && <div className="text-xs text-gray-500 font-serif italic">{article.place}</div>}
+                  <div className="text-xs text-gray-400 font-medium mb-2">
+                    {article.publishedDate.toLocaleDateString('tr-TR', { year: 'numeric', month: 'long', day: 'numeric' })}
+                  </div>
+                  <div className="w-full flex items-center justify-between lg:justify-end mt-1">
+                    <IssueLabel number={issueNumber} />
+                    <div className="flex gap-1 lg:hidden">
+                      <FontButton label="A-" onClick={() => handleFontChange('decrease')} disabled={fontIndex === 0} />
+                      <FontButton label="A+" onClick={() => handleFontChange('increase')} disabled={fontIndex === FONT_SIZES.length - 1} />
+                    </div>
+                  </div>
                 </div>
-              )}
-              <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6 text-balance tracking-tight">
-                {article.title}
-              </h1>
-              {article.description && (
-                <p className="text-lg md:text-xl text-gray-600 font-serif italic leading-relaxed">
-                  {article.description}
-                </p>
-              )}
+              </aside>
 
-              <div className="hidden lg:flex gap-1 mt-8">
-                <FontButton label="A-" onClick={() => handleFontChange('decrease')} disabled={fontIndex === 0} />
-                <FontButton label="A+" onClick={() => handleFontChange('increase')} disabled={fontIndex === FONT_SIZES.length - 1} />
+              {/* MAIN CONTENT */}
+              <div className="col-span-1 lg:col-span-6 order-1 lg:order-none">
+                {/* Kategori etiketi */}
+                {article.category && (
+                  <div className="mb-4">
+                    <Label label={article.category.name} />
+                  </div>
+                )}
+                {/* Başlık */}
+                <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold leading-tight mb-4 text-balance tracking-tight">
+                  {article.title}
+                </h1>
+                {/* Açıklama */}
+                {article.description && (
+                  <p className="text-lg md:text-xl text-gray-600 font-serif italic leading-relaxed mb-6">
+                    {article.description}
+                  </p>
+                )}
+                {/* Kapak Görseli */}
+                {article.firstMedia?.src && (
+                  <div className="w-full mb-6">
+                    <img
+                      src={article.firstMedia.src}
+                      alt={article.firstMedia.alt || article.title}
+                      className="w-full h-auto object-cover shadow-sm"
+                    />
+                    <ImageCaption alt={article.firstMedia.alt || article.title} />
+                  </div>
+                )}
               </div>
-            </header>
 
-            {/* Sağ: Görsel (Keskin Köşeler, Doğal Uzunluk) */}
-            <div>
-              <div className="w-full shadow-sm">
-                <img
-                  src={article.firstMedia?.src}
-                  alt={article.title}
-                  className="w-full h-auto object-cover" // Köşe yuvarlama (rounded) yok
-                />
-              </div>
-              <ImageCaption alt={article.firstMedia?.alt || article.title} />
+              <div className="hidden lg:block lg:col-span-3"></div>
             </div>
           </div>
         )}
+
+
 
 
         {/* --- GRID (CONTENT & SIDEBAR) --- */}
@@ -351,61 +385,63 @@ export const FeaturedArticleDetail = () => {
 
           <div className="hidden lg:block lg:col-span-1"></div>
 
-          {/* --- SIDEBAR --- */}
-          <aside className="col-span-1 lg:col-span-2 relative flex flex-col items-start lg:items-end text-left lg:text-right">
-            <div className="w-full pt-0 lg:pt-0 border-t-0 lg:border-t-0 border-black lg:w-auto">
+          {/* --- SIDEBAR (sadece featured için) --- */}
+          {isFeatured && (
+            <aside className="col-span-1 lg:col-span-2 relative flex flex-col items-start lg:items-end text-left lg:text-right">
+              <div className="w-full pt-0 lg:pt-0 border-t-0 lg:border-t-0 border-black lg:w-auto">
 
-              <div className="flex flex-col gap-1 items-start lg:items-end mb-6 w-full">
-                <div className="text-sm lg:text-base font-bold text-black">{article.author}</div>
-                {article.place && <div className="text-xs text-gray-500 font-serif italic">{article.place}</div>}
+                <div className="flex flex-col gap-1 items-start lg:items-end mb-6 w-full">
+                  <div className="text-sm lg:text-base font-bold text-black">{article.author}</div>
+                  {article.place && <div className="text-xs text-gray-500 font-serif italic">{article.place}</div>}
 
-                <div className="text-xs text-gray-400 font-medium mb-3">
-                  {article.publishedDate.toLocaleDateString('tr-TR', { year: 'numeric', month: 'long', day: 'numeric' })}
-                </div>
-
-                <div className="w-full flex items-center justify-between lg:justify-end mt-1">
-                  <IssueLabel number={issueNumber} />
-                  <div className="flex gap-1 lg:hidden">
-                    <FontButton
-                      label="A-"
-                      onClick={() => handleFontChange('decrease')}
-                      disabled={fontIndex === 0}
-                    />
-                    <FontButton
-                      label="A+"
-                      onClick={() => handleFontChange('increase')}
-                      disabled={fontIndex === FONT_SIZES.length - 1}
-                    />
+                  <div className="text-xs text-gray-400 font-medium mb-3">
+                    {article.publishedDate.toLocaleDateString('tr-TR', { year: 'numeric', month: 'long', day: 'numeric' })}
                   </div>
+
+                  <div className="w-full flex items-center justify-between lg:justify-end mt-1">
+                    <IssueLabel number={issueNumber} />
+                    <div className="flex gap-1 lg:hidden">
+                      <FontButton
+                        label="A-"
+                        onClick={() => handleFontChange('decrease')}
+                        disabled={fontIndex === 0}
+                      />
+                      <FontButton
+                        label="A+"
+                        onClick={() => handleFontChange('increase')}
+                        disabled={fontIndex === FONT_SIZES.length - 1}
+                      />
+                    </div>
+                  </div>
+
+                </div>
+
+                <div className="hidden lg:flex flex-wrap gap-2 justify-start lg:justify-end mb-6">
+                  {article.category && (
+                    <Link
+                      to={`/category?category=${encodeURIComponent(article.category.name)}`}
+                      className="inline-block"
+                    >
+                      <Label label={article.category.name} />
+                    </Link>
+                  )}
+                  {article.tags && article.tags.map((tag, i) => (
+                    <Link
+                      key={i}
+                      to={`/category?tag=${encodeURIComponent(tag.name)}`}
+                      className="inline-block"
+                    >
+                      <Label label={tag.name} />
+                    </Link>
+                  ))}
                 </div>
 
               </div>
-
-              <div className="flex flex-wrap gap-2 justify-start lg:justify-end mb-6">
-                {article.category && (
-                  <Link
-                    to={`/category?category=${encodeURIComponent(article.category.name)}`}
-                    className="inline-block"
-                  >
-                    <Label label={article.category.name} />
-                  </Link>
-                )}
-                {article.tags && article.tags.map((tag, i) => (
-                  <Link
-                    key={i}
-                    to={`/category?tag=${encodeURIComponent(tag.name)}`}
-                    className="inline-block"
-                  >
-                    <Label label={tag.name} />
-                  </Link>
-                ))}
-              </div>
-
-            </div>
-          </aside>
+            </aside>
+          )}
 
           {/* Content */}
-          <div className="col-span-1 lg:col-span-6 relative z-0">
+          <div className={`${isFeatured ? 'col-span-1 lg:col-span-6' : 'col-span-1 lg:col-span-6 lg:col-start-4'} relative z-0`}>
             <article className="w-full">
               <div className="w-full">
                 {renderContent()}
@@ -414,6 +450,25 @@ export const FeaturedArticleDetail = () => {
 
             {/* Yorumlar */}
             <section className="mt-12 lg:mt-16 border-t border-gray-200 pt-8 lg:pt-12">
+              {/* Etiketler: featured mobile'da içeriğin altında, normal her zaman altında */}
+              {article.tags && article.tags.length > 0 && (
+                <div className={`flex flex-wrap gap-2 mb-8 pb-8 border-b border-gray-100 ${isFeatured ? 'lg:hidden' : ''}`}>
+                  {isFeatured && article.category && (
+                    <Link to={`/category?category=${encodeURIComponent(article.category.name)}`} className="inline-block">
+                      <Label label={article.category.name} />
+                    </Link>
+                  )}
+                  {article.tags.map((tag, i) => (
+                    <Link
+                      key={i}
+                      to={`/category?tag=${encodeURIComponent(tag.name)}`}
+                      className="inline-block"
+                    >
+                      <Label label={tag.name} />
+                    </Link>
+                  ))}
+                </div>
+              )}
               <h3 className="text-lg lg:text-xl font-bold mb-4">Görüş Bildir</h3>
               <p className="text-gray-500 mb-6 italic text-sm">
                 Yorumlarınız doğrudan Genç Hayat yazı kuruluna gitmektedir.
@@ -435,15 +490,15 @@ export const FeaturedArticleDetail = () => {
           <div className="hidden lg:block lg:col-span-3"></div>
         </div>
 
-        {/* --- DİĞER YAZILAR --- */}
+        {/* --- SON SAYININ ÖNERİLEN YAZILARI --- */}
         {relatedArticles.length > 0 && (
           <section className="w-full mt-8 border-t border-black/10 pt-10">
             <div className="w-full text-center lg:text-left">
               <h3 className="text-2xl lg:text-3xl font-bold mb-4 px-4 sm:px-8 md:px-16 lg:px-24 xl:px-[140px] font-sans tracking-tight">
-                Diğer Yazılar
+                Son Sayının Önerilen Yazıları
               </h3>
             </div>
-            <ArticleLine articles={relatedArticles} />
+            <ArticleLine articles={relatedArticles} centered={true} />
           </section>
         )}
 

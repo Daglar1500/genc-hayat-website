@@ -28,6 +28,8 @@ export const NAV_DATA = {
         { label: "8 Mart", to: "/dosyalar/8-mart" },
         { label: "Antiemperyalizm", to: "/dosyalar/antiemperyalizm" },
         { label: "Anadil", to: "/dosyalar/anadil" },
+        { label: "25 Kasım", to: "/dosyalar/25-kasim" },
+        { label: "MESEM", to: "/dosyalar/mesem" },
     ],
     issues: [
         { label: "505. Sayı", to: "/sayi/505" },

@@ -1,6 +1,5 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-// GridMotion ve Resim Importları (Dosya yollarını projenize göre kontrol edin)
 import GridMotion from '../lib/GridMotion';
 import img1 from "../public/gh-kapak/GH - Sayı 505 - 24 Aralık 2025_page-0001.jpg";
 import img2 from "../public/gh-kapak/gh.jpg";

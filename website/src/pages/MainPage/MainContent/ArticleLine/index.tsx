@@ -147,9 +147,10 @@ const MobileCarousel = ({ articles }: { articles: any[] }) => {
 interface ArticleLineProps {
   articles?: any[]; // Dışarıdan gelen makale listesi
   className?: string;
+  centered?: boolean; // 3 veya daha az yazı varsa ortala
 }
 
-export const ArticleLine = ({ articles, className }: ArticleLineProps) => {
+export const ArticleLine = ({ articles, className, centered }: ArticleLineProps) => {
   const [isMobile, setIsMobile] = useState(false);
 
   // 1. Veri Kontrolü: Prop gelirse onu kullan, yoksa Mock'tan ilk 4'ü al
@@ -158,21 +159,10 @@ export const ArticleLine = ({ articles, className }: ArticleLineProps) => {
     return MOCK_ARTICLES.slice(0, 4);
   }, [articles]);
 
-  // 2. Grid Sınıfı Hesaplama: 3'lü veya 4'lü yapıya göre dinamik
-  const gridClassName = useMemo(() => {
-    const count = displayedArticles.length;
-    let classes = "grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-";
-
-    if (count === 3) {
-      // 3 tane ise: LG ve XL'de 3 sütun
-      classes += " lg:grid-cols-3 xl:grid-cols-3";
-    } else {
-      // 4 (veya diğer) ise: LG'de 3, XL'de 4 sütun (Varsayılan)
-      classes += " lg:grid-cols-3 xl:grid-cols-4";
-    }
-
-    return classes;
-  }, [displayedArticles.length]);
+  // centered=true ve 4'ten az yazı varsa grid'e justify-center ekle
+  const gridClassName = centered && displayedArticles.length < 4
+    ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center"
+    : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6";
 
   useEffect(() => {
     const checkMobile = () => { setIsMobile(window.innerWidth < 768); };

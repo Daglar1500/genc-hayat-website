@@ -193,50 +193,56 @@ export const IssueDetailPage = () => {
             {/* Hero: Cover + Sunu/Rota */}
             <div className="pt-24 pb-0 bg-white">
                 <div className="max-w-[1400px] mx-auto px-4 sm:px-8 md:px-16 lg:px-24 xl:px-[140px]">
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start pb-12 border-b border-gray-200">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-stretch pb-12 border-b border-gray-200">
 
                         {/* Cover — 4 columns (1/3 of 12) */}
-                        <div className="lg:col-span-4">
-                            {issueInfo ? (
-                                <div className="shadow-2xl hover:shadow-3xl transition-shadow duration-300">
-                                    <img
-                                        src={issueInfo.cover}
-                                        alt={`${issueNumber}. Sayı Kapağı`}
-                                        className="w-full h-auto object-cover"
-                                    />
-                                </div>
-                            ) : (
-                                <div className="w-full aspect-[3/4] bg-gray-100 flex items-center justify-center">
-                                    <span className="text-gray-400 text-sm">Kapak Görseli Yok</span>
-                                </div>
-                            )}
-                            {issueInfo && (
-                                <a
-                                    href={issueInfo.pdfUrl}
-                                    className="mt-4 w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-black text-white text-xs font-bold uppercase tracking-widest hover:bg-red-600 transition-colors duration-300"
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
-                                        <path d="M10.75 2.75a.75.75 0 00-1.5 0v8.614L6.295 8.235a.75.75 0 10-1.09 1.03l4.25 4.5a.75.75 0 001.09 0l4.25-4.5a.75.75 0 00-1.09-1.03l-2.955 3.129V2.75z" />
-                                        <path d="M3.5 12.75a.75.75 0 00-1.5 0v2.5A2.75 2.75 0 004.75 18h10.5A2.75 2.75 0 0018 15.25v-2.5a.75.75 0 00-1.5 0v2.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-2.5z" />
-                                    </svg>
-                                    Sayıyı İndir (PDF)
-                                </a>
-                            )}
+                        <div className="lg:col-span-4 lg:relative">
+                            <div className="lg:sticky lg:top-32 flex flex-col gap-6">
+                                {issueInfo ? (
+                                    <div className="shadow-2xl hover:shadow-3xl transition-shadow duration-300">
+                                        <img
+                                            src={issueInfo.cover}
+                                            alt={`${issueNumber}. Sayı Kapağı`}
+                                            className="w-full h-auto object-cover"
+                                        />
+                                    </div>
+                                ) : (
+                                    <div className="w-full aspect-[3/4] bg-gray-100 flex items-center justify-center">
+                                        <span className="text-gray-400 text-sm">Kapak Görseli Yok</span>
+                                    </div>
+                                )}
+                                {issueInfo && (
+                                    <a
+                                        href={issueInfo.pdfUrl}
+                                        className="w-full inline-flex items-center justify-center gap-2 px-5 py-4 bg-black text-white text-xs font-bold uppercase tracking-widest hover:bg-red-600 transition-colors duration-300"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+                                            <path d="M10.75 2.75a.75.75 0 00-1.5 0v8.614L6.295 8.235a.75.75 0 10-1.09 1.03l4.25 4.5a.75.75 0 001.09 0l4.25-4.5a.75.75 0 00-1.09-1.03l-2.955 3.129V2.75z" />
+                                            <path d="M3.5 12.75a.75.75 0 00-1.5 0v2.5A2.75 2.75 0 004.75 18h10.5A2.75 2.75 0 0018 15.25v-2.5a.75.75 0 00-1.5 0v2.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-2.5z" />
+                                        </svg>
+                                        Sayıyı İndir (PDF)
+                                    </a>
+                                )}
+                            </div>
                         </div>
 
                         {/* Info + Sunu/Rota — 8 columns */}
-                        <div className="lg:col-span-8 flex flex-col items-stretch pt-0 lg:pt-2">
-                            <p className="text-xs tracking-[3px] text-red-600 uppercase font-labilvariable mb-3">Dergi</p>
-                            <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-zinc-900 mb-4 leading-tight">
-                                {issueNumber}. Sayı
-                            </h1>
-                            {issueInfo && (
-                                <>
-                                    <p className="text-xl text-gray-500 font-serif italic mb-1">{issueInfo.title}</p>
-                                    <p className="text-sm text-gray-400 mb-6">{issueInfo.date}</p>
-                                </>
-                            )}
-                            <SunuRotaPanel issueNumber={issueNumber} />
+                        <div className="lg:col-span-8 flex flex-col h-full pt-0">
+                            <div className="shrink-0 mb-2">
+                                <p className="text-xs tracking-[3px] text-red-600 uppercase font-labilvariable mb-3">Dergi</p>
+                                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-zinc-900 mb-4 leading-tight">
+                                    {issueNumber}. Sayı
+                                </h1>
+                                {issueInfo && (
+                                    <>
+                                        <p className="text-xl text-gray-500 font-serif italic mb-1">{issueInfo.title}</p>
+                                        <p className="text-sm text-gray-400 mb-4">{issueInfo.date}</p>
+                                    </>
+                                )}
+                            </div>
+                            <div className="flex-1 min-h-0 w-full flex flex-col">
+                                <SunuRotaPanel issueNumber={issueNumber} />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -250,15 +256,59 @@ export const IssueDetailPage = () => {
                         <span className="ml-3 text-sm font-normal text-gray-400">({articles.length} yazı)</span>
                     </h2>
                     {articles.length > 0 ? (
-                        <ArticleLine articles={articles} />
+                        <ArticleLine articles={articles} className="!px-0 !py-0 !max-w-none w-full" />
                     ) : (
                         <div className="flex flex-col items-center justify-center py-20 text-center">
                             <p className="text-xl text-gray-500 font-serif italic">Bu sayı için listelenecek yazı bulunmuyor.</p>
-                            <Link to="/sayilar" className="mt-4 text-sm font-bold text-red-600 underline decoration-2 underline-offset-4">
-                                Tüm Sayılara Git
-                            </Link>
                         </div>
                     )}
+                </div>
+            </section>
+
+            {/* Diğer Sayılar (Max 5, No Scroll) */}
+            <section className="py-12 bg-white">
+                <div className="max-w-[1400px] mx-auto px-4 sm:px-8 md:px-16 lg:px-24 xl:px-[140px]">
+                    <div className="flex items-center justify-between mb-8">
+                        <h3 className="text-2xl lg:text-3xl font-bold tracking-tight text-zinc-900 border-b-2 border-red-600 pb-2 inline-block">
+                            Diğer Sayılar
+                        </h3>
+                        <Link to="/sayilar" className="text-sm font-bold text-red-600 hover:text-red-700 transition-colors uppercase tracking-wider">
+                            Tümünü Gör
+                        </Link>
+                    </div>
+
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+                        {Object.entries(ISSUE_COVERS)
+                            .sort(([a], [b]) => parseInt(b) - parseInt(a))
+                            .filter(([num]) => num !== id)
+                            .slice(0, 5)
+                            .map(([num, info]) => (
+                                <Link
+                                    key={num}
+                                    to={`/sayi/${num}`}
+                                    className="group flex flex-col items-center"
+                                >
+                                    <div className="w-full relative flex flex-col items-center overflow-hidden bg-transparent shadow-md transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-1 mb-4">
+                                        <img
+                                            src={info.cover}
+                                            alt={`${num}. Sayı`}
+                                            className="w-full h-auto object-contain block"
+                                        />
+                                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                            <span className="text-white font-bold tracking-widest text-sm uppercase">İncele</span>
+                                        </div>
+                                    </div>
+                                    <div className="text-center w-full px-2">
+                                        <h4 className="font-bold text-zinc-900 group-hover:text-red-600 transition-colors leading-tight mb-1 text-base">
+                                            Sayı {num}
+                                        </h4>
+                                        <p className="text-xs text-gray-500 font-serif italic truncate w-full">
+                                            {info.title.replace('Dosya: ', '')}
+                                        </p>
+                                    </div>
+                                </Link>
+                            ))}
+                    </div>
                 </div>
             </section>
         </div>

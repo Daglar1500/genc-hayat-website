@@ -18,16 +18,24 @@ const VISIBLE_COUNT = 4;
 
 // ─── CAROUSEL ────────────────────────────────────────────────────────────────
 
-const ArticleCarousel = () => {
+const ArticleCarousel = ({ issueNumber, isLatest }: { issueNumber: number; isLatest: boolean }) => {
   const [startIndex, setStartIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const total = recommendedArticles.length;
   const canNext = startIndex + VISIBLE_COUNT < total;
   const canPrev = startIndex > 0;
 
+  const heading = isLatest
+    ? 'Son Sayının Önerilen Yazıları'
+    : `${issueNumber}. Sayının Önerilen Yazıları`;
+
   const next = useCallback(() => { if (canNext) setStartIndex(i => i + 1); }, [canNext]);
   const prev = useCallback(() => { if (canPrev) setStartIndex(i => i - 1); }, [canPrev]);
   const resetToStart = () => setStartIndex(0);
+
+  useEffect(() => {
+    setStartIndex(0);
+  }, [issueNumber]);
 
   useEffect(() => {
     if (isPaused) return;
@@ -43,7 +51,7 @@ const ArticleCarousel = () => {
     <div className="relative" onMouseEnter={() => setIsPaused(true)} onMouseLeave={() => setIsPaused(false)}>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <span className="text-xs font-bold text-zinc-400 uppercase tracking-widest">Önerilen Yazılar</span>
+          <span className="text-xs font-bold text-zinc-400 uppercase tracking-widest">{heading}</span>
           <div className="h-0.5 w-12 bg-black mt-1.5" />
         </div>
         <div className="flex items-center gap-2">
@@ -348,34 +356,24 @@ export const SunuRotaPanel = ({ issueData, expanded: externalExpanded, onToggleE
 const VISIBLE_ISSUES = 3;
 
 const CoverCard = ({ issueData, issuesList, onSelectIssue }: { issueData: IssueData, issuesList: IssueData[], onSelectIssue: (issue: IssueData) => void }) => {
-  const [issueOffset, setIssueOffset] = useState(0);
+  // Tüm sayılar sabit sırada: en büyükten küçüğe
+  const allNumbers = [...issuesList].sort((a, b) => b.number - a.number).map(i => i.number);
 
-  // Consider 508 as the latest issue, or whichever is higher in the data tracker.
-  const maxIssue = Math.max(508, ...issuesList.map(i => i.number), issueData.number);
-
-  // Generate an array of all available issue numbers from maxIssue down to 1, excluding the currently viewed one.
-  const allNumbers = Array.from({ length: maxIssue }, (_, i) => maxIssue - i).filter(n => n !== issueData.number);
-
-  // When the current issue changes, auto-center the pagination so that its neighbors (newer and older) are visible
-  useEffect(() => {
-    // Find where the next older issue is in our filtered array
-    const idx = allNumbers.findIndex(n => n < issueData.number);
-    // Offset by -1 to ideally show 1 newer issue and 2 older issues (if VISIBLE_ISSUES is 3)
-    let newOffset = idx !== -1 ? idx - 1 : 0;
-    // Don't let offset go out of bounds
-    newOffset = Math.max(0, Math.min(newOffset, allNumbers.length - VISIBLE_ISSUES));
-    setIssueOffset(newOffset);
-  }, [issueData.number, allNumbers.length]);
+  const [issueOffset, setIssueOffset] = useState(() => {
+    // Başlangıçta seçili sayının görünür olduğu offset'i bul
+    const idx = allNumbers.indexOf(issueData.number);
+    return Math.max(0, Math.min(idx, allNumbers.length - VISIBLE_ISSUES));
+  });
 
   const handleNextIssues = () => {
     if (issueOffset + VISIBLE_ISSUES < allNumbers.length) {
-      setIssueOffset(Math.min(issueOffset + VISIBLE_ISSUES, allNumbers.length - VISIBLE_ISSUES));
+      setIssueOffset(Math.min(issueOffset + 1, allNumbers.length - VISIBLE_ISSUES));
     }
   };
 
   const handlePrevIssues = () => {
-    if (issueOffset - VISIBLE_ISSUES >= 0) {
-      setIssueOffset(Math.max(0, issueOffset - VISIBLE_ISSUES));
+    if (issueOffset > 0) {
+      setIssueOffset(Math.max(0, issueOffset - 1));
     }
   };
 
@@ -383,19 +381,7 @@ const CoverCard = ({ issueData, issuesList, onSelectIssue }: { issueData: IssueD
 
   const handleSelectNumber = (num: number) => {
     const found = issuesList.find(i => i.number === num);
-    if (found) {
-      onSelectIssue(found);
-    } else {
-      // Fallback generator for issues without explicit mock data logic
-      onSelectIssue({
-        number: num,
-        cover: gh_cover, // placeholder image wrapper
-        sunuText: <p className="mb-5 text-xl">{num}. Sayımızın sunuş yazısı henüz dijital arşive eklenmedi, içerikler ilerleyen güncellemelerde yüklenecektir.</p>,
-        rotaTitle: "Arşiv: Sayı " + num,
-        rotaDesc: `${num}. sayımıza ait arşiv belgeleri.`,
-        rotaContent: <div className="mb-5"><h4 className="text-xl font-bold mb-3">Arşiv Kaydı</h4><p>Bu sayıya ait rota ve sunu yazıları dijitalleşme sürecindedir.</p></div>
-      });
-    }
+    if (found) onSelectIssue(found);
   };
 
   return (
@@ -422,60 +408,45 @@ const CoverCard = ({ issueData, issuesList, onSelectIssue }: { issueData: IssueD
         </div>
       </Link>
 
-      {/* Previous Issues Selector */}
-      <div className="relative z-20 flex gap-1 justify-center items-center mb-6 shrink-0 overflow-hidden min-h-[32px]">
-        {/* Prev Issues Button (Look newer) */}
+      {/* Issue Selector — sabit sıra, sadece seçili vurgulanır */}
+      <div className="relative z-20 flex gap-1 justify-center items-center mb-6 shrink-0 min-h-[32px]">
+        {/* Önceki (daha yeni sayılar) */}
         {issueOffset > 0 && (
           <button
             onClick={handlePrevIssues}
             className="flex items-center justify-center w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 text-zinc-600 transition-colors shrink-0 mr-1"
             aria-label="Daha Yeni Sayılar"
-            title="Daha Yeni Sayılar"
           >
-            <svg
-              className="w-4 h-4 transition-transform duration-300"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
         )}
 
-        <AnimatePresence mode="popLayout">
-          {visibleNumbers.map((num) => (
-            <motion.button
+        {visibleNumbers.map((num) => {
+          const isSelected = num === issueData.number;
+          return (
+            <button
               key={num}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              transition={{ duration: 0.2 }}
               onClick={() => handleSelectNumber(num)}
-              className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${issueData.number === num
-                ? 'bg-red-600 text-white shadow-md'
-                : 'bg-white border border-gray-200 text-zinc-600 hover:border-black hover:text-black'
+              className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${isSelected
+                  ? 'bg-red-600 text-white shadow-md cursor-default'
+                  : 'bg-white border border-gray-200 text-zinc-600 hover:border-black hover:text-black'
                 }`}
             >
               {num}
-            </motion.button>
-          ))}
-        </AnimatePresence>
+            </button>
+          );
+        })}
 
-        {/* Next Issues Button (Look older) */}
+        {/* Sonraki (daha eski sayılar) */}
         {issueOffset + VISIBLE_ISSUES < allNumbers.length && (
           <button
             onClick={handleNextIssues}
             className="flex items-center justify-center w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 text-zinc-600 transition-colors shrink-0 ml-1"
-            aria-label="Daha Eski Sayılar, Sayı 1'e doğru"
-            title="Daha Eski Sayılar"
+            aria-label="Daha Eski Sayılar"
           >
-            <svg
-              className="w-4 h-4 transition-transform duration-300"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
             </svg>
           </button>
@@ -486,9 +457,14 @@ const CoverCard = ({ issueData, issuesList, onSelectIssue }: { issueData: IssueD
   );
 };
 
+
 // ─── MOBILE LAYOUT ──────────────────────────────────────────────────────────
 
 const MobileLayout = ({ selectedIssue, issuesList, onSelectIssue }: { selectedIssue: IssueData, issuesList: IssueData[], onSelectIssue: (issue: IssueData) => void }) => {
+  const latestIssueNumber = Math.max(...issuesList.map(i => i.number));
+  const isLatest = selectedIssue.number === latestIssueNumber;
+  const heading = isLatest ? 'Son Sayının Önerilen Yazıları' : `${selectedIssue.number}. Sayının Önerilen Yazıları`;
+
   return (
     <div className="flex flex-col gap-8">
       {/* 1. Cover */}
@@ -497,9 +473,9 @@ const MobileLayout = ({ selectedIssue, issuesList, onSelectIssue }: { selectedIs
       {/* 2. Sunu/Rota dark box */}
       <SunuRotaPanel issueData={selectedIssue} />
 
-      {/* 3. Önerilen Yazılar — uses same ArticleLine mobile carousel */}
+      {/* 3. Önerilen Yazılar */}
       <div>
-        <span className="text-xs font-bold text-zinc-400 uppercase tracking-widest pl-4">Önerilen Yazılar</span>
+        <span className="text-xs font-bold text-zinc-400 uppercase tracking-widest pl-4">{heading}</span>
         <div className="h-0.5 w-12 bg-black mt-1.5 mb-2 ml-4" />
         <ArticleLine articles={recommendedArticles} className="!py-0" />
       </div>
@@ -517,6 +493,9 @@ export const MainSection = () => {
     setSelectedIssue(issue);
     setIsExpanded(false);
   };
+
+  const latestIssueNumber = Math.max(...recentIssuesData.map(i => i.number));
+  const isLatest = selectedIssue.number === latestIssueNumber;
 
   return (
     <section className="py-16 md:py-24 bg-white font-bradford">
@@ -545,7 +524,7 @@ export const MainSection = () => {
 
           {/* Row 2: Carousel */}
           <div className="border-t border-gray-100 pt-10">
-            <ArticleCarousel />
+            <ArticleCarousel issueNumber={selectedIssue.number} isLatest={isLatest} />
           </div>
         </div>
       </div>

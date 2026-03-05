@@ -18,7 +18,7 @@ export const ShareFloatingButton = () => {
                 <button className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white shadow-lg border border-gray-200 flex items-center justify-center text-gray-700 hover:bg-black hover:text-white hover:border-black transition-colors">
                     <span className="sr-only">X (Twitter)</span>
                     {/* Güncel X Logosu */}
-                    <svg className="w-4 h-4 md:w-5 md:h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zl-1.161 8.761-6.572-8.71h-1.87l7.135 9.475z"></path></svg>
+                    <svg className="w-4 h-4 md:w-5 md:h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 8.761l-6.572-8.71h-1.87l7.135 9.475z"></path></svg>
                 </button>
 
                 {/* 3. WhatsApp (Yeşil) */}

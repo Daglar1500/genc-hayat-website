@@ -1,41 +1,8 @@
 import { useParams } from 'react-router-dom';
 import { MOCK_ARTICLES } from '../data/MockArticles';
 import { ArticleCardElement } from './MainPage/ArticleCard';
+import { DOSYA_DATA } from '../data/DosyaData';
 
-// --- Dosya Veri ---
-interface DosyaInfo {
-    title: string;
-    description: string;
-    heroImage: string;
-    filterTag?: string;
-}
-
-const DOSYA_DATA: Record<string, DosyaInfo> = {
-    'cumhuriyet': {
-        title: 'Cumhuriyet',
-        description: 'Cumhuriyetin tarihsel sürecini, ideallerini ve günümüzdeki yansımalarını ele alıyoruz.',
-        heroImage: 'https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=1600&q=80',
-        filterTag: 'cumhuriyet',
-    },
-    '8-mart': {
-        title: '8 Mart',
-        description: "8 Mart Dünya Emekçi Kadınlar Günü'ne dair yazılar ve analizler.",
-        heroImage: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=1600&q=80',
-        filterTag: '8 mart',
-    },
-    'antiemperyalizm': {
-        title: 'Antiemperyalizm',
-        description: 'Emperyalizme karşı mücadele ve antiemperyalist hareketler üzerine derinlemesine analizler.',
-        heroImage: 'https://images.unsplash.com/photo-1521295121783-8a321d551ad2?auto=format&fit=crop&w=1600&q=80',
-        filterTag: 'antiemperyalizm',
-    },
-    'anadil': {
-        title: 'Anadil',
-        description: 'Anadil hakkı, dil politikaları ve dilsel çeşitlilik üzerine yazılar.',
-        heroImage: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=1600&q=80',
-        filterTag: 'anadil',
-    },
-};
 
 export const DosyalarPage = () => {
     const { slug } = useParams<{ slug: string }>();

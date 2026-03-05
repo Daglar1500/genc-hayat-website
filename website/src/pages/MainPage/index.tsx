@@ -11,6 +11,7 @@ import { VideoSection } from "./MainContent/YoutubeVideos";
 import { MOCK_ARTICLES } from "../../data/MockArticles";
 import { ArchiveSection } from "./MainContent/IssuesSection"
 import { SpotifySection } from "./MainContent/SpotifyListsSection";
+import { LetterboxdSection } from "./MainContent/LetterboxdSection";
 
 export const MainContent = () => {
 
@@ -58,6 +59,7 @@ export const MainContent = () => {
       <ArticleLine articles={lineArticles3} />
 
       <SpotifySection />
+      <LetterboxdSection />
 
       <ArchiveSection />
       {/* Sadece desktop modda (lg ve üzeri ekranlarda) görünür */}

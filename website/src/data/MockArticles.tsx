@@ -8,8 +8,104 @@ const getLabel = (name: string, type: "category" | "tag" = "category") => {
   return found || LabeloDefault[0];
 };
 export const MOCK_ARTICLES: ArticleCard[] = [
-
   {
+    type: "sunu",
+    href: "/articles/sunu-504",
+    title: "Genç Hayat 504. Sayı Sunuş",
+    description: "Okullarımız çoğu zaman yokluğuyla hatırlanan, varlığıyla pek fark etme şansına erişemediğimiz bir etken maddenin arayışındayız. Mesela bir sıvı sabun, dezenfektan tam da bu özellikleri karşılıyor bizim için.",
+    author: "Yayın Kurulu",
+    issueNumber: 504,
+    publishedDate: new Date("2025-11-20"),
+    firstMedia: {
+      type: "image",
+      src: "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=1600&q=80",
+      mediaLayout: "full-width"
+    },
+    category: getLabel("güncel"),
+    tags: [getLabel("gençlik hareketi tarihi", "tag")],
+    content: [
+      {
+        blockContent: {
+          type: "text",
+          textContent: "Okullarımız çoğu zaman yokluğuyla hatırlanan, varlığıyla pek fark etme şansına erişemediğimiz bir etken maddenin arayışındayız. Mesela bir sıvı sabun, dezenfektan tam da bu özellikleri karşılıyor bizim için. Günlük hayatta sessizce birikiren- ler vardır pas,kir, çeşitli mikroplar gibi; belki kabullendiğimiz belki alıştığımız. Bu tarz şeyler ortak alanlarda daha hızlı da çoğalabilirler kimi zaman; kalabalıkta, ihmalde, üst üste bindikçe görünmezleşirler belki. Ancak o ortak alanları oluş turan kalabalıkların, yani her bir kişinin efor gösterdiği koşullarda, ne kadar fazla kişi 'Böyle ah vah'la ne yapacağız biz ya, kalkın bir şey yapalım ya' diyerek, 'Öyle oturup izleyelim mi ya, ortalığı pislik götürüyor' diyerek harekete geçme kararına katılırsa; hasta eden mikroplarla, etrafı kirletenlerin ortadan kalkması da o kadar etkili olur. Düzenli ve ısrarlı bir müdahale varsa sonuç verir."
+        }
+      },
+      {
+        blockContent: {
+          type: "text",
+          textContent: "Günlük hayatta alıştığımız sorunlar da böyledir; birikir, görünmez hale gelir kanıksamaktan bazen aynı zararlı mikroorganizmalar gibi, normalleşir varlıkları. Oysa yapılan araştırmalann dezenfektanlanın bunlar üzerindeki etkisini gösterdiği gibi, tarihin de defalarca gösterdiği bir formül, kanıtladığı bir gerçeklik vardır; sınıf safında yürüyen gençlik mücadelesi kazanır. Geçmiş deneyimlerinden öğrendiği mücadele sayesinde birikmiş sorunların giderildiğini tespit etmiştir tarih, araştırmalar, geçmiş günümüz güncel ömekleri. İşte böyle, israrlı ve düzenli kullanım olduğunda sorunların %90 oranında azaldığı, bize, güvenceli bir yaşam hakkımıza, nitelikli ve parasız bir eğitime yönelik saldırıların da %100 oranın- da engellendiği görülmüştür. Yapılan gözlemler aynı zamanda şunu gösterir: birikmiş sorunlar kendiliğinden dağılmaz, kalıcı etki için de her bir kişinin önlem alması gerekir. Tek sefer kullanımına başvurulan çözümler yüzeyde etki edebilir ancak kalıcı çözüm için süreklilik gerekir. İstikrarlı ve örgütlü bir mücadele varsa kazanım gelir."
+        }
+      },
+      {
+        blockContent: {
+          type: "text",
+          textContent: "Bu sayımızda liseler yeniden açılırken, eğitim bakanının hamlelerinin öğrenciler lehine olmadığı bir kez daha açığa çıkıyor. Liseliler parasız, bilimsel ve demokratik eğitim istiyor, güvenli okullar, hijyenik koşullar, günde bir öğün ücretsiz yemek, karşılanabilir kantin fiyatları talep ediyor. Ezbere müfredat yerine ilgi alanlarına ve yeteneklerine göre öğrenmek istiyorlar; MESEM adı altında güvencesiz çalıştırılmak, iş kazalanında ya da iş cinayetlerinde hayatını kaybeden çocuk ve genç işçilerden biri olmak istemiyorlar. Bunun için de mücadeleden başka çare kalmıyor, etken maddesiyse örgütlülük olmadığı müddetçe sonuç vermiyor. İşte bu yüzden her okulda, bazı basit ihtiyaçlanın bulunması gerektiği gibi, mücadelenin de artık bir zorunluluk olarak bulunması gerekiyor."
+        }
+      },
+      {
+        blockContent: {
+          type: "text",
+          textContent: "İşte böyle, alanlarımızda birikenleri hatırlatıyor; temizliğin tek başına değil, birlikte mümkün olduğunu göstermek için bir araya getiriyoruz sayfalarımızı yeniden. Herkesin kullandığı yerler için tasarlanmış bir çözümden, süreklilik isteyen bir alışkanlıktan söz ediyoruz, çünkü bazı şeyler lüks değil, ihtiyaç olduğunu biliyoruz. Ve bazı şeylerin hepimizce kullanılması, her yerde bulunması gerektiğini biliyoruz."
+        }
+      },
+      {
+        blockContent: {
+          type: "text",
+          textContent: "Dergimizdeki yazılanın ifade ettiği gibi, 'kasanın ağzı ihtiyaçlarımıza kapalı ama savaşlara ardına kadar açık bu düzende, ve enstrüman telinden daha gergin hissedebiliyoruz zaman zaman. Ama yalnız değiliz, birlikteliğimize sahibiz, gücümüzü birliğini alan işçiler gibi; biz de gücümüzü birlikte, ortak sorunlara ortak çözümler için hareket edersek buluyoruz. Genç Hayat, 508. sayısıyla karşınızda."
+        }
+      }
+    ]
+  },
+  {
+    type: "rota",
+    href: "/articles/rota-504",
+    title: "Pusulasız Zamanlarda Yön Bulmak",
+    description: "Bu yazı, gençliğin bugünkü koşullarını ve Erdal Eren'in mücadelesinden alınacak dersleri ele almaktadır.",
+    author: "Yayın Kurulu",
+    issueNumber: 504,
+    publishedDate: new Date("2025-11-20"),
+    firstMedia: {
+      type: "image",
+      src: "https://images.unsplash.com/photo-1595113316349-9fa4eb24f884?q=80&w=1600",
+      mediaLayout: "full-width"
+    },
+    category: getLabel("güncel"),
+    tags: [getLabel("siyasi tarih", "tag")],
+    content: [
+      {
+        blockContent: {
+          type: "subheading",
+          textContent: "Geçmişten Bugüne"
+        }
+      },
+      {
+        blockContent: {
+          type: "text",
+          textContent: "Erdal Eren'in 12 Eylül faşist cuntasınca idam edilişinin üzerinden 45 yıl geçti. Erdal, o dönemde Ankara Ortaöğrenimliler Derneği (ANOD) bünyesinde örgütlenmiş, işçi sınıfı mücadelesinin ilk adımlarını atan kararlı bir meslek lisesi öğrencisiydi."
+        }
+      },
+      {
+        blockContent: {
+          type: "text",
+          textContent: "Yoksulluk her geçen gün daha da derinleşiyor. Bugün Erdal gibi meslek liseli olan yüz binlerce genç, MESEM adı altında, denetimsiz, sigortasız işyerlerine adeta sürülüyor."
+        }
+      },
+      {
+        blockContent: {
+          type: "subheading",
+          textContent: "Mücadeleyi Güncellemek"
+        }
+      },
+      {
+        blockContent: {
+          type: "text",
+          textContent: "Erdal Eren'in mücadelesini güncellemek, bugünün gençliğinin en acil görevidir. Çünkü dün olduğu gibi bugün de özgürlük ve eşitlik mücadelesi sınavdan geçiriyor bizi."
+        }
+      }
+    ]
+  },
+  {
+    type: "featured",
     href: "/articles/pluribus-soguk-savas",
     title: "Pluribus: Soğuk Savaş’tan dijital çağa kolektivizm kâbusları",
     description: "Dizinin asıl açtığı soru, şu: “İnsanlığın gerçekten kurtulması için, hepimizin aynı zihinle düşünmesi mi gerekiyor, yoksa birbirimizi özgür ve eşit öznelere dönüştürecek yeni kolektif akıllar mı kurmamız?”",
@@ -181,13 +277,14 @@ export const MOCK_ARTICLES: ArticleCard[] = [
 
   // --- KÜLTÜR-SANAT (7 Adet) ---
   {
+    type: "normal",
     href: "/articles/oguz-atay-yeniden",
     title: "Oğuz Atay’ı Yeniden Okumak: Tutunamayanlar’ın Güncelliği",
-    description: "Bugünün prekaryası, Atay’ın 'tutunamayanlar'ını kendi aynasında görerek toplumsal uyumsuzluğun modern tezahürlerini sorguluyor. Selim Işık'ın 70'li yıllarda yaşadığı aydın bunalımı, günümüzün ekonomik ve kültürel belirsizlikleri içinde sıkışan bireylerin hikayesiyle şaşırtıcı benzerlikler taşıyor. Bu inceleme, romanın sadece edebi bir eser değil, aynı zamanda toplumsal bir teşhis olarak nasıl hala geçerliliğini koruduğunu tartışıyor.",
+    description: "Bugünün prekaryası, Atay’ın 'tutunamayanlar'ını kendi aynasında görerek toplumsal uyumsuzluğun modern tezahürlerini sorguluyor. ",
     author: "Selin Kaya",
     place: "Karşılaştırmalı Edebiyat",
     location: "İstanbul Bilgi Üniversitesi",
-    issueNumber: 497,
+    issueNumber: 504,
     publishedDate: new Date("2025-10-28"),
     firstMedia: {
       href: "/articles/oguz-atay-yeniden",
@@ -196,9 +293,10 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     },
     category: getLabel("kültür-sanat"),
     tags: [getLabel("edebiyat", "tag"), getLabel("yabancılaşma", "tag"), getLabel("birey ve toplum", "tag")],
-    content: [{ blockContent: { type: "text", textContent: "Selim Işık'ın bunalımı, 70'lerin aydın bunalımıydı..." } }]
+    content: [{ blockContent: { type: "text", textContent: "Oğuz Atay 1934 doğumlu Türk roman ve öykü yazarıdır. Postmodernizm anlayışı ile eserlerini yazmıştır. Eserlerini yazarken, Dostoyevski, Franz Kafka, James Joyce, Vladimir Nabokov gibi ünlü yazarlardan etkilenerek yazmıştır. Tiyatro'ya kazandırdığı eserlerden dolayı aynı zamanda oyun yazarıdır. Oğuz Atay'ın Kısaca Hayatı Oğuz Atay 12 Ekim 1934'de Kastamonu'nun İnebolu ilçesinde dünyaya gelmiştir. Babası aynı zamanda ağır ceza yargıcı olan Cemil Atay'dır. Babası aynı zamanda Cumhuriyet Halk Partisi'nden milletvekilliği de yapmıştır. Oğuz Atay eğitimi için Ankara'ya gitmiştir. Ankara'da ilk ve ortaokul eğitimini tamamlamıştır. Üniversite eğitimi için İstanbul'a gitmeyi karar veren Oğuz Atay sınavlara girer ve İstanbul Teknik Üniversitesi İnşaat Fakültesi'ni kazanır. 1957 yılında İstanbul Teknik Üniversitesi'nden mezun olur. Bir dönem Kadıköy vapur iskelesinin yapımında çalışmıştır Ardından bu görevinden istifa eden Oğuz Atay, Yıldız Teknik Üniversitesi'nde öğretim üyesi olarak çalışmaya başlar. Oğuz Atay Bir Bilim Adamının Romanı adlı eserini genç yaştan ölen bilim adamı olan Mustafa İnan'a adamıştır. Onun hayat hikayesini kendi tarzı ile anlatarak eserine işledi. Oğuz Atay 1961 yılında modacı olan Fatma Gürbüz ile evlenir. Bu evlilikten de bir kız çocuğu dünyaya gelir.1975 yılında doçentlik unvanı kazanmıştır. Türk edebiyatında ses getirmiş olan Tutunamayanlar eseri en beğenilen eseridir. Türk romanını çağdaş seviyeye getirmiş olan bu eser pek çok eleştirmen tarafından tam not almayı başarmıştır. Oğuz Atay yazmış olduğu Tehlikeli Oyunlar eseri de yine aynı etkiyi yakalamıştır. Oğuz Atay aynı zamanda 1970 yılında TRT tarafından roman ödülüne layık görülmüştür. 1973 yılında tiyatroya da bir eser kazandırarak oyunlarla yaşayanlar eseri devlet tiyatrolarında sahnelenerek çok beğenilmiştir. Kendisinin büyük projem dediği eseri olan Türkiye'nin Ruhu eserini yazamadan beyninde çıkan bir hastalık neticesinde vefat etmiştir. Bu eser yarıda kalmış bir eser olarak kayıtlara geçmiştir. Vefat ettikten sonra naaşı Edirnekapı Sakızağacı mezarlığına defnedilmiştir. Oğuz Atay'ın hayatını anlatan Nilgün Eroğlu Maktav'ın yönettiği 2002 yapımı bir TRT belgeseli bulunmaktadır." } }]
   },
   {
+    type: "normal",
     href: "/articles/sinema-ve-tasra",
     title: "Taşra Sıkıntısından Evrensel Bunalıma: Nuri Bilge Sineması",
     description: "Nuri Bilge Ceylan sinemasının değişmez izleği olan taşra sıkıntısı, yerel bir sorun olmaktan çıkıp evrensel bir varoluş sancısına dönüşüyor. Ahlat Ağacı'ndan Kuru Otlar Üstüne'ye uzanan filmografisinde yönetmen, taşranın boğucu atmosferini karakterlerin içsel çatışmalarıyla ustaca harmanlıyor. Yazımızda, yönetmenin görsel dili ve anlatım teknikleri üzerinden taşranın makus talihinin sinematografik yansımalarını analiz ediyoruz.",
@@ -214,16 +312,17 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     },
     category: getLabel("kültür-sanat"),
     tags: [getLabel("sinema", "tag"), getLabel("sosyoloji", "tag"), getLabel("birey ve toplum", "tag")],
-    content: [{ blockContent: { type: "text", textContent: "Nuri Bilge Ceylan sineması, taşranın sadece coğrafi değil..." } }]
+    content: [{ blockContent: { type: "text", textContent: "Oğuz Atay 1934 doğumlu Türk roman ve öykü yazarıdır. Postmodernizm anlayışı ile eserlerini yazmıştır. Eserlerini yazarken, Dostoyevski, Franz Kafka, James Joyce, Vladimir Nabokov gibi ünlü yazarlardan etkilenerek yazmıştır. Tiyatro'ya kazandırdığı eserlerden dolayı aynı zamanda oyun yazarıdır. Oğuz Atay'ın Kısaca Hayatı Oğuz Atay 12 Ekim 1934'de Kastamonu'nun İnebolu ilçesinde dünyaya gelmiştir. Babası aynı zamanda ağır ceza yargıcı olan Cemil Atay'dır. Babası aynı zamanda Cumhuriyet Halk Partisi'nden milletvekilliği de yapmıştır. Oğuz Atay eğitimi için Ankara'ya gitmiştir. Ankara'da ilk ve ortaokul eğitimini tamamlamıştır. Üniversite eğitimi için İstanbul'a gitmeyi karar veren Oğuz Atay sınavlara girer ve İstanbul Teknik Üniversitesi İnşaat Fakültesi'ni kazanır. 1957 yılında İstanbul Teknik Üniversitesi'nden mezun olur. Bir dönem Kadıköy vapur iskelesinin yapımında çalışmıştır Ardından bu görevinden istifa eden Oğuz Atay, Yıldız Teknik Üniversitesi'nde öğretim üyesi olarak çalışmaya başlar. Oğuz Atay Bir Bilim Adamının Romanı adlı eserini genç yaştan ölen bilim adamı olan Mustafa İnan'a adamıştır. Onun hayat hikayesini kendi tarzı ile anlatarak eserine işledi. Oğuz Atay 1961 yılında modacı olan Fatma Gürbüz ile evlenir. Bu evlilikten de bir kız çocuğu dünyaya gelir.1975 yılında doçentlik unvanı kazanmıştır. Türk edebiyatında ses getirmiş olan Tutunamayanlar eseri en beğenilen eseridir. Türk romanını çağdaş seviyeye getirmiş olan bu eser pek çok eleştirmen tarafından tam not almayı başarmıştır. Oğuz Atay yazmış olduğu Tehlikeli Oyunlar eseri de yine aynı etkiyi yakalamıştır. Oğuz Atay aynı zamanda 1970 yılında TRT tarafından roman ödülüne layık görülmüştür. 1973 yılında tiyatroya da bir eser kazandırarak oyunlarla yaşayanlar eseri devlet tiyatrolarında sahnelenerek çok beğenilmiştir. Kendisinin büyük projem dediği eseri olan Türkiye'nin Ruhu eserini yazamadan beyninde çıkan bir hastalık neticesinde vefat etmiştir. Bu eser yarıda kalmış bir eser olarak kayıtlara geçmiştir. Vefat ettikten sonra naaşı Edirnekapı Sakızağacı mezarlığına defnedilmiştir. Oğuz Atay'ın hayatını anlatan Nilgün Eroğlu Maktav'ın yönettiği 2002 yapımı bir TRT belgeseli bulunmaktadır." } }]
   },
   {
+    type: "normal",
     href: "/articles/bagimsiz-muzik",
     title: "Kadıköy Sound'dan Dijital Platformlara Alternatif Müzik",
     description: "Bağımsız müzisyenler, dijital platformların ve acımasız algoritmaların arasında sanatlarını icra etmeye çalışırken büyük bir varoluş mücadelesi veriyor. Spotify listelerine girme baskısı ve sahnede kalma zorunluluğu arasında sıkışan genç sanatçılar, alternatif yollar arayarak kendi kitlelerini yaratmaya çabalıyor. Bu araştırma, Kadıköy'ün yeraltı sahnelerinden dijital dünyanın vitrinlerine uzanan bu zorlu yolculuğun dinamiklerini ele alıyor.",
     author: "Ece Yılmaz",
     place: "Kültür Yönetimi",
     location: "İstanbul Bilgi Üniversitesi",
-    issueNumber: 492,
+    issueNumber: 504,
     publishedDate: new Date("2025-10-05"),
     firstMedia: {
       href: "/articles/bagimsiz-muzik",
@@ -235,13 +334,14 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     content: [{ blockContent: { type: "text", textContent: "Spotify listelerine girmek mi, yoksa sahnede kalmak mı?..." } }]
   },
   {
+    type: "normal",
     href: "/articles/sokak-sanati",
     title: "Duvarlar Konuşuyor: Politik Bir Eylem Olarak Graffiti",
     description: "Karaköy'ün dar sokaklarından Berlin Duvarı'nın yıkıntılarına kadar graffiti, sprey boyanın isyanı olarak kent dokusuna kazınmaya devam ediyor. Sokak sanatı, sadece estetik bir dışavurum değil, aynı zamanda kamusal alanın mülkiyetini ve kullanımını sorgulayan politik bir eylem biçimi olarak öne çıkıyor. Banksy gibi figürlerin popüler kültürün bir parçası haline gelmesiyle birlikte, bu sanat dalının ticarileşme ve özgünlüğünü koruma ikilemini tartışıyoruz.",
     author: "Caner Erkin",
     place: "Güzel Sanatlar Fakültesi",
     location: "Mimar Sinan GSÜ",
-    issueNumber: 485,
+    issueNumber: 504,
     publishedDate: new Date("2025-08-30"),
     firstMedia: {
       href: "/articles/sokak-sanati",
@@ -253,6 +353,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     content: [{ blockContent: { type: "text", textContent: "Banksy popüler kültürün bir parçası mı oldu?..." } }]
   },
   {
+    type: "normal",
     href: "/articles/tiyatro-direniyor",
     title: "Alternatif Sahneler ve Ödeneksiz Tiyatro Gerçeği",
     description: "Pandemi sonrası dönemde tiyatroların ayakta kalma savaşı sürerken, Kadıköy ve Beyoğlu'nun küçük sahnelerinde büyük ve cesur hikayeler anlatılmaya devam ediyor. Ödeneksiz tiyatrolar, ekonomik zorluklara ve sansür baskısına rağmen kolektif üretim modelleriyle sanatı halka ulaştırmanın yollarını arıyor. Bu yazı, sahne arkasındaki görünmeyen emeği ve tiyatrocuların dayanışma ağlarını mercek altına alıyor.",
@@ -271,6 +372,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     content: [{ blockContent: { type: "text", textContent: "Pandemi sonrası tiyatroların ayakta kalma savaşı..." } }]
   },
   {
+    type: "normal",
     href: "/articles/cagdas-sanat",
     title: "Bienal Eleştirisi: Sanat Kimin İçin?",
     description: "Beyaz küp galerilerin steril ortamından dışarı taşmaya çalışan çağdaş sanat, gerçekten halkla buluşabiliyor mu yoksa sadece elit bir zümreye mi hitap ediyor? Büyük sermaye gruplarının sponsorluğunda gerçekleşen bienaller, sanatın eleştirel gücünü törpülerken, bağımsız sanatçılar bu çelişki içinde kendilerine yer bulmaya çalışıyor. Sanatın metalaşması ve kamusal erişilebilirliği üzerine eleştirel bir bienal okuması yapıyoruz.",
@@ -292,13 +394,14 @@ export const MOCK_ARTICLES: ArticleCard[] = [
 
   // --- GÜNCEL (8 Adet) ---
   {
+    type: "normal",
     href: "/articles/beton-ve-bellek",
     title: "Beton ve Bellek: İstanbul’un Kaybolan Meydanları",
     description: "İstanbul’un meydanları sadece kentsel boşluklar değil, aynı zamanda toplumsal hafızanın ve demokratik karşılaşmaların yaşandığı hayati alanlardır. Son yirmi yılda hızlanan kentsel dönüşüm projeleriyle birlikte, bu meydanların betona gömülmesi ve ticarileştirilmesi kentlilerin yaşam alanlarını daraltıyor. Bu makale, Taksim'den Üsküdar'a uzanan meydan düzenlemelerinin ardındaki politik tercihleri ve kent hakkı mücadelesini irdeliyor.",
     author: "Zeynep Yılmaz",
     place: "Şehir ve Bölge Planlama",
     location: "İTÜ",
-    issueNumber: 495,
+    issueNumber: 504,
     publishedDate: new Date("2025-11-18"),
     firstMedia: {
       href: "/articles/beton-ve-bellek",
@@ -310,13 +413,14 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     content: [{ blockContent: { type: "text", textContent: "İstanbul’un meydanları, son yirmi yılda..." } }]
   },
   {
+    type: "normal",
     href: "/articles/iklim-krizi-greenwashing",
     title: "Yeşil Aklama (Greenwashing) Yalanları",
     description: "Büyük şirketlerin yayımladığı 'sürdürülebilirlik' raporları, gezegeni kurtarmayı mı hedefliyor yoksa çevreye verdikleri zararı şık ambalajlarla gizlemeyi mi? Karbon ayak izini bireysel tüketicilere yükleyen hakim söylem, endüstriyel kirliliğin asıl sorumlularını gözden kaçırmamıza neden oluyor. Yeşil aklama stratejilerinin perde arkasını aralıyor ve iklim kriziyle mücadelenin gerçekçi yollarını tartışıyoruz.",
     author: "Ece Vural",
     place: "Ekoloji Topluluğu",
     location: "Muğla",
-    issueNumber: 500,
+    issueNumber: 504,
     publishedDate: new Date("2025-10-20"),
     firstMedia: {
       href: "/articles/iklim-krizi-greenwashing",
@@ -328,6 +432,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     content: [{ blockContent: { type: "text", textContent: "Karbon ayak izini bireylere yükleyen söylem..." } }]
   },
   {
+    type: "normal",
     href: "/articles/barinma-krizi",
     title: "Öğrenci Evinden Çıkamamak: Barınma Krizi",
     description: "Büyükşehirlerde kiraların astronomik seviyelere ulaşmasıyla birlikte üniversite öğrencileri kampüslere ve şehirlere sığamaz hale geldi. KYK yurtlarının yetersiz kapasitesi ve özel yurtların fahiş fiyatları, öğrencileri sağlıksız ve güvencesiz barınma koşullarına itiyor. Öğrenci hareketinin gündemine oturan barınma sorununun ekonomik ve sosyal boyutlarını, öğrencilerin yaşadığı mağduriyetler üzerinden ele alıyoruz.",
@@ -346,6 +451,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     content: [{ blockContent: { type: "text", textContent: "KYK yurtlarının kapasite sorunu ve özel yurt fiyatları..." } }]
   },
   {
+    type: "normal",
     href: "/articles/goc-yollari",
     title: "Sınırdaki Hayatlar: Göç ve Entegrasyon",
     description: "Türkiye'nin göçmen politikası, sadece sınır güvenliği meselesi değil, aynı zamanda toplumsal uyum ve insan hakları ekseninde ele alınması gereken çok katmanlı bir sorundur. Mültecilerin kayıt dışı ekonomi içindeki konumu ve yaşadıkları sömürü, göçmen karşıtlığı üzerinden yükselen siyasi söylemlerle daha da karmaşık bir hal alıyor. Bu yazı, göç olgusunu insani ve sosyolojik bir perspektiften değerlendirerek entegrasyon tartışmalarına ışık tutuyor.",
@@ -364,6 +470,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     content: [{ blockContent: { type: "text", textContent: "Mültecilerin iş gücü piyasasındaki konumu..." } }]
   },
   {
+    type: "normal",
     href: "/articles/dijital-bagimlilik",
     title: "Ekran Süresi ve Kayıp Gençlik",
     description: "Sosyal medya algoritmaları, dopamin döngüsünü tetikleyerek dikkatimizi çalmak ve bizi ekranlara hapsetmek üzerine kusursuzca tasarlanmış durumda. Sonsuz kaydırma tuzağına düşen genç kuşaklar, dijital bağımlılığın getirdiği odaklanma sorunları ve sosyal izolasyonla mücadele ediyor. Teknolojinin psikolojimiz üzerindeki etkilerini inceleyen bu yazı, dijital detoks ve bilinçli kullanım üzerine öneriler sunuyor.",
@@ -382,6 +489,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     content: [{ blockContent: { type: "text", textContent: "Dopamin döngüsü ve sonsuz kaydırma tuzağı..." } }]
   },
   {
+    type: "normal",
     href: "/articles/kadin-cinayetleri",
     title: "İstanbul Sözleşmesi ve Sonrası",
     description: "Kadın mücadelesi sokaklarda ve meydanlarda tüm hızıyla devam ederken, yasal güvencelerin erozyona uğraması şiddetle mücadeleyi sekteye uğratıyor. İstanbul Sözleşmesi'nden çıkılmasının yarattığı hukuki boşluk ve 6284 sayılı kanunun uygulanmasındaki sorunlar, kadınların yaşam hakkını doğrudan tehdit ediyor. Bu dosya, hukuki süreçlerin işleyişini ve kadın hareketinin taleplerini detaylı bir şekilde inceliyor.",
@@ -400,6 +508,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     content: [{ blockContent: { type: "text", textContent: "6284 sayılı kanunun uygulanmasındaki sorunlar..." } }]
   },
   {
+    type: "normal",
     href: "/articles/issizlik",
     title: "Diplomalı İşsizler Ordusu",
     description: "Üniversite mezunu gençlerin iş bulma ümidi her geçen gün azalırken, eğitim sistemi ile istihdam piyasası arasındaki kopukluk derinleşiyor. Genç işsizliği oranlarının tarihi zirvelere ulaştığı bu dönemde, diplomalar birer kağıt parçasına dönüşme riskiyle karşı karşıya kalıyor. Neoliberal politikaların yarattığı güvencesizlik ortamında gençlerin gelecek kaygısını ve çözüm arayışlarını veriler ışığında tartışıyoruz.",
@@ -418,6 +527,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     content: [{ blockContent: { type: "text", textContent: "Genç işsizliği oranları tarihi zirvede..." } }]
   },
   {
+    type: "normal",
     href: "/articles/gida-krizi",
     title: "Tarladan Sofraya Enflasyon",
     description: "Gıda fiyatlarındaki durdurulamaz artış, sadece bir enflasyon sorunu değil, yıllardır uygulanan yanlış tarım politikalarının acı bir sonucudur. İthalata dayalı tarım modeli, yerli üreticiyi toprağından koparırken tüketicinin de gıdaya erişimini zorlaştırıyor. Tarladan sofraya uzanan tedarik zincirindeki kopuşları ve sürdürülebilir bir gıda politikası için yapılması gerekenleri uzman görüşleriyle ele alıyoruz.",
@@ -439,6 +549,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
 
   // --- TARİH (7 Adet) ---
   {
+    type: "normal",
     href: "/articles/modernlesme-sancilari",
     title: "Erken Cumhuriyet'te Taşra ve Merkez Gerilimi",
     description: "Ankara'nın inşası sadece yeni bir başkent projesi değil, aynı zamanda modernleşme hamlesinin Anadolu'ya yayılmasını hedefleyen kapsamlı bir toplum mühendisliği girişimiydi. Yakup Kadri'nin 'Yaban' romanında da işlendiği gibi, aydın ile köylü arasındaki mesafe ve çatışma, Cumhuriyet'in ilk yıllarındaki toplumsal dönüşümün en sancılı yönlerinden birini oluşturuyordu. Bu çalışma, merkezden taşraya uzanan modernleşme dalgasının yarattığı kültürel gerilimleri tarihsel bir perspektifle inceliyor.",
@@ -457,6 +568,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     content: [{ blockContent: { type: "text", textContent: "Yakup Kadri'nin Yaban romanı..." } }]
   },
   {
+    type: "normal",
     href: "/articles/68-hareketi",
     title: "Türkiye'de 68 Kuşağı: Bir Ütopya Arayışı",
     description: "Deniz Gezmiş ve arkadaşlarının öncülük ettiği 68 kuşağı hareketi, Türkiye'nin siyasi tarihinde bağımsızlık ve devrim idealleriyle özdeşleşen silinmez bir iz bıraktı. Üniversite işgalleriyle başlayan ve antiemperyalist bir mücadeleye dönüşen bu süreç, gençliğin toplumsal muhalefetteki rolünü yeniden tanımladı. O dönemin tanıklıkları ve belgeleri ışığında, 68 hareketinin mirasının bugün nasıl okunması gerektiğini ve günümüz gençliğine neler söylediğini tartışıyoruz.",
@@ -475,6 +587,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     content: [{ blockContent: { type: "text", textContent: "Üniversite işgalleri ve devrimci gençlik..." } }]
   },
   {
+    type: "normal",
     href: "/articles/osmanli-modernlesmesi",
     title: "Tanzimat'tan Meşrutiyet'e Batılılaşma",
     description: "Osmanlı aydınının Doğu ile Batı arasında sıkışmışlığı, İmparatorluğun son dönemindeki modernleşme çabalarının hem itici gücü hem de en büyük açmazı olmuştur. Tanzimat Fermanı ile başlayan ve Meşrutiyet ile hız kazanan anayasal hareketler, devletin kurtuluşu için aranan reçetelerin çeşitliliğini gözler önüne seriyor. Jön Türkler'den İttihatçılara uzanan bu fikri süreklilik içinde, Osmanlı modernleşmesinin entelektüel köklerine iniyoruz.",
@@ -493,6 +606,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     content: [{ blockContent: { type: "text", textContent: "Jön Türkler ve anayasal hareketler..." } }]
   },
   {
+    type: "normal",
     href: "/articles/koy-enstituleri",
     title: "Yarım Kalmış Bir Mucize: Köy Enstitüleri",
     description: "Anadolu'nun aydınlanma projesi olarak hayata geçirilen Köy Enstitüleri, sadece bir eğitim hamlesi değil, aynı zamanda kırsal kalkınmayı hedefleyen devrimci bir modeldi. Tonguç Baba ve Hasan Ali Yücel'in vizyonuyla kurulan bu okullar, öğrencilerine sadece teorik bilgi değil, hayatı dönüştürecek pratik beceriler de kazandırıyordu. Enstitülerin kapatılma süreci ve bu yarım kalmış mucizenin Türk eğitim sisteminde yarattığı boşluğu derinlemesine inceliyoruz.",
@@ -511,6 +625,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     content: [{ blockContent: { type: "text", textContent: "Tonguç Baba ve Hasan Ali Yücel'in vizyonu..." } }]
   },
   {
+    type: "normal",
     href: "/articles/isci-sinifi-tarihi",
     title: "15-16 Haziran ve İşçi Sınıfının Uyanışı",
     description: "Türkiye işçi sınıfı tarihinin en büyük kitlesel eylemi olan 15-16 Haziran 1970 olayları, sendikal hakların kısıtlanmasına karşı verilen örgütlü bir cevap olarak tarihe geçti. DİSK'in kapatılmasına karşı İstanbul ve Kocaeli sokaklarını dolduran yüz binlerce işçi, sınıf bilincinin gücünü tüm ülkeye gösterdi. Bu dosya, o gün yaşananları, işçilerin taleplerini ve bu direnişin Türkiye siyasetindeki uzun erimli etkilerini ele alıyor.",
@@ -529,6 +644,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     content: [{ blockContent: { type: "text", textContent: "DİSK'in kapatılmasına karşı yürüyen binler..." } }]
   },
   {
+    type: "normal",
     href: "/articles/soguk-savas-turkiye",
     title: "NATO'ya Giriş ve Türkiye'nin Yönü",
     description: "İkinci Dünya Savaşı sonrası şekillenen yeni dünya düzeninde Türkiye'nin tercihi, Soğuk Savaş dinamiklerini ve ülkenin iç siyasetini derinden etkiledi. Truman Doktrini ile başlayan ve Kore Savaşı'na asker gönderilmesiyle pekişen Batı bloku ile entegrasyon süreci, Türkiye'nin dış politikasında olduğu kadar toplumsal yapısında da dönüşümlere yol açtı. NATO üyeliğinin getirdiği askeri ve siyasi yükümlülüklerin tarihsel bilançosunu çıkarıyoruz.",
@@ -547,6 +663,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     content: [{ blockContent: { type: "text", textContent: "Truman Doktrini ve Kore Savaşı..." } }]
   },
   {
+    type: "normal",
     href: "/articles/feminist-tarih",
     title: "Osmanlı'dan Cumhuriyete Kadın Hareketleri",
     description: "Türkiye'de kadın mücadelesinin kökleri sanılanın aksine Cumhuriyet öncesine, Osmanlı'nın son dönemindeki kadın derneklerine ve neşriyatına kadar uzanıyor. Nezihe Muhiddin öncülüğünde kurulan Kadınlar Halk Fırkası gibi girişimler, kadınların siyasi hak taleplerinin ne kadar eskiye dayandığını kanıtlıyor. Bu yazı, seçme ve seçilme hakkına giden yolda kadınların verdiği zorlu mücadeleyi ve tarih yazımında görmezden gelinen kadın öncüleri gün yüzüne çıkarıyor.",
@@ -568,6 +685,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
 
   // --- FELSEFE (7 Adet) ---
   {
+    type: "normal",
     href: "/articles/algoritmik-halusinasyonlar",
     title: "Algoritmik Halüsinasyonlar: Gerçeğin Sonu mu?",
     description: "Yapay zeka modellerinin inandırıcı ama gerçek dışı bilgiler üretmesi olarak tanımlanan 'halüsinasyonlar', sadece teknik bir hata değil, aynı zamanda yeni bir ontolojik soruna işaret ediyor. Generative AI araçlarının yaygınlaşmasıyla birlikte hakikat ve kurgu arasındaki sınır giderek bulanıklaşırken, gerçeğin neliği üzerine felsefi tartışmalar yeniden alevleniyor. Bu makalede, Baudrillard'ın simülasyon kuramı ışığında algoritmik gerçekliğin doğasını sorguluyoruz.",
@@ -586,6 +704,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     content: [{ blockContent: { type: "text", textContent: "Generative AI araçlarının ürettiği inandırıcı yalanlar..." } }]
   },
   {
+    type: "normal",
     href: "/articles/spinoza-ozgurluk",
     title: "Spinoza ve Zorunluluğun Bilinci Olarak Özgürlük",
     description: "Determinist bir evren anlayışına sahip olan Spinoza'ya göre, insan eylemleri de doğa yasalarının zorunlu bir sonucudur; peki bu durumda özgür irade mümkün müdür? Filozof, özgürlüğü nedensellik zincirinden kopuk bir keyfilik olarak değil, insanın kendi doğasını ve duygularını anlama kapasitesi, yani 'zorunluluğun bilinci' olarak tanımlar. Ethica'daki geometrik düzen içinde duyguların köleliğinden aklın özgürlüğüne giden yolu bu yazıda takip ediyoruz.",
@@ -604,6 +723,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     content: [{ blockContent: { type: "text", textContent: "Ethica'da duyguların geometrik düzeni..." } }]
   },
   {
+    type: "normal",
     href: "/articles/varolusculuk",
     title: "Sartre ve Camus Tartışması: Başkaldırı mı Devrim mi?",
     description: "Varoluşçuluğun iki dev ismi Sartre ve Camus arasındaki dostluğun bitmesine neden olan polemik, aslında siyaset felsefesinin en temel sorularından birini barındırır: Amaç, araçları meşrulaştırır mı? Sartre, devrimci şiddeti ve örgütlü mücadeleyi savunurken, Camus başkaldıran insanın ahlaki sınırlarını ve yaşamın kutsallığını ön plana çıkarır. Bulantı ve Yabancı romanlarının izinden giderek, bu tarihsel tartışmanın politik ve etik boyutlarını yeniden değerlendiriyoruz.",
@@ -622,6 +742,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     content: [{ blockContent: { type: "text", textContent: "Bulantı ve Yabancı romanları üzerinden..." } }]
   },
   {
+    type: "normal",
     href: "/articles/bilim-felsefesi-kuhn",
     title: "Paradigma Değişimleri: Kuhn ve Popper",
     description: "Bilimsel bilginin ilerleyişi, Popper'ın iddia ettiği gibi yanlışlamalar yoluyla kümülatif bir şekilde mi gerçekleşir, yoksa Kuhn'un öne sürdüğü gibi devrimsel paradigma değişimleriyle mi? Thomas Kuhn, 'Bilimsel Devrimlerin Yapısı' adlı eserinde bilimin sosyal ve tarihsel bağlamdan bağımsız olmadığını, kriz dönemlerinde yaşanan kopuşlarla ilerlediğini savunur. Bu yazı, bilim felsefesinin bu iki temel yaklaşımını karşılaştırarak bilimin nesnelliği tartışmasına katkı sunuyor.",
@@ -640,6 +761,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     content: [{ blockContent: { type: "text", textContent: "Bilimsel Devrimlerin Yapısı..." } }]
   },
   {
+    type: "normal",
     href: "/articles/stoacilik-bugun",
     title: "Modern Dünyada Stoacılık: Bir Teselli mi?",
     description: "Antik Roma'dan günümüze uzanan Stoacı felsefe, modern plaza çalışanlarından silikon vadisi girişimcilerine kadar geniş bir kitlede neden bu kadar popüler oldu? Marcus Aurelius'un 'kontrol edemediklerini dert etme' öğretisi, kişisel gelişim endüstrisi tarafından basit bir stres yönetimi tekniğine indirgenmiş durumda. Stoacılığın bugünkü popülaritesinin arkasındaki toplumsal nedenleri ve felsefenin otantik anlamını kaybettiği noktaları eleştirel bir gözle inceliyoruz.",
@@ -658,6 +780,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     content: [{ blockContent: { type: "text", textContent: "Kontrol edemediklerini dert etme felsefesi..." } }]
   },
   {
+    type: "normal",
     href: "/articles/hegel-diyalektik",
     title: "Efendi-Köle Diyalektiği ve Tanınma Arzusu",
     description: "Hegel'in 'Tinin Fenomenolojisi' eserindeki en çarpıcı bölümlerden biri olan efendi-köle diyalektiği, insan bilincinin oluşumunu karşılıklı tanınma mücadelesi üzerinden açıklar. Köle, emeğiyle doğayı dönüştürerek özgürleşirken, efendi kölenin emeğine bağımlı hale gelerek kendi statüsünün tutsağı olur. Bu felsefi metaforun, modern toplumdaki sınıf ilişkilerini ve kimlik politikalarını anlamak için sunduğu zengin kavramsal çerçeveyi analiz ediyoruz.",
@@ -676,6 +799,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     content: [{ blockContent: { type: "text", textContent: "Tarihin sonu tartışmaları..." } }]
   },
   {
+    type: "normal",
     href: "/articles/post-truth",
     title: "Hakikat Sonrası Çağda Doğruyu Aramak",
     description: "Yalanın gerçeklerden daha hızlı yayıldığı ve duyguların olguların önüne geçtiği 'post-truth' (hakikat sonrası) çağında, felsefenin hakikati savunma görevi her zamankinden daha hayati. Sosyal medyanın yankı odaları ve manipülasyon teknikleri, ortak bir gerçeklik zemininde buluşmamızı imkansız hale getiriyor. Bu yazı, hakikat kavramının uğradığı erozyonu ve eleştirel düşünmenin bu dezenformasyon çağındaki önemini vurguluyor.",
@@ -697,6 +821,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
 
   // --- KURAM (7 Adet) ---
   {
+    type: "normal",
     href: "/articles/prekarya-manifestosu",
     title: "Görünmeyen Emek: Dijital Platformlarda Sömürü",
     description: "Dijital kapitalizmin yükselişiyle birlikte ortaya çıkan yeni işçi sınıfı prekarya, güvencesizlik ve belirsizlik üzerine kurulu bir çalışma rejiminin parçası haline geldi. Motokuryelerden içerik moderatörlerine kadar uzanan bu geniş kitle, algoritmaların yönetimi altında 'iş ortağı' adı altında esnek ama sömürüye açık koşullarda çalıştırılıyor. Bu manifesto niteliğindeki yazı, dijital platformlardaki görünmeyen emeği ifşa ederek yeni bir örgütlenme modelinin imkanlarını tartışıyor.",
@@ -715,6 +840,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     content: [{ blockContent: { type: "text", textContent: "Bir 'iş ortağı' (partner) olarak adlandırılmak..." } }]
   },
   {
+    type: "normal",
     href: "/articles/walter-benjamin",
     title: "Pasajlar'da Kaybolmak: Walter Benjamin'in Flaneur'ü",
     description: "19. yüzyıl Paris'inin pasajlarında dolaşan flaneur, modern kentin ilk gözlemcisi olarak Walter Benjamin'in başyapıtı Pasajlar Projesi'nin merkezinde yer alır. Benjamin için tarih düz bir çizgide ilerleyen bir süreç değil, yıkıntıların ve parçaların bir araya geldiği bir kurgudur; flaneur ise bu yıkıntıların arasında hakikati arayan figürdür. Günümüzün AVM kültürüne ve tüketim mabetlerine Benjamin'in penceresinden bakarak, kentsel deneyimin dönüşümünü izliyoruz.",
@@ -733,6 +859,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     content: [{ blockContent: { type: "text", textContent: "Benjamin için tarih, bir ilerleme değil..." } }]
   },
   {
+    type: "normal",
     href: "/articles/marksizm-ekoloji",
     title: "Metabolik Yarık: Marx ve Ekoloji",
     description: "Genellikle sadece endüstriyel üretimi öncelediği düşünülen Marx, aslında kapitalizmin doğa ile insan arasındaki madde alışverişinde onarılmaz bir 'metabolik yarık' açtığını tespit etmiştir. John Bellamy Foster'ın öncülüğünde gelişen ekolojik Marksizm, kapitalist birikim rejiminin gezegenin sınırlarını nasıl zorladığını teorik bir zemine oturtuyor. Bu yazı, iklim krizini anlamak için Marksist ekolojinin sunduğu kavramsal araçları ve çözüm önerilerini irdeliyor.",
@@ -751,6 +878,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     content: [{ blockContent: { type: "text", textContent: "Doğa ile insan arasındaki madde alışverişinin kopuşu..." } }]
   },
   {
+    type: "normal",
     href: "/articles/frankfurt-okulu",
     title: "Kültür Endüstrisi ve Aydınlanmanın Diyalektiği",
     description: "Adorno ve Horkheimer'ın 'Aydınlanmanın Diyalektiği' eserinde ortaya attığı kültür endüstrisi kavramı, sanatın kitlesel üretim ve tüketim nesnesine dönüşerek eleştirel gücünü yitirmesini anlatır. Bugün Netflix dizilerinden pop müziğe kadar her alanda standartlaşan kültürel ürünler, izleyiciyi pasif bir tüketiciye dönüştürerek sistemin devamlılığını sağlar. Frankfurt Okulu'nun karamsar ama keskin eleştirilerinin dijital çağda hala ne kadar geçerli olduğunu tartışıyoruz.",
@@ -769,6 +897,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     content: [{ blockContent: { type: "text", textContent: "Standartlaşan sanat ürünleri ve pasif izleyici..." } }]
   },
   {
+    type: "normal",
     href: "/articles/gramsci-hegemonya",
     title: "Hapishane Defterleri'nden Bugüne Hegemonya",
     description: "Antonio Gramsci'nin faşist hapishanelerinde kaleme aldığı hegemonya kavramı, egemen sınıfın sadece zor yoluyla değil, aynı zamanda rıza üreterek iktidarını nasıl sürdürdüğünü açıklar. Sivil toplum, medya ve eğitim kurumları aracılığıyla inşa edilen bu rıza, karşı-hegemonya stratejileriyle kırılmadıkça devrimci bir dönüşüm mümkün değildir. Gramsci'nin 'organik aydın' ve 'tarihsel blok' kavramları ışığında, bugünün siyasi mücadelelerine stratejik bir bakış sunuyoruz.",
@@ -787,6 +916,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     content: [{ blockContent: { type: "text", textContent: "Organik aydınlar ve tarihsel blok..." } }]
   },
   {
+    type: "normal",
     href: "/articles/foucault-biyoiktidar",
     title: "Biyoiktidar ve Gözetim Toplumu",
     description: "Michel Foucault'nun iktidar analizleri, modern devletin sadece toprakları değil, nüfusu ve bedenleri de yönetme arzusu üzerine kuruludur; buna 'biyoiktidar' adını verir. Panoptikon hapishane modelinden dijital veri gözetimine uzanan süreçte, iktidar mekanizmaları daha incelikli ve her yere nüfuz eden bir hal almıştır. Sağlık politikalarından dijital izlemeye kadar bedenlerimizin nasıl disipline edildiğini ve yönetildiğini Foucaultcu bir perspektifle ele alıyoruz.",
@@ -805,6 +935,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     content: [{ blockContent: { type: "text", textContent: "Hapishanenin Doğuşu ve modern kapatılma mekanları..." } }]
   },
   {
+    type: "normal",
     href: "/articles/mekan-uretimi",
     title: "Lefebvre ve Mekanın Üretimi",
     description: "Henri Lefebvre'e göre mekan, sadece boş bir geometrik alan değil, toplumsal ilişkilerin üretildiği ve yeniden üretildiği politik bir üründür. Şehir planlamasından mimariye kadar her mekansal düzenleme, arkasında bir ideoloji ve sınıf çıkarı barındırır. Kent hakkı kavramının da fikir babası olan Lefebvre'in teorisi üzerinden, modern kentlerin nasıl sermayenin ihtiyaçlarına göre şekillendiğini ve buna karşı nasıl bir yaşam alanı kurgulanabileceğini tartışıyoruz.",
@@ -826,6 +957,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
 
   // --- DÜNYA (8 Adet) ---
   {
+    type: "normal",
     href: "/articles/latin-amerika-solu",
     title: "Latin Amerika’da Yeni Sol Dalga ve Sınırları",
     description: "Latin Amerika siyasetinde esen 'pembe dalga' rüzgarları, Şili'den Brezilya'ya sol iktidarları iş başına getirse de, bu yönetimler ciddi yapısal sorunlarla karşı karşıya. Neoliberal tahribatın derin izleri ve küresel ekonomik kriz, sol hükümetlerin vaatlerini gerçekleştirmesini zorlaştırırken, toplumsal muhalefet de beklentilerini yüksek tutuyor. Boric'in Şili'deki zaferinden Lula'nın dönüşüne kadar kıtadaki siyasi dengeleri ve solun sınırlarını analiz ediyoruz.",
@@ -844,6 +976,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     content: [{ blockContent: { type: "text", textContent: "Boric'in Şili'deki zaferi..." } }]
   },
   {
+    type: "normal",
     href: "/articles/cin-yukselisi",
     title: "Kuşak ve Yol: Çin'in Küresel Hegemonya Arayışı",
     description: "Çin'in 'Kuşak ve Yol' girişimi, sadece devasa bir altyapı projesi değil, aynı zamanda küresel ticaret yollarını ve jeopolitik dengeleri yeniden şekillendirme hamlesidir. ABD ile yaşanan ticaret savaşları ve teknolojik rekabet, dünyayı yeni bir Soğuk Savaş'ın eşiğine getirirken, Çin'in Afrika ve Asya'daki yatırımları etki alanını genişletiyor. Bu makale, Çin'in yükselişinin küresel kapitalizm içindeki anlamını ve olası jeopolitik sonuçlarını değerlendiriyor.",
@@ -862,6 +995,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     content: [{ blockContent: { type: "text", textContent: "Afrika'daki Çin yatırımları..." } }]
   },
   {
+    type: "normal",
     href: "/articles/avrupa-sagi",
     title: "Avrupa'da Aşırı Sağın Yükselişi",
     description: "Avrupa genelinde yükselişe geçen aşırı sağ partiler, mülteci krizi ve ekonomik durgunluğu kullanarak kitlelerin öfkesini sandığa yansıtmayı başarıyor. İtalya'dan Fransa'ya, Hollanda'dan Almanya'ya kadar yayılan bu milliyetçi dalga, Avrupa Birliği'nin temel değerlerini ve geleceğini tehdit ediyor. Faşizmin yeni yüzünü ve popülist söylemlerin toplumda nasıl karşılık bulduğunu, son seçim sonuçları ve sosyolojik veriler ışığında inceliyoruz.",
@@ -880,6 +1014,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     content: [{ blockContent: { type: "text", textContent: "İtalya ve Fransa seçimleri..." } }]
   },
   {
+    type: "normal",
     href: "/articles/filistin-meselesi",
     title: "Apartheid Rejimi ve Filistin Direnişi",
     description: "Orta Doğu'nun kanayan yarası Filistin meselesi, İsrail'in sistematik işgal ve apartheid politikalarıyla çözümsüzlüğe sürüklenmeye devam ediyor. Gazze'deki insani kriz ve Batı Şeria'daki yerleşimci şiddeti, uluslararası toplumun sessizliğiyle birleşince bölgedeki barış umutlarını tüketiyor. Filistin halkının tarihsel direnişini, uluslararası hukukun ihlallerini ve küresel güçlerin ikiyüzlü tutumunu bu dosyada detaylandırıyoruz.",
@@ -898,6 +1033,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     content: [{ blockContent: { type: "text", textContent: "Gazze'deki insani kriz..." } }]
   },
   {
+    type: "normal",
     href: "/articles/afrika-darbeler",
     title: "Sahel Bölgesinde Darbeler Zinciri",
     description: "Afrika'nın Sahel bölgesinde peş peşe yaşanan askeri darbeler, kıtada Fransa'nın sömürgeci geçmişine duyulan tepkinin ve değişen güç dengelerinin bir sonucu olarak okunmalı. Mali, Nijer ve Burkina Faso gibi ülkelerdeki rejim değişiklikleri, Batı karşıtı bir damarı beslerken, Rusya gibi yeni aktörlerin bölgedeki etkisini artırıyor. Afrika'nın 'ikinci bağımsızlık savaşı' olarak da nitelendirilen bu sürecin dinamiklerini ve olası sonuçlarını tartışıyoruz.",
@@ -916,6 +1052,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     content: [{ blockContent: { type: "text", textContent: "Nijer ve Mali'deki gelişmeler..." } }]
   },
   {
+    type: "normal",
     href: "/articles/rusya-ukrayna",
     title: "Uzayan Savaşın Küresel Etkileri",
     description: "Rusya ve Ukrayna arasındaki savaş, sadece iki ülke arasındaki bir çatışma olmanın ötesine geçerek küresel enerji piyasalarını, gıda güvenliğini ve ittifak sistemlerini sarstı. NATO'nun genişleme stratejisi ve Rusya'nın güvenlik kaygıları ekseninde başlayan bu savaş, Avrupa'nın güvenlik mimarisini geri dönülemez bir şekilde değiştirdi. Savaşın ekonomik maliyetlerini ve barış masasının neden hala kurulamadığını jeopolitik bir analizle ele alıyoruz.",
@@ -934,6 +1071,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     content: [{ blockContent: { type: "text", textContent: "NATO'nun genişleme stratejisi..." } }]
   },
   {
+    type: "normal",
     href: "/articles/abd-secimleri",
     title: "Kutuplaşmış Amerika Sandık Başında",
     description: "ABD siyaseti, tarihinin en derin kutuplaşmalarından birini yaşarken, yaklaşan seçimler sadece Amerika'nın değil tüm dünyanın geleceğini etkileyecek kritik bir dönemeç niteliğinde. Trumpizmin popülist söylemleri ile Demokratların yaşadığı liderlik krizi arasında sıkışan seçmenler, demokrasinin kırılganlığını test ediyor. Kongre baskınından bugüne uzanan siyasi gerilimi ve Amerikan toplumundaki kültürel çatışmaları sandık analiziyle birleştiriyoruz.",
@@ -952,6 +1090,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     content: [{ blockContent: { type: "text", textContent: "Kongre baskınından bugüne..." } }]
   },
   {
+    type: "normal",
     href: "/articles/hindistan-modi",
     title: "Hindistan'da Milliyetçiliğin Yükselişi",
     description: "Dünyanın en büyük demokrasisi olarak bilinen Hindistan, Modi yönetimi altında giderek artan bir Hindu milliyetçiliği ve otoriterleşme eğilimi gösteriyor. Dini azınlıklara yönelik baskılar ve ifade özgürlüğünün kısıtlanması, ülkenin seküler anayasal yapısını tehdit ederken, ekonomik büyüme rakamları bu sosyal gerilimleri maskeliyor. Hindistan'ın iç siyasetindeki bu dönüşümün Asya'daki dengelere ve demokrasi tartışmalarına etkisini irdeliyoruz.",
@@ -973,6 +1112,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
 
   // --- SPOR (7 Adet) ---
   {
+    type: "normal",
     href: "/articles/endustriyel-futbol",
     title: "Endüstriyel Futbol ve Tribünlerin Sessizliği",
     description: "Futbolun sadece bir oyun olmaktan çıkıp milyar dolarlık bir endüstriye dönüşmesi, tribün kültürünü ve taraftarlık ruhunu geri dönülmez bir şekilde değiştirdi. Yüksek bilet fiyatları, Passolig gibi denetim mekanizmaları ve yayın gelirlerine odaklı kulüp yönetimleri, futbolu halktan kopararak steril bir eğlence ürününe dönüştürüyor. Premier Lig modelinin küreselleşmesiyle birlikte sessizleşen tribünleri ve futbolun kaybettiği ruhu sorguluyoruz.",
@@ -991,6 +1131,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     content: [{ blockContent: { type: "text", textContent: "Premier Lig modeli tüm dünyaya ihraç edilirken..." } }]
   },
   {
+    type: "normal",
     href: "/articles/kadin-voleybolu",
     title: "Filenin Sultanları: Bir Başarı Hikayesi",
     description: "Türkiye Kadın Voleybol Milli Takımı'nın uluslararası arenada elde ettiği tarihi başarılar, sadece sportif bir zafer değil, aynı zamanda kadınların toplumsal hayattaki gücünün de bir simgesi. Avrupa şampiyonlukları ve olimpiyat madalyalarıyla taçlanan bu yolculuk, kız çocuklarına ilham verirken, sporun toplumsal cinsiyet eşitliği mücadelesindeki rolünü de gözler önüne seriyor. Filenin Sultanları'nın başarısının arkasındaki disiplin, emek ve takım ruhunu analiz ediyoruz.",
@@ -1009,6 +1150,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     content: [{ blockContent: { type: "text", textContent: "Avrupa şampiyonluğu ve olimpiyat madalyası..." } }]
   },
   {
+    type: "normal",
     href: "/articles/amator-branslar",
     title: "Futbolun Gölgesinde Amatör Branşlar",
     description: "Türkiye'de spor denince akla gelen ilk şey futbol olsa da, asıl olimpiyat başarısını getiren amatör branşlar ne yazık ki yeterli ilgiyi ve desteği göremiyor. Tesisleşme sorunları, sponsor eksikliği ve medya görünürlüğünün azlığı, yetenekli genç sporcuların potansiyellerini gerçekleştirmesinin önünde büyük bir engel oluşturuyor. Futbol hegemonyasının gölgesinde var olma savaşı veren amatör sporların ve sporcuların yaşadığı zorlukları gündeme taşıyoruz.",
@@ -1027,6 +1169,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     content: [{ blockContent: { type: "text", textContent: "Tesisleşme sorunu ve altyapı eksikliği..." } }]
   },
   {
+    type: "normal",
     href: "/articles/spor-ve-politika",
     title: "Tribünler Siyaset Yapar mı?",
     description: "Gezi Direnişi'nden bugüne taraftar gruplarının toplumsal muhalefet içindeki aktif rolü, 'spor siyasetin dışındadır' ezberini çoktan bozdu. Çarşı grubundan üniversite tribünlerine kadar uzanan örgütlü taraftar yapıları, sadece takımlarını desteklemekle kalmıyor, aynı zamanda adalet ve demokrasi taleplerini de stadyumlarda haykırıyor. Tribünlerin birer kamusal alan olarak politik işlevini ve taraftar kültürünün sosyopolitik dinamiklerini inceliyoruz.",
@@ -1045,6 +1188,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     content: [{ blockContent: { type: "text", textContent: "Çarşı grubu ve tribün sloganları..." } }]
   },
   {
+    type: "normal",
     href: "/articles/espor-yukselisi",
     title: "Espor: Spor mu Eğlence mi?",
     description: "Dijital oyun dünyasının hızla büyümesiyle birlikte hayatımıza giren espor, stadyumları dolduran izleyicileri ve milyon dolarlık ödül havuzlarıyla geleneksel spora rakip oluyor. Fiziksel aktivite içermediği gerekçesiyle spor sayılıp sayılmayacağı tartışılsa da, gerektirdiği refleks, strateji ve takım oyunu, onu yeni nesil bir rekabet alanı haline getiriyor. Gençlik kültürünün merkezine yerleşen esporun ekonomisini ve geleceğini mercek altına alıyoruz.",
@@ -1063,6 +1207,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     content: [{ blockContent: { type: "text", textContent: "League of Legends finalleri stadyumları dolduruyor..." } }]
   },
   {
+    type: "normal",
     href: "/articles/doping-skandallari",
     title: "Daha Hızlı, Daha Güçlü, Daha İlaçlı?",
     description: "Modern sporun en büyük gölgesi olan doping, 'daha hızlı, daha yüksek, daha güçlü' sloganının sınırlarını zorlarken etik değerleri ve sporcu sağlığını tehdit ediyor. Devlet destekli doping programlarından bireysel hırslara kadar uzanan bu karanlık ağ, haksız rekabet yaratarak sporun adalet duygusunu zedeliyor. Rusya'nın olimpiyatlardan men edilmesine kadar varan skandallar üzerinden, sporda performans artırıcı maddelerin kullanımını ve etik tartışmaları ele alıyoruz.",
@@ -1081,6 +1226,7 @@ export const MOCK_ARTICLES: ArticleCard[] = [
     content: [{ blockContent: { type: "text", textContent: "Rusya'nın olimpiyatlardan men edilmesi..." } }]
   },
   {
+    type: "normal",
     href: "/articles/mahalle-maci",
     title: "Kaybolan Bir Kültür: Mahalle Maçları",
     description: "Bir zamanlar çocukluğun vazgeçilmez bir parçası olan mahalle maçları, kentsel dönüşüm ve betonlaşan şehirler yüzünden tarihe karışıyor. Sokakların oyun alanı olmaktan çıkıp otoparklara dönüşmesi, sadece bir oyunu değil, komşuluk ilişkilerini ve sokak kültürünü de yok ediyor. 'Üç korner bir penaltı' devrinin kapanışını, değişen kent sosyolojisi ve çocukların oyun hakkı üzerinden hüzünlü bir nostaljiyle anlatıyoruz.",
