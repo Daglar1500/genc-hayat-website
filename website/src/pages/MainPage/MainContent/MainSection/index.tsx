@@ -20,7 +20,7 @@ const ArticleCarousel = ({ issueNumber, isLatest }: { issueNumber: number; isLat
   const VISIBLE_COUNT = 4;
 
   useEffect(() => {
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+    const apiUrl = (import.meta as any).env?.VITE_API_URL ?? 'http://localhost:3001/api';
     fetch(`${apiUrl}/articles`)
       .then(res => res.json())
       .then(data => {

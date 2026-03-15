@@ -16,7 +16,7 @@ export const DosyalarPage = () => {
 
     useEffect(() => {
         const fetchArticles = async () => {
-            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
             try {
                 // Endpoint could be /articles or a specific search endpoint. We fetch all for now and filter, 
                 // or ideally backend should have /api/articles?tag=...

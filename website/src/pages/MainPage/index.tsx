@@ -18,16 +18,14 @@ export const MainContent = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // API'dan dinamik layout verisini çek (VITE_API_URL docker config'inde tanımlı olmalı, şimdilik sabit veya env'den)
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+    const apiUrl = (import.meta as any).env?.VITE_API_URL ?? 'http://localhost:3001/api';
     fetch(`${apiUrl}/init`)
       .then(res => res.json())
       .then(data => {
-        // Admin panel formatını website ArticleCard formatına dönüştürüyoruz
         const mappedSections = data.sections.map((sec: any) => ({
           ...sec,
-          articles: sec.articles.map((a: any) => ({
-            href: `/articles/${a.id}`, // veya slug
+          articles: (sec.articles || []).map((a: any) => ({
+            href: `/articles/${a.id}`,
             title: a.title,
             type: a.type || 'normal',
             description: a.subheading,
@@ -54,31 +52,33 @@ export const MainContent = () => {
     return <div className="pt-[100px] text-center w-full py-20 text-gray-500 font-bold">Yükleniyor...</div>;
   }
 
-  // API'den dönen sıralanmış, PINNED veya unpinned 'section'ları döngüyle renderla.
   return (
     <div className="pt-[100px]">
       <FeedSection />
-
-      {/* Sunu/Rota (MainSection kısmı şimdilik aynı, detaylandırılabilir) */}
       <MainSection />
 
-      {/* Dinamik sıralı bloklar (Admin panelindeki layout sıralamasına göre) */}
       {sections.map(sec => {
+        if (sec.isVisible === false) return null;
+
         if (sec.type === 'category-row') {
           return <CategorySection key={sec.id} categoryTitle={sec.title || "Kategori"} articles={sec.articles} />;
         }
         if (sec.type === 'ordinary-row' || sec.type === 'spot-row') {
           return <ArticleLine key={sec.id} articles={sec.articles} />;
         }
-        return null; // feed-row vs için
+        if (sec.type === 'video-row' && sec.config) {
+          return <VideoSection key={sec.id} videos={sec.config.videos || []} channelUrl={sec.config.channelUrl || ''} />;
+        }
+        if (sec.type === 'spotify-row' && sec.config) {
+          return <SpotifySection key={sec.id} playlists={sec.config.playlists || []} profileUrl={sec.config.profileUrl || ''} />;
+        }
+        if (sec.type === 'letterboxd-row' && sec.config) {
+          return <LetterboxdSection key={sec.id} films={sec.config.films || []} profileUrl={sec.config.profileUrl || ''} />;
+        }
+        return null;
       })}
 
-      <VideoSection />
       <FeaturedArticle />
-
-      <SpotifySection />
-      <LetterboxdSection />
-
       <ArchiveSection />
 
       <div className="hidden lg:block">

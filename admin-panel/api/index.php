@@ -284,7 +284,7 @@ elseif ($method === 'POST' && $uri === '/api/layout/save') {
 
     $newSA = [];
     foreach ($sectionsFromFrontend as $section) {
-        foreach ($section['articles'] as $index => $art) {
+        foreach (($section['articles'] ?? []) as $index => $art) {
             $newSA[] = ['sectionId' => $section['id'], 'articleId' => $art['id'], 'sortOrder' => $index];
         }
     }
