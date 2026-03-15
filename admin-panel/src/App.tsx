@@ -5,7 +5,7 @@ import {
     ChevronDown, ChevronUp, Trash2, Edit3, Settings,
     Pin, CheckSquare, Square,
     MapPin, ArrowRight, Layout, Type,
-    AlignLeft, BookOpen, Star, List
+    AlignLeft, BookOpen, Star, List, Eye, EyeOff
 } from 'lucide-react';
 
 // --- Types ---
@@ -42,18 +42,20 @@ interface Article {
     type?: 'featured' | 'normal' | 'sunu' | 'rota';
 }
 
-type SectionType = 'main-row' | 'category-row' | 'ordinary-row' | 'spot-row' | 'article-feed';
+type SectionType = 'main-row' | 'category-row' | 'ordinary-row' | 'spot-row' | 'article-feed' | 'video-row' | 'spotify-row' | 'letterboxd-row' | 'archive-row';
 
 interface Section {
     id: string;
     type: SectionType;
     title?: string;
     isPinned: boolean;
+    isVisible?: boolean;
     coverImage?: string;
     preface?: string;
     routeArticle?: Article;
     issueNumber?: string;
     articles: Article[];
+    config?: any;
 }
 
 interface CoverMedia {
@@ -98,6 +100,10 @@ const getSectionLabel = (type: SectionType) => {
         case 'spot-row': return 'SPOT SATIRI';
 
         case 'article-feed': return 'HABER AKIŞI';
+        case 'video-row': return 'VİDEO SATIRI';
+        case 'spotify-row': return 'SPOTİFY LİSTELERİ';
+        case 'letterboxd-row': return 'LETTERBOXD FİLMLER';
+        case 'archive-row': return 'ARŞİV';
 
         default: return type;
 
@@ -202,7 +208,8 @@ const LogArticle = ({
     const [formData, setFormData] = useState<Partial<Article>>(initialData ? { ...initialData, text: getInitialText() } : {
         text: '',
         labels: [],
-        status: 'not-edited'
+        status: 'not-edited',
+        editorName: 'Admin'
     });
 
     const toggleLabel = (lbl: string) => {
@@ -783,7 +790,7 @@ export default function App() {
 
                             {/* EDITOR INITIALS (Top Right) */}
                             <div className="absolute top-2 right-2 text-[10px] font-bold text-gray-400">
-                                {a.editorName[0].toUpperCase()}
+                                {(a.editorName?.[0] ?? '?').toUpperCase()}
                             </div>
                         </div>
                     ))}
@@ -814,7 +821,7 @@ export default function App() {
                     {sections.sort((a, b) => (a.isPinned === b.isPinned) ? 0 : a.isPinned ? -1 : 1).map((section, idx) => (
                         <div
                             key={section.id}
-                            className={`relative group border rounded-xl p-8 transition-all ${section.isPinned ? 'border-blue-500 shadow-blue-50' : 'border-gray-200'} bg-white`}
+                            className={`relative group border rounded-xl p-8 transition-all ${section.isPinned ? 'border-blue-500 shadow-blue-50' : 'border-gray-200'} ${(section.isVisible ?? true) ? 'bg-white' : 'bg-gray-50 opacity-60'}`}
                             onDragOver={e => e.preventDefault()}
                             onDrop={(e) => {
                                 // Only trigger main drop if not handled by child
@@ -833,6 +840,7 @@ export default function App() {
 
                             {/* CONTROLS (Z-INDEX 100) */}
                             <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2 bg-white p-1 rounded-lg border shadow-sm z-20">
+                                <button onClick={() => { const ns = [...sections]; const s = ns.find(x => x.id === section.id)!; s.isVisible = !(s.isVisible ?? true); setSections(ns) }} className={`p-1.5 rounded-md transition-all ${(section.isVisible ?? true) ? 'hover:text-gray-600 hover:bg-gray-50' : 'text-red-500 bg-red-50'}`} title={(section.isVisible ?? true) ? 'Gizle' : 'Göster'}>{(section.isVisible ?? true) ? <Eye size={16} /> : <EyeOff size={16} />}</button>
                                 <button onClick={() => { const ns = [...sections]; ns.find(x => x.id === section.id)!.isPinned = !ns.find(x => x.id === section.id)!.isPinned; setSections(ns) }} className="p-1.5 rounded-md transition-all hover:text-blue-600 hover:bg-blue-50 hover:shadow-[0_0_8px_rgba(59,130,246,0.4)]"><Pin size={16} /></button>
                                 <button onClick={() => { const ns = [...sections]; if (idx > 0) { [ns[idx], ns[idx - 1]] = [ns[idx - 1], ns[idx]]; setSections(ns); } }} className="p-1.5 rounded-md transition-all hover:text-green-600 hover:bg-green-50 hover:shadow-[0_0_8px_rgba(34,197,94,0.4)]"><ChevronUp size={16} /></button>
                                 <button onClick={() => { const ns = [...sections]; if (idx < ns.length - 1) { [ns[idx], ns[idx + 1]] = [ns[idx + 1], ns[idx]]; setSections(ns); } }} className="p-1.5 rounded-md transition-all hover:text-green-600 hover:bg-green-50 hover:shadow-[0_0_8px_rgba(34,197,94,0.4)]"><ChevronDown size={16} /></button>
