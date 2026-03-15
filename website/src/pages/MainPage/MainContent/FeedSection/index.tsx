@@ -105,7 +105,7 @@ export const FeedCarousel = () => {
 
   // Veri Çekme İşlemi (MainContent ile benzer mantık)
   useEffect(() => {
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+    const apiUrl = (import.meta as any).env?.VITE_API_URL ?? 'http://localhost:3001/api';
     fetch(`${apiUrl}/init`)
       .then(res => res.json())
       .then(data => {

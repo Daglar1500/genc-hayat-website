@@ -81,7 +81,7 @@ interface Issue {
     otherArticles?: Article[];
 }
 
-const API_URL = (import.meta as any).env?.VITE_API_URL ?? 'http://localhost:8080/api';
+const API_URL = (import.meta as any).env?.VITE_API_URL ?? 'http://localhost:3001/api';
 
 // --- Components ---
 
@@ -563,6 +563,31 @@ export default function App() {
         }));
     };
 
+    const updateSectionConfig = (sectionId: string, newConfig: any) => {
+        setSections(prev => prev.map(s => s.id === sectionId ? { ...s, config: { ...(s.config || {}), ...newConfig } } : s));
+    };
+
+    const addConfigItem = (sectionId: string, field: string, item: any) => {
+        const sec = sections.find(s => s.id === sectionId);
+        if (!sec) return;
+        const arr = [...(sec.config?.[field] || []), item];
+        updateSectionConfig(sectionId, { [field]: arr });
+    };
+
+    const removeConfigItem = (sectionId: string, field: string, index: number) => {
+        const sec = sections.find(s => s.id === sectionId);
+        if (!sec) return;
+        const arr = (sec.config?.[field] || []).filter((_: any, i: number) => i !== index);
+        updateSectionConfig(sectionId, { [field]: arr });
+    };
+
+    const updateConfigItem = (sectionId: string, field: string, index: number, patch: any) => {
+        const sec = sections.find(s => s.id === sectionId);
+        if (!sec) return;
+        const arr = (sec.config?.[field] || []).map((item: any, i: number) => i === index ? { ...item, ...patch } : item);
+        updateSectionConfig(sectionId, { [field]: arr });
+    };
+
     const startEditArticle = (article: Article) => {
         setSelectedArticle(article);
         setView('log');
@@ -652,7 +677,7 @@ export default function App() {
         if (dragged.type === 'sidebar') {
             // Drag from Sidebar (Library)
             const found = loggedArticles.find(a => a.id === dragged.id);
-            if (found) art = { ...found, id: `${found.id}-${Date.now()}` }; // Clone with new ID
+            if (found) art = { ...found };
         } else if (sourceSecIdx !== -1) {
             // Drag from another (or same) section
             const sourceSection = newSections[sourceSecIdx];
@@ -770,30 +795,48 @@ export default function App() {
                     <h2 className="font-medium text-gray-800">Haber Kütüphanesi</h2>
                     <button onClick={() => setMenuOpen(false)}><X size={18} /></button>
                 </div>
-                <div className="p-4 space-y-3 overflow-y-auto h-full pb-20 bg-[#F8F9FC]">
-                    {loggedArticles.map(a => (
-                        <div key={a.id} draggable onDragStart={e => handleDragStart(e, 'sidebar', a.id)} className="relative p-3 border rounded-xl bg-white hover:shadow-md cursor-grab active:cursor-grabbing flex gap-3 group transition-all hover:border-blue-300 overflow-hidden">
-                            {/* Status Stripe (Left) - TWICE AS BOLD (w-2) */}
-                            <div className={`absolute left-0 top-0 bottom-0 w-2 ${a.status === 'edited' ? 'bg-green-500' : 'bg-red-500'}`}></div>
-
-                            <img src={a.imageUrl} className="w-12 h-12 rounded-lg object-cover bg-gray-100 ml-2" />
-                            <div className="flex-1 min-w-0 ml-1">
-                                <div className="font-medium text-xs text-gray-800 line-clamp-2 leading-tight mb-0.5 pr-6">{a.title}</div>
-                                {/* ADDED SCHOOL INFO TO SIDEBAR */}
-                                {a.school && <div className="text-[10px] text-blue-600 font-semibold truncate">{a.school}</div>}
-
-                                <div className="flex justify-between items-center mt-1">
-                                    <span className="text-[10px] text-gray-500 font-medium truncate max-w-[80px]">{a.author}</span>
-                                    <span className="text-[10px] text-gray-400">{formatLogDate(a.createdAt)}</span>
+                <div className="p-4 overflow-y-auto h-full pb-20 bg-[#F8F9FC]">
+                    {(() => {
+                        // Group articles by issueNumber, sorted descending
+                        const groups: Record<string, Article[]> = {};
+                        loggedArticles.forEach(a => {
+                            const key = a.issueNumber || 'Sayısız';
+                            if (!groups[key]) groups[key] = [];
+                            groups[key].push(a);
+                        });
+                        const sorted = Object.entries(groups).sort(([a], [b]) => {
+                            const na = parseInt(a) || 0, nb = parseInt(b) || 0;
+                            return nb - na;
+                        });
+                        return sorted.map(([issueNum, arts]) => (
+                            <div key={issueNum} className="mb-4">
+                                <div className="flex items-center gap-2 mb-2 px-1">
+                                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Sayı {issueNum}</span>
+                                    <div className="flex-1 h-px bg-gray-200" />
+                                    <span className="text-[10px] text-gray-300">{arts.length}</span>
+                                </div>
+                                <div className="space-y-2">
+                                    {arts.map(a => (
+                                        <div key={a.id} draggable onDragStart={e => handleDragStart(e, 'sidebar', a.id)} className="relative p-3 border rounded-xl bg-white hover:shadow-md cursor-grab active:cursor-grabbing flex gap-3 group transition-all hover:border-blue-300 overflow-hidden">
+                                            <div className={`absolute left-0 top-0 bottom-0 w-2 ${a.status === 'edited' ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                                            <img src={a.imageUrl} className="w-12 h-12 rounded-lg object-cover bg-gray-100 ml-2 shrink-0" />
+                                            <div className="flex-1 min-w-0 ml-1">
+                                                <div className="font-medium text-xs text-gray-800 line-clamp-2 leading-tight mb-0.5 pr-6">{a.title}</div>
+                                                {a.school && <div className="text-[10px] text-blue-600 font-semibold truncate">{a.school}</div>}
+                                                <div className="flex justify-between items-center mt-1">
+                                                    <span className="text-[10px] text-gray-500 font-medium truncate max-w-[80px]">{a.author}</span>
+                                                    <span className="text-[10px] text-gray-400">{formatLogDate(a.createdAt)}</span>
+                                                </div>
+                                            </div>
+                                            <div className="absolute top-2 right-2 text-[10px] font-bold text-gray-400">
+                                                {(a.editorName?.[0] ?? '?').toUpperCase()}
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
-
-                            {/* EDITOR INITIALS (Top Right) */}
-                            <div className="absolute top-2 right-2 text-[10px] font-bold text-gray-400">
-                                {(a.editorName?.[0] ?? '?').toUpperCase()}
-                            </div>
-                        </div>
-                    ))}
+                        ));
+                    })()}
                 </div>
             </div>
 
@@ -936,6 +979,97 @@ export default function App() {
                                             </div>
                                         </>
                                     ) : <div className="text-gray-500">Spot Haberini Buraya Sürükle</div>}
+                                </div>
+                            )}
+
+                            {section.type === 'video-row' && (
+                                <div className="space-y-4">
+                                    <div className="flex items-center gap-3">
+                                        <label className="text-xs font-bold text-gray-500 uppercase whitespace-nowrap">Kanal URL</label>
+                                        <input
+                                            className="flex-1 p-2 border rounded-lg text-sm"
+                                            placeholder="https://www.youtube.com/@KanalAdi"
+                                            value={section.config?.channelUrl || ''}
+                                            onChange={e => updateSectionConfig(section.id, { channelUrl: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <div className="text-xs font-bold text-gray-500 uppercase">Videolar</div>
+                                        {(section.config?.videos || []).map((v: any, i: number) => (
+                                            <div key={v.id} className="flex gap-2 items-center p-2 border rounded-lg bg-gray-50">
+                                                <div className="w-6 h-6 bg-red-600 text-white text-xs font-bold rounded flex items-center justify-center shrink-0">{i + 1}</div>
+                                                <input className="flex-1 p-1.5 border rounded text-sm" placeholder="Video URL (YouTube)" value={v.url} onChange={e => updateConfigItem(section.id, 'videos', i, { url: e.target.value })} />
+                                                <input className="w-48 p-1.5 border rounded text-sm" placeholder="Video Başlığı" value={v.title || ''} onChange={e => updateConfigItem(section.id, 'videos', i, { title: e.target.value })} />
+                                                <button onClick={() => removeConfigItem(section.id, 'videos', i)} className="p-1.5 text-red-500 hover:bg-red-50 rounded"><Trash2 size={14} /></button>
+                                            </div>
+                                        ))}
+                                        <button onClick={() => addConfigItem(section.id, 'videos', { id: `v-${Date.now()}`, url: '', title: '', thumbnail: '', duration: '', date: '' })} className="text-sm text-red-600 font-medium hover:underline flex items-center gap-1">
+                                            <Plus size={14} /> Video Ekle
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+
+                            {section.type === 'spotify-row' && (
+                                <div className="space-y-4">
+                                    <div className="flex items-center gap-3">
+                                        <label className="text-xs font-bold text-gray-500 uppercase whitespace-nowrap">Profil URL</label>
+                                        <input
+                                            className="flex-1 p-2 border rounded-lg text-sm"
+                                            placeholder="https://open.spotify.com/user/..."
+                                            value={section.config?.profileUrl || ''}
+                                            onChange={e => updateSectionConfig(section.id, { profileUrl: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <div className="text-xs font-bold text-gray-500 uppercase">Çalma Listeleri</div>
+                                        {(section.config?.playlists || []).map((p: any, i: number) => (
+                                            <div key={p.id} className="flex gap-2 items-center p-2 border rounded-lg bg-gray-50">
+                                                <div className="w-6 h-6 bg-green-600 text-white text-xs font-bold rounded flex items-center justify-center shrink-0">{i + 1}</div>
+                                                <input className="flex-1 p-1.5 border rounded text-sm" placeholder="Playlist URL (Spotify)" value={p.url} onChange={e => updateConfigItem(section.id, 'playlists', i, { url: e.target.value })} />
+                                                <input className="w-48 p-1.5 border rounded text-sm" placeholder="Liste Adı" value={p.title || ''} onChange={e => updateConfigItem(section.id, 'playlists', i, { title: e.target.value })} />
+                                                <button onClick={() => removeConfigItem(section.id, 'playlists', i)} className="p-1.5 text-red-500 hover:bg-red-50 rounded"><Trash2 size={14} /></button>
+                                            </div>
+                                        ))}
+                                        <button onClick={() => addConfigItem(section.id, 'playlists', { id: `p-${Date.now()}`, url: '', title: '', description: '', cover: '', trackCount: '' })} className="text-sm text-green-600 font-medium hover:underline flex items-center gap-1">
+                                            <Plus size={14} /> Playlist Ekle
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+
+                            {section.type === 'letterboxd-row' && (
+                                <div className="space-y-4">
+                                    <div className="flex items-center gap-3">
+                                        <label className="text-xs font-bold text-gray-500 uppercase whitespace-nowrap">Profil URL</label>
+                                        <input
+                                            className="flex-1 p-2 border rounded-lg text-sm"
+                                            placeholder="https://letterboxd.com/kullanici/"
+                                            value={section.config?.profileUrl || ''}
+                                            onChange={e => updateSectionConfig(section.id, { profileUrl: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <div className="text-xs font-bold text-gray-500 uppercase">Filmler</div>
+                                        {(section.config?.films || []).map((f: any, i: number) => (
+                                            <div key={f.id} className="flex gap-2 items-center p-2 border rounded-lg bg-gray-50">
+                                                <div className="w-6 h-6 bg-emerald-700 text-white text-xs font-bold rounded flex items-center justify-center shrink-0">{i + 1}</div>
+                                                <input className="flex-1 p-1.5 border rounded text-sm" placeholder="Film URL (Letterboxd)" value={f.url} onChange={e => updateConfigItem(section.id, 'films', i, { url: e.target.value })} />
+                                                <input className="w-40 p-1.5 border rounded text-sm" placeholder="Film Adı" value={f.title || ''} onChange={e => updateConfigItem(section.id, 'films', i, { title: e.target.value })} />
+                                                <input className="w-16 p-1.5 border rounded text-sm" placeholder="Yıl" value={f.year || ''} onChange={e => updateConfigItem(section.id, 'films', i, { year: e.target.value })} />
+                                                <button onClick={() => removeConfigItem(section.id, 'films', i)} className="p-1.5 text-red-500 hover:bg-red-50 rounded"><Trash2 size={14} /></button>
+                                            </div>
+                                        ))}
+                                        <button onClick={() => addConfigItem(section.id, 'films', { id: `f-${Date.now()}`, url: '', title: '', year: '', director: '', rating: 0, posterUrl: '' })} className="text-sm text-emerald-700 font-medium hover:underline flex items-center gap-1">
+                                            <Plus size={14} /> Film Ekle
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+
+                            {section.type === 'archive-row' && (
+                                <div className="flex items-center justify-center h-20 text-gray-400 text-sm font-medium border-2 border-dashed rounded-lg">
+                                    Sayı Arşivi — Sayılar sekmesinden yönetilir
                                 </div>
                             )}
 

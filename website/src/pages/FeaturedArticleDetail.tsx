@@ -118,7 +118,7 @@ export const FeaturedArticleDetail = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
       try {
         // Slug based fetch from API
         const res = await fetch(`${apiUrl}/articles/${slug}`);

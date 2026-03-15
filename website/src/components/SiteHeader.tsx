@@ -387,7 +387,7 @@ export const SiteHeader = () => {
     useEffect(() => {
         if (isArticlePage && articleId) {
             // Sadece bu makale featured mi diye kontrol etmek için apiye ufak bir call yapıyoruz.
-            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
             fetch(`${apiUrl}/articles/${articleId}`)
                 .then(res => res.json())
                 .then(data => {

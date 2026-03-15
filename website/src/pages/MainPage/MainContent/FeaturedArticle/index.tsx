@@ -7,7 +7,7 @@ export const FeaturedArticle = () => {
 
   useEffect(() => {
     const fetchFeaturedArticle = async () => {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+      const apiUrl = (import.meta as any).env?.VITE_API_URL ?? 'http://localhost:3001/api';
       try {
         // İdealde API'da ?type=featured gibi bir endpoint olmalı
         const res = await fetch(`${apiUrl}/articles`);

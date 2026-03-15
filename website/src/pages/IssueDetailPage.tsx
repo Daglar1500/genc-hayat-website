@@ -191,7 +191,7 @@ export const IssueDetailPage = () => {
 
     useEffect(() => {
         const fetchArticles = async () => {
-            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
             try {
                 // Burada query string vb kullanarak 'issueNumber' filtresi yapılabilir. 
                 // Şimdilik client side filter yapıyoruz mock yerine api data.

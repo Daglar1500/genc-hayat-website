@@ -68,7 +68,7 @@ export const DiscoverFeed = ({ onClose }: DiscoverFeedProps) => {
 
     // Fetch data
     const fetchFeed = async () => {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
       try {
         const res = await fetch(`${apiUrl}/init`);
         const data = await res.json();
