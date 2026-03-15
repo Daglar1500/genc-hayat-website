@@ -1,0 +1,37 @@
+[
+    {
+        "id": "c1",
+        "name": "Güncel",
+        "color": "#90CAF9"
+    },
+    {
+        "id": "c2",
+        "name": "Tarih",
+        "color": "#CE93D8"
+    },
+    {
+        "id": "c3",
+        "name": "Kuram",
+        "color": "#A5D6A7"
+    },
+    {
+        "id": "c4",
+        "name": "Felsefe",
+        "color": "#FFCC80"
+    },
+    {
+        "id": "c5",
+        "name": "Kültür-Sanat",
+        "color": "#F48FB1"
+    },
+    {
+        "id": "c6",
+        "name": "Dünya",
+        "color": "#80CBC4"
+    },
+    {
+        "id": "c7",
+        "name": "Spor",
+        "color": "#EF9A9A"
+    }
+]

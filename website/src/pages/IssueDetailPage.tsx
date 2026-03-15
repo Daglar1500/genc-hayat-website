@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MOCK_ARTICLES } from '../data/MockArticles';
 import { ArticleLine } from './MainPage/MainContent/ArticleLine';
+import { ArticleCard, Labelo } from './MainPage/ArticleCard';
 
 // Kapak görselleri
 import img1 from "../public/gh-kapak/GH - Sayı 505 - 24 Aralık 2025_page-0001.jpg";
@@ -185,7 +185,48 @@ export const IssueDetailPage = () => {
     const { id } = useParams<{ id: string }>();
     const issueNumber = parseInt(id || '0', 10);
     const issueInfo = ISSUE_COVERS[id || ''];
-    const articles = MOCK_ARTICLES.filter(a => a.issueNumber === issueNumber);
+
+    const [articles, setArticles] = useState<ArticleCard[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchArticles = async () => {
+            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+            try {
+                // Burada query string vb kullanarak 'issueNumber' filtresi yapılabilir. 
+                // Şimdilik client side filter yapıyoruz mock yerine api data.
+                const res = await fetch(`${apiUrl}/articles`);
+                const data = await res.json();
+
+                const filteredData = data.filter((a: any) => a.issueNumber === issueNumber);
+
+                const mappedArticles = filteredData.map((a: any) => ({
+                    href: `/articles/${a.id}`,
+                    title: a.title,
+                    type: a.type || 'normal',
+                    description: a.subheading,
+                    author: a.author,
+                    place: a.place,
+                    location: a.school,
+                    issueNumber: a.issueNumber,
+                    publishedDate: new Date(a.createdAt),
+                    firstMedia: { type: 'image', src: a.imageUrl, alt: a.title, mediaLayout: 'full-width' },
+                    category: new Labelo('category', a.category),
+                    tags: a.labels?.map((l: string) => new Labelo('tag', l)) || []
+                } as ArticleCard));
+
+                setArticles(mappedArticles);
+            } catch (err) {
+                console.error("Yazılar çekilirken hata oluştu:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (issueNumber) {
+            fetchArticles();
+        }
+    }, [issueNumber]);
 
     return (
         <div className="min-h-screen bg-white font-bradford">
@@ -255,7 +296,9 @@ export const IssueDetailPage = () => {
                         Bu Sayının Yazıları
                         <span className="ml-3 text-sm font-normal text-gray-400">({articles.length} yazı)</span>
                     </h2>
-                    {articles.length > 0 ? (
+                    {loading ? (
+                        <div className="flex justify-center items-center py-20 text-gray-500">Yükleniyor...</div>
+                    ) : articles.length > 0 ? (
                         <ArticleLine articles={articles} className="!px-0 !py-0 !max-w-none w-full" />
                     ) : (
                         <div className="flex flex-col items-center justify-center py-20 text-center">

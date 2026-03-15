@@ -1,0 +1,52 @@
+[
+    {
+        "id": "sec-feed",
+        "type": "article-feed",
+        "title": null,
+        "isPinned": true,
+        "coverImage": null,
+        "preface": null,
+        "issueNumber": null,
+        "routeArticleId": null
+    },
+    {
+        "id": "sec-main",
+        "type": "main-row",
+        "title": null,
+        "isPinned": false,
+        "coverImage": "https:\/\/images.unsplash.com\/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=800&q=80",
+        "preface": "Gençlik, tarih boyunca toplumsal dönüşümün motoru olmuştur. Bu sayıda diyalektiğin izinde yürüyoruz...",
+        "issueNumber": "504",
+        "routeArticleId": "art-1"
+    },
+    {
+        "id": "sec-ord",
+        "type": "ordinary-row",
+        "title": null,
+        "isPinned": false,
+        "coverImage": null,
+        "preface": null,
+        "issueNumber": null,
+        "routeArticleId": null
+    },
+    {
+        "id": "sec-spot",
+        "type": "spot-row",
+        "title": null,
+        "isPinned": false,
+        "coverImage": null,
+        "preface": null,
+        "issueNumber": null,
+        "routeArticleId": null
+    },
+    {
+        "id": "sec-cat-1",
+        "type": "category-row",
+        "title": "Felsefe",
+        "isPinned": false,
+        "coverImage": null,
+        "preface": null,
+        "issueNumber": null,
+        "routeArticleId": null
+    }
+]

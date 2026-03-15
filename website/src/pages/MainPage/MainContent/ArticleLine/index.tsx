@@ -1,5 +1,4 @@
 import { ArticleCardElement } from "../../ArticleCard";
-import { MOCK_ARTICLES } from "../../../../data/MockArticles";
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { motion, useMotionValue, PanInfo } from 'framer-motion';
 
@@ -153,10 +152,10 @@ interface ArticleLineProps {
 export const ArticleLine = ({ articles, className, centered }: ArticleLineProps) => {
   const [isMobile, setIsMobile] = useState(false);
 
-  // 1. Veri Kontrolü: Prop gelirse onu kullan, yoksa Mock'tan ilk 4'ü al
+  // 1. Veri Kontrolü: Prop gelirse onu kullan, yoksa boş dizi dön
   const displayedArticles = useMemo(() => {
     if (articles && articles.length > 0) return articles;
-    return MOCK_ARTICLES.slice(0, 4);
+    return [];
   }, [articles]);
 
   // centered=true ve 4'ten az yazı varsa grid'e justify-center ekle

@@ -4,8 +4,6 @@ import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import logo from '../public/logo.png';
 import logo_white from '../public/logo_white.png';
 import { NAV_DATA } from './Footer';
-import { MOCK_ARTICLES } from '../data/MockArticles';
-
 
 // --- Sub-Components ---
 
@@ -382,10 +380,31 @@ const MobileMenu = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
 export const SiteHeader = () => {
     const location = useLocation();
     const isArticlePage = location.pathname.startsWith('/articles/');
-    // Slug'dan article tipini bul — sadece "featured" type sayfalarda transparent header
-    const articleSlug = isArticlePage ? location.pathname.replace('/articles/', '') : '';
-    const currentArticle = articleSlug ? MOCK_ARTICLES.find(a => a.href === `/articles/${articleSlug}`) : undefined;
-    const isFeaturedArticle = currentArticle?.type === 'featured';
+    const articleId = isArticlePage ? location.pathname.replace('/articles/', '') : '';
+
+    const [isFeaturedArticle, setIsFeaturedArticle] = useState(false);
+
+    useEffect(() => {
+        if (isArticlePage && articleId) {
+            // Sadece bu makale featured mi diye kontrol etmek için apiye ufak bir call yapıyoruz.
+            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+            fetch(`${apiUrl}/articles/${articleId}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.type === 'featured') {
+                        setIsFeaturedArticle(true);
+                    } else {
+                        setIsFeaturedArticle(false);
+                    }
+                })
+                .catch(err => {
+                    console.error("Error fetching article for header:", err);
+                    setIsFeaturedArticle(false);
+                });
+        } else {
+            setIsFeaturedArticle(false);
+        }
+    }, [isArticlePage, articleId]);
 
     const isTransparentPage = isFeaturedArticle
         || location.pathname.startsWith('/category')

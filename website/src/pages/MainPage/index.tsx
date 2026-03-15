@@ -1,68 +1,86 @@
-import { FloatingNavbar } from "../../components/FloatingNavbar";
-import { SiteHeader } from "../../components/SiteHeader";
+import { useState, useEffect } from "react";
 import { BreakoutGame } from "./MainContent/BreakoutGame";
 import { FeedSection } from "./MainContent/FeedSection/index";
 import { ArticleLine } from "./MainContent/ArticleLine";
 import { FeaturedArticle } from "./MainContent/FeaturedArticle";
 import { CategorySection } from "./MainContent/CategorySection";
 import { MainSection } from "./MainContent/MainSection";
-import { ShareFloatingButton } from "../../components/ShareFloatingButton";
 import { VideoSection } from "./MainContent/YoutubeVideos";
-import { MOCK_ARTICLES } from "../../data/MockArticles";
-import { ArchiveSection } from "./MainContent/IssuesSection"
+import { ArchiveSection } from "./MainContent/IssuesSection";
 import { SpotifySection } from "./MainContent/SpotifyListsSection";
 import { LetterboxdSection } from "./MainContent/LetterboxdSection";
 
+import { ArticleCard, Labelo } from "../../pages/MainPage/ArticleCard";
+
 export const MainContent = () => {
 
-  // --- VERİ HAZIRLIĞI ---
+  const [sections, setSections] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // 1. Kategori Bazlı Filtrelemeler
-  const tarihArticles = MOCK_ARTICLES.filter(a => a.category.name === "tarih").slice(0, 3);
-  const guncelArticles = MOCK_ARTICLES.filter(a => a.category.name === "güncel").slice(0, 3);
-  const felsefeArticles = MOCK_ARTICLES.filter(a => a.category.name === "felsefe").slice(0, 3);
+  useEffect(() => {
+    // API'dan dinamik layout verisini çek (VITE_API_URL docker config'inde tanımlı olmalı, şimdilik sabit veya env'den)
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+    fetch(`${apiUrl}/init`)
+      .then(res => res.json())
+      .then(data => {
+        // Admin panel formatını website ArticleCard formatına dönüştürüyoruz
+        const mappedSections = data.sections.map((sec: any) => ({
+          ...sec,
+          articles: sec.articles.map((a: any) => ({
+            href: `/articles/${a.id}`, // veya slug
+            title: a.title,
+            type: a.type || 'normal',
+            description: a.subheading,
+            author: a.author,
+            place: a.place,
+            location: a.school,
+            issueNumber: a.issueNumber,
+            publishedDate: new Date(a.createdAt),
+            firstMedia: { type: 'image', src: a.imageUrl, alt: a.title },
+            category: new Labelo('category', a.category),
+            tags: a.labels?.map((l: string) => new Labelo('tag', l)) || []
+          } as ArticleCard))
+        }));
+        setSections(mappedSections);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("API Fetch Error:", err);
+        setLoading(false);
+      });
+  }, []);
 
-  // 2. Article Line için Karma veya Özel Listeler
-  // Örneğin: İlk 4 makale
-  const lineArticles1 = MOCK_ARTICLES.slice(0, 4);
-  // Örneğin: 4. ile 8. arasındaki makaleler
-  const lineArticles2 = MOCK_ARTICLES.slice(4, 8);
-  // Örneğin: Rastgele veya özel seçilmiş bir liste
-  const lineArticles3 = MOCK_ARTICLES.slice(8, 12);
+  if (loading) {
+    return <div className="pt-[100px] text-center w-full py-20 text-gray-500 font-bold">Yükleniyor...</div>;
+  }
 
+  // API'den dönen sıralanmış, PINNED veya unpinned 'section'ları döngüyle renderla.
   return (
     <div className="pt-[100px]">
       <FeedSection />
+
+      {/* Sunu/Rota (MainSection kısmı şimdilik aynı, detaylandırılabilir) */}
       <MainSection />
 
-      {/* Article Line'a veri gönderiyoruz */}
-      <ArticleLine articles={lineArticles1} />
+      {/* Dinamik sıralı bloklar (Admin panelindeki layout sıralamasına göre) */}
+      {sections.map(sec => {
+        if (sec.type === 'category-row') {
+          return <CategorySection key={sec.id} categoryTitle={sec.title || "Kategori"} articles={sec.articles} />;
+        }
+        if (sec.type === 'ordinary-row' || sec.type === 'spot-row') {
+          return <ArticleLine key={sec.id} articles={sec.articles} />;
+        }
+        return null; // feed-row vs için
+      })}
 
       <VideoSection />
       <FeaturedArticle />
-
-      <ArticleLine articles={lineArticles2} />
-
-
-
-      {/* Category Section artık hem başlığı hem de veriyi bizden alıyor */}
-      <CategorySection categoryTitle="Tarih" articles={tarihArticles} />
-
-      <ArticleLine articles={lineArticles1} /> {/* İsterseniz tekrar aynı veriyi kullanabilirsiniz */}
-
-      <CategorySection categoryTitle="Güncel" articles={guncelArticles} />
-
-      <ArticleLine articles={lineArticles2} />
-
-      <CategorySection categoryTitle="Felsefe" articles={felsefeArticles} />
-
-      <ArticleLine articles={lineArticles3} />
 
       <SpotifySection />
       <LetterboxdSection />
 
       <ArchiveSection />
-      {/* Sadece desktop modda (lg ve üzeri ekranlarda) görünür */}
+
       <div className="hidden lg:block">
         <BreakoutGame />
       </div>

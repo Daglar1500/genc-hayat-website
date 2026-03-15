@@ -1,9 +1,49 @@
-import { Label, ArticleCard, Labelo } from "../../ArticleCard";
-import { MOCK_ARTICLES } from "../../../../data/MockArticles";
+import { useState, useEffect } from "react";
+import { Label, ArticleCardElement, ArticleCard, Labelo } from "../../ArticleCard";
 
 export const FeaturedArticle = () => {
-  const featuredArticleData = MOCK_ARTICLES[0];
+  const [featuredArticleData, setFeaturedArticleData] = useState<ArticleCard | null>(null);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    const fetchFeaturedArticle = async () => {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+      try {
+        // İdealde API'da ?type=featured gibi bir endpoint olmalı
+        const res = await fetch(`${apiUrl}/articles`);
+        const data = await res.json();
+
+        const featuredData = data.find((a: any) => a.type === 'featured' || a.category === 'Manşet') || data[0];
+
+        if (featuredData) {
+          const mappedArticle: ArticleCard = {
+            href: `/articles/${featuredData.id}`,
+            title: featuredData.title,
+            type: featuredData.type || 'normal',
+            description: featuredData.subheading || featuredData.content?.substring(0, 150),
+            author: featuredData.author,
+            place: featuredData.place,
+            location: featuredData.school,
+            issueNumber: featuredData.issueNumber,
+            publishedDate: new Date(featuredData.createdAt),
+            firstMedia: { type: 'image', src: featuredData.imageUrl, alt: featuredData.title, mediaLayout: 'full-width' },
+            category: new Labelo('category', featuredData.category),
+            tags: featuredData.labels?.map((l: string) => new Labelo('tag', l)) || [],
+            content: [{ blockContent: { type: 'text', textContent: featuredData.content || '' } }]
+          };
+          setFeaturedArticleData(mappedArticle);
+        }
+      } catch (err) {
+        console.error("Öne çıkan yazı çekilirken hata oluştu:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFeaturedArticle();
+  }, []);
+
+  if (loading) return <div className="min-h-screen flex items-center justify-center text-gray-400">Yükleniyor...</div>;
   if (!featuredArticleData) return null;
 
   return (

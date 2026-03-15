@@ -1,0 +1,47 @@
+version: '3.9'
+
+services:
+  # ── PHP/Apache Backend ──────────────────────────────────────────────────────
+  php-api:
+    build:
+      context: ./admin-panel
+      dockerfile: Dockerfile
+    container_name: gench-hayat-api
+    ports:
+      - "8080:80" # API: http://localhost:8080/api/init
+    volumes:
+      # db klasörünü volume'a bağla — veri container dışında kalıcı olsun
+      - ./admin-panel/api/db:/var/www/html/api/db
+    environment:
+      - APACHE_LOG_DIR=/var/log/apache2
+    restart: unless-stopped
+
+  # ── React Admin Panel (dev server) ─────────────────────────────────────────
+  admin-panel:
+    image: node:20-alpine
+    container_name: gench-hayat-admin
+    working_dir: /app
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    ports:
+      - "5173:5173" # Admin Panel: http://localhost:5173
+    volumes:
+      - ./admin-panel:/app
+      - /app/node_modules # anonymous volume — host node_modules ile çakışmasın
+    environment:
+      - VITE_API_URL=http://localhost:8080/api
+    depends_on:
+      - php-api
+    restart: unless-stopped
+
+  # ── React Website (frontend — opsiyonel) ────────────────────────────────────
+  website:
+    image: node:20-alpine
+    container_name: gench-hayat-website
+    working_dir: /app
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    ports:
+      - "5174:5173" # Website: http://localhost:5174
+    volumes:
+      - ./website:/app
+      - /app/node_modules
+    restart: unless-stopped

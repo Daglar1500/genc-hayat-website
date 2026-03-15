@@ -6,21 +6,46 @@ import gh_499 from '../../../../public/gh-kapak/GH - Sayı_ 499 - 1 Ekim 2025_pa
 import gh_502 from '../../../../public/gh-kapak/GH - Sayı_ 502 - 12 Kasım 2025 (1)_page-0001.jpg';
 import { ArticleCardElement } from '../../ArticleCard';
 import type { ArticleCard } from '../../ArticleCard';
-import { ArticleLine } from '../ArticleLine';
-import { MOCK_ARTICLES } from '../../../../data/MockArticles';
 
 // ─── RECOMMENDED ARTICLES DATA ──────────────────────────────────────────────
 
-// Give a subset (e.g. latest 7-8 or random from MOCK_ARTICLES) to recommended
-const recommendedArticles: ArticleCard[] = MOCK_ARTICLES.slice(0, 8);
-
-const VISIBLE_COUNT = 4;
+import { Labelo } from '../../ArticleCard';
 
 // ─── CAROUSEL ────────────────────────────────────────────────────────────────
 
 const ArticleCarousel = ({ issueNumber, isLatest }: { issueNumber: number; isLatest: boolean }) => {
   const [startIndex, setStartIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [recommendedArticles, setRecommendedArticles] = useState<ArticleCard[]>([]);
+  const VISIBLE_COUNT = 4;
+
+  useEffect(() => {
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+    fetch(`${apiUrl}/articles`)
+      .then(res => res.json())
+      .then(data => {
+        // En son eklenen 8 makaleyi al
+        const articles = data.slice(0, 8).map((a: any) => ({
+          href: `/articles/${a.id}`,
+          title: a.title,
+          type: a.type || 'normal',
+          description: a.subheading,
+          author: a.author,
+          place: a.place,
+          location: a.school,
+          issueNumber: a.issueNumber,
+          publishedDate: new Date(a.createdAt),
+          firstMedia: { type: 'image', src: a.imageUrl, alt: a.title },
+          category: new Labelo('category', a.category),
+          tags: a.labels?.map((l: string) => new Labelo('tag', l)) || []
+        } as ArticleCard));
+        setRecommendedArticles(articles);
+      })
+      .catch(err => {
+        console.error("Error fetching recommended articles:", err);
+      });
+  }, []);
+
   const total = recommendedArticles.length;
   const canNext = startIndex + VISIBLE_COUNT < total;
   const canPrev = startIndex > 0;
@@ -47,6 +72,10 @@ const ArticleCarousel = ({ issueNumber, isLatest }: { issueNumber: number; isLat
 
   const visibleArticles = recommendedArticles.slice(startIndex, startIndex + VISIBLE_COUNT);
 
+  if (recommendedArticles.length === 0) {
+    return null;
+  }
+
   return (
     <div className="relative" onMouseEnter={() => setIsPaused(true)} onMouseLeave={() => setIsPaused(false)}>
       <div className="flex items-center justify-between mb-6">
@@ -56,7 +85,7 @@ const ArticleCarousel = ({ issueNumber, isLatest }: { issueNumber: number; isLat
         </div>
         <div className="flex items-center gap-2">
           <div className="flex gap-1 mr-2">
-            {Array.from({ length: total - VISIBLE_COUNT + 1 }).map((_, i) => (
+            {Array.from({ length: Math.max(0, total - VISIBLE_COUNT + 1) }).map((_, i) => (
               <button key={i} onClick={() => setStartIndex(i)} className={`w-1.5 h-1.5 rounded-full transition-colors duration-300 ${startIndex === i ? 'bg-black' : 'bg-gray-300 hover:bg-gray-500'}`} />
             ))}
           </div>
@@ -206,8 +235,6 @@ const recentIssuesData: IssueData[] = [
 // ─── SUNU / ROTA : MODERN LIGHT DESIGN ────────────────────────────────────────
 
 type ActivePanel = 'sunu' | 'rota';
-
-const FUTURA_STYLE = "font-['Futura_BLK_BT','Futura','Arial_Black',sans-serif] font-black";
 
 export const SunuRotaPanel = ({ issueData, expanded: externalExpanded, onToggleExpand }: { issueData: IssueData, expanded?: boolean; onToggleExpand?: () => void }) => {
   const [activePanel, setActivePanel] = useState<ActivePanel>('sunu');
@@ -430,8 +457,8 @@ const CoverCard = ({ issueData, issuesList, onSelectIssue }: { issueData: IssueD
               key={num}
               onClick={() => handleSelectNumber(num)}
               className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${isSelected
-                  ? 'bg-red-600 text-white shadow-md cursor-default'
-                  : 'bg-white border border-gray-200 text-zinc-600 hover:border-black hover:text-black'
+                ? 'bg-red-600 text-white shadow-md cursor-default'
+                : 'bg-white border border-gray-200 text-zinc-600 hover:border-black hover:text-black'
                 }`}
             >
               {num}
@@ -477,7 +504,8 @@ const MobileLayout = ({ selectedIssue, issuesList, onSelectIssue }: { selectedIs
       <div>
         <span className="text-xs font-bold text-zinc-400 uppercase tracking-widest pl-4">{heading}</span>
         <div className="h-0.5 w-12 bg-black mt-1.5 mb-2 ml-4" />
-        <ArticleLine articles={recommendedArticles} className="!py-0" />
+        {/* Mobile carousel is handled separately, for now we will skip showing recommended statically here or we can just render ArticleCarousel. Let's just use ArticleCarousel */}
+        <ArticleCarousel issueNumber={selectedIssue.number} isLatest={isLatest} />
       </div>
     </div>
   );
