@@ -1,3 +1,5 @@
+import { useState, useEffect } from "react";
+import { BreakoutGame } from "./MainContent/BreakoutGame";
 import { FeedSection } from "./MainContent/FeedSection/index";
 import { ArticleLine } from "./MainContent/ArticleLine";
 import { FeaturedArticle } from "./MainContent/FeaturedArticle";
@@ -7,58 +9,77 @@ import { VideoSection } from "./MainContent/YoutubeVideos";
 import { ArchiveSection } from "./MainContent/IssuesSection";
 import { SpotifySection } from "./MainContent/SpotifyListsSection";
 import { LetterboxdSection } from "./MainContent/LetterboxdSection";
-import { BreakoutGame } from "./MainContent/BreakoutGame";
-import { useApi, toArticleCard } from "../../lib/ApiContext";
+
+import { ArticleCard, Labelo } from "../../pages/MainPage/ArticleCard";
 
 export const MainContent = () => {
-  const { data } = useApi();
 
-  const dynamicSections = data?.sections.filter(
-    s => s.type !== 'article-feed' && s.type !== 'main-row'
-  ) ?? [];
+  const [sections, setSections] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    // API'dan dinamik layout verisini çek (VITE_API_URL docker config'inde tanımlı olmalı, şimdilik sabit veya env'den)
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+    fetch(`${apiUrl}/init`)
+      .then(res => res.json())
+      .then(data => {
+        // Admin panel formatını website ArticleCard formatına dönüştürüyoruz
+        const mappedSections = data.sections.map((sec: any) => ({
+          ...sec,
+          articles: sec.articles.map((a: any) => ({
+            href: `/articles/${a.id}`, // veya slug
+            title: a.title,
+            type: a.type || 'normal',
+            description: a.subheading,
+            author: a.author,
+            place: a.place,
+            location: a.school,
+            issueNumber: a.issueNumber,
+            publishedDate: new Date(a.createdAt),
+            firstMedia: { type: 'image', src: a.imageUrl, alt: a.title },
+            category: new Labelo('category', a.category),
+            tags: a.labels?.map((l: string) => new Labelo('tag', l)) || []
+          } as ArticleCard))
+        }));
+        setSections(mappedSections);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("API Fetch Error:", err);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) {
+    return <div className="pt-[100px] text-center w-full py-20 text-gray-500 font-bold">Yükleniyor...</div>;
+  }
+
+  // API'den dönen sıralanmış, PINNED veya unpinned 'section'ları döngüyle renderla.
   return (
     <div className="pt-[100px]">
       <FeedSection />
+
+      {/* Sunu/Rota (MainSection kısmı şimdilik aynı, detaylandırılabilir) */}
       <MainSection />
 
-      {dynamicSections.map((section) => {
-        if (section.isVisible === false) return null;
-
-        if (section.type === 'ordinary-row') {
-          const articles = section.articles.map(toArticleCard);
-          if (!articles.length) return null;
-          return <ArticleLine key={section.id} articles={articles} />;
+      {/* Dinamik sıralı bloklar (Admin panelindeki layout sıralamasına göre) */}
+      {sections.map(sec => {
+        if (sec.type === 'category-row') {
+          return <CategorySection key={sec.id} categoryTitle={sec.title || "Kategori"} articles={sec.articles} />;
         }
-        if (section.type === 'category-row') {
-          const articles = section.articles.map(toArticleCard);
-          if (!articles.length) return null;
-          return <CategorySection key={section.id} categoryTitle={section.title || ''} articles={articles} />;
+        if (sec.type === 'ordinary-row' || sec.type === 'spot-row') {
+          return <ArticleLine key={sec.id} articles={sec.articles} />;
         }
-        if (section.type === 'spot-row') {
-          if (!section.articles.length) return null;
-          return <FeaturedArticle key={section.id} article={toArticleCard(section.articles[0])} />;
-        }
-        if (section.type === 'video-row') {
-          const cfg = section.config || {};
-          if (!cfg.videos?.length) return null;
-          return <VideoSection key={section.id} videos={cfg.videos} channelUrl={cfg.channelUrl || ''} />;
-        }
-        if (section.type === 'spotify-row') {
-          const cfg = section.config || {};
-          if (!cfg.playlists?.length) return null;
-          return <SpotifySection key={section.id} playlists={cfg.playlists} profileUrl={cfg.profileUrl || ''} />;
-        }
-        if (section.type === 'letterboxd-row') {
-          const cfg = section.config || {};
-          if (!cfg.films?.length) return null;
-          return <LetterboxdSection key={section.id} films={cfg.films} profileUrl={cfg.profileUrl || ''} />;
-        }
-        if (section.type === 'archive-row') {
-          return <ArchiveSection key={section.id} />;
-        }
-        return null;
+        return null; // feed-row vs için
       })}
+
+      <VideoSection />
+      <FeaturedArticle />
+
+      <SpotifySection />
+      <LetterboxdSection />
+
+      <ArchiveSection />
 
       <div className="hidden lg:block">
         <BreakoutGame />

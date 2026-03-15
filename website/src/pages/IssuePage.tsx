@@ -1,12 +1,7 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import img1 from "../public/gh-kapak/GH - Sayı 505 - 24 Aralık 2025_page-0001.jpg";
-import img2 from "../public/gh-kapak/gh.jpg";
-import img3 from "../public/gh-kapak/GH - Sayı_ 502 - 12 Kasım 2025 (1)_page-0001.jpg";
-import img4 from "../public/gh-kapak/GH - Sayı_ 499 - 1 Ekim 2025_page-0001.jpg";
-import img5 from "../public/gh-kapak/GH - Sayı_ 497 - 3 Eylül 2025 (1)_page-0001.jpg";
-import img6 from "../public/gh-kapak/GH - Sayı_ 496 - 16 Ağustos 2025 (1)_page-0001.jpg";
-import img7 from "../public/gh-kapak/GH - Sayı_ 494 - 23 Temmuz 2025_page-0001.jpg";
-import img8 from "../public/gh-kapak/GH - Sayı_ 490 - 28 Mayıs 2025_page-0001.jpg";
+// Resimleri şimdilik örnek olarak tutabiliriz ancak API'dan gelen URL'leri kullanacağız
+import defaultCoverImg from "../public/gh-kapak/gh.jpg";
 
 // --- Types ---
 type Issue = {
@@ -18,18 +13,6 @@ type Issue = {
   pdfUrl: string;
 };
 
-// --- Mock Data ---
-const MOCK_ISSUES: Issue[] = [
-  { id: "505", number: "505. Sayı", title: "Dosya: Yeni Yıl ve Umut", date: "Aralık 2025", coverImage: img1, pdfUrl: "#" },
-  { id: "504", number: "504. Sayı", title: "Dosya: Erdal Eren ve Gençlik", date: "Aralık 2025", coverImage: img2, pdfUrl: "#" },
-  { id: "502", number: "502. Sayı", title: "Dosya: Sonbahar Direnişi", date: "Kasım 2025", coverImage: img3, pdfUrl: "#" },
-  { id: "499", number: "499. Sayı", title: "Dosya: Ekim Dönümü", date: "Ekim 2025", coverImage: img4, pdfUrl: "#" },
-  { id: "497", number: "497. Sayı", title: "Dosya: Cumhuriyet ve Biz", date: "Eylül 2025", coverImage: img5, pdfUrl: "#" },
-  { id: "496", number: "496. Sayı", title: "Dosya: Üniversiteler Açılırken", date: "Ağustos 2025", coverImage: img6, pdfUrl: "#" },
-  { id: "494", number: "494. Sayı", title: "Dosya: Yaz ve Emek", date: "Temmuz 2025", coverImage: img7, pdfUrl: "#" },
-  { id: "490", number: "490. Sayı", title: "Dosya: 1 Mayıs ve Gençlik", date: "Mayıs 2025", coverImage: img8, pdfUrl: "#" },
-];
-
 // --- Sub-Components ---
 
 const IssueCard = ({ issue }: { issue: Issue }) => {
@@ -39,7 +22,7 @@ const IssueCard = ({ issue }: { issue: Issue }) => {
       <Link to={`/sayi/${issue.id}`} className="relative block w-full aspect-[3/4] overflow-hidden rounded-sm shadow-sm transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-1">
         {/* Image */}
         <img
-          src={issue.coverImage}
+          src={issue.coverImage || defaultCoverImg}
           alt={`${issue.number} Kapak Görseli`}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
@@ -85,6 +68,42 @@ const IssueCard = ({ issue }: { issue: Issue }) => {
 // --- Main Page Component ---
 
 export const IssuesPage = () => {
+  const [issues, setIssues] = useState<Issue[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchIssues = async () => {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+      try {
+        const res = await fetch(`${apiUrl}/issues`);
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        const data = await res.json();
+
+        // Handle PHP backend wrapping results in a "data" property if paginated etc.
+        const issuesData = Array.isArray(data) ? data : (data.data || []);
+
+        const mappedIssues = issuesData.map((issue: any) => ({
+          id: issue.id.toString(),
+          number: `${issue.issueNumber}. Sayı`,
+          title: issue.title || `Dosya: ${issue.theme || 'Yeni Sayı'}`,
+          date: new Date(issue.publishedAt || issue.createdAt).toLocaleDateString("tr-TR", { month: 'long', year: 'numeric' }),
+          coverImage: issue.coverImageUrl,
+          pdfUrl: issue.pdfUrl || '#'
+        }));
+
+        setIssues(mappedIssues);
+      } catch (error) {
+        console.error("Sayılar yüklenirken hata oluştu:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchIssues();
+  }, []);
+
   return (
     <div className="min-h-screen bg-white pt-24 pb-20 font-bradford">
       {/* Container */}
@@ -102,11 +121,17 @@ export const IssuesPage = () => {
           </div>
 
           {/* Grid Layout */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12">
-            {MOCK_ISSUES.map((issue) => (
-              <IssueCard key={issue.id} issue={issue} />
-            ))}
-          </div>
+          {loading ? (
+            <div className="flex justify-center items-center py-20 text-stone-500">Yükleniyor...</div>
+          ) : issues.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12">
+              {issues.map((issue) => (
+                <IssueCard key={issue.id} issue={issue} />
+              ))}
+            </div>
+          ) : (
+            <div className="flex justify-center items-center py-20 text-stone-500">Henüz yayınlanmış bir sayı bulunmamaktadır.</div>
+          )}
 
           {/* Load More */}
           <div className="mt-20 flex justify-center">

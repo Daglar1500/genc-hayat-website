@@ -1,0 +1,266 @@
+[
+  {
+    "id": "art-0",
+    "slug": "diyalektigin-izinde",
+    "type": "sunu",
+    "title": "Diyalektiğin İzinde",
+    "subheading": "Bu sayıda doğanın ve tarihin diyalektik hareketini izliyoruz.",
+    "author": "Zeynep Yılmaz",
+    "editorName": "Admin",
+    "place": "İstanbul",
+    "school": "Felsefe Bölümü, Boğaziçi Üniversitesi",
+    "content": [
+      { "id": "b1", "type": "paragraph", "value": "Boğaziçi Direnişi döneminde üniversitedeki öğrenci hareketine damgasını vuran birçok mücadele inisiyatifi 2020-2021 yıllarında popülerdi. Tüm Boğaziçi öğrencilerine açık olan bu inisiyatifler, yapısı inisiyatifin çizdiği, tabii ki süreç içinde değişime uğrayabilen çerçeve içinde mücadelenin örgütlenebilmesi için bir imkân taşıyordu." },
+      { "id": "b2", "type": "subheading", "value": "Diyalektik Materyalizm Nedir?" },
+      { "id": "b3", "type": "paragraph", "value": "Marx ve Engels'in geliştirdiği diyalektik materyalizm, doğayı ve toplumu sürekli hareket, değişim ve çelişki içinde ele alır. Bu felsefi yaklaşım, dünyayı anlamlandırmak için güçlü araçlar sunar." }
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=800&q=80",
+    "labels": ["Felsefe", "Diyalektik Materyalizm"],
+    "category": "Felsefe",
+    "issueNumber": "504",
+    "createdAt": 1748217600000,
+    "status": "edited"
+  },
+  {
+    "id": "art-1",
+    "slug": "gencligin-rotasi",
+    "type": "rota",
+    "title": "Gençliğin Rotası: 2025'e Bakarken",
+    "subheading": "Genç kuşakların toplumsal mücadele içindeki yeri ve rotası.",
+    "author": "Ahmet Demir",
+    "editorName": "Admin",
+    "place": "Ankara",
+    "school": "Siyasal Bilgiler, Mülkiye",
+    "content": [
+      { "id": "b1", "type": "paragraph", "value": "Gençlik hareketi, tarihsel süreçte toplumsal dönüşümlerin öncü gücü olmuştur. Bugün de bu misyon, yeni koşullar altında sürmektedir." },
+      { "id": "b2", "type": "subheading", "value": "Yeni Neslin Omuzlarında" },
+      { "id": "b3", "type": "paragraph", "value": "Dijital çağın gençleri, hem yerel hem de küresel sorunlarla yüzleşmek zorundadır. İklim krizi, ekonomik eşitsizlik ve demokratik gerileme bu neslin gündemini belirliyor." }
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?auto=format&fit=crop&w=800&q=80",
+    "labels": ["Gençlik Sosyolojisi", "Sosyalizm"],
+    "category": "Güncel",
+    "issueNumber": "504",
+    "createdAt": 1748131200000,
+    "status": "edited"
+  },
+  {
+    "id": "art-2",
+    "slug": "neoliberalizmin-krizi",
+    "type": "featured",
+    "title": "Neoliberalizmin Krizi",
+    "subheading": "Küresel ekonomik düzenin çöküşü ve alternatifler.",
+    "author": "Ali Kaya",
+    "editorName": "Selin",
+    "place": "İzmir",
+    "school": "İktisat Bölümü, DEÜ",
+    "content": [
+      { "id": "b1", "type": "paragraph", "value": "Neoliberalizm, 1980'lerden bu yana küresel ekonomiyi şekillendiren baskın ideoloji olmuştur. Ancak 2008 krizi ve ardından gelen pandemi, bu sistemin derin çelişkilerini gün yüzüne çıkardı." }
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1542601906990-b4d3fb7d5fa5?auto=format&fit=crop&w=800&q=80",
+    "labels": ["Neoliberalizm", "Kapitalizm", "Ekonomi"],
+    "category": "Kuram",
+    "issueNumber": "504",
+    "createdAt": 1748044800000,
+    "status": "edited"
+  },
+  {
+    "id": "art-3",
+    "slug": "kent-yoksullugu",
+    "type": "featured",
+    "title": "21. Yüzyılda Kent Yoksulluğu",
+    "subheading": "Büyük şehirlerin gölgesinde hayatta kalmak.",
+    "author": "Ayşe Şahin",
+    "editorName": "Veli",
+    "place": "İstanbul",
+    "school": "Esenyurt, İstanbul",
+    "content": [
+      { "id": "b1", "type": "paragraph", "value": "Kentsel yoksulluk, tarihsel süreçte sanayileşme ve göçle bağlantılı olarak ortaya çıkmıştır. Türkiye'de özellikle 1950'lerden itibaren hızlı kentleşme süreci, büyük şehirlerde geniş yoksul mahallelerin oluşmasına neden olmuştur." }
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&w=800&q=80",
+    "labels": ["Kent Sosyolojisi", "Yoksulluk", "Eşitsizlik"],
+    "category": "Güncel",
+    "issueNumber": "503",
+    "createdAt": 1747958400000,
+    "status": "not-edited"
+  },
+  {
+    "id": "art-4",
+    "slug": "goc-psikolojisi",
+    "type": "normal",
+    "title": "Göçün Psikolojisi",
+    "subheading": "Yerinden edilmenin insan zihnine etkileri.",
+    "author": "Mehmet Çelik",
+    "editorName": "Admin",
+    "place": "Diyarbakır",
+    "school": "Tuzluçayır, Ankara",
+    "content": [
+      { "id": "b1", "type": "paragraph", "value": "Göç, insanoğlunun varoluşsal deneyimlerinden biridir. Ancak zorunlu göç, mülteci olarak yaşamak veya iç göç gibi deneyimler, derin psikolojik izler bırakabilir." }
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=800&q=80",
+    "labels": ["Göç", "Psikoloji", "Yoksulluk"],
+    "category": "Güncel",
+    "issueNumber": "503",
+    "createdAt": 1747872000000,
+    "status": "not-edited"
+  },
+  {
+    "id": "art-5",
+    "slug": "varoluşculuk-bugun",
+    "type": "normal",
+    "title": "Modern Varoluşçuluk",
+    "subheading": "Sartre ve Camus'nun günümüze yansımaları.",
+    "author": "Elif Öztürk",
+    "editorName": "Selin",
+    "place": "Ankara",
+    "school": "Felsefe, Galatasaray Üni.",
+    "content": [
+      { "id": "b1", "type": "paragraph", "value": "Varoluşçuluk, 20. yüzyılın en etkili felsefi akımlarından biridir. İnsan özgürlüğü, sorumluluk ve anlam arayışı üzerine kurulu bu felsefe, günümüz koşullarında da canlılığını sürdürmektedir." }
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=800&q=80",
+    "labels": ["Varoluşçuluk", "Felsefe"],
+    "category": "Felsefe",
+    "issueNumber": "502",
+    "createdAt": 1747785600000,
+    "status": "edited"
+  },
+  {
+    "id": "art-6",
+    "slug": "tarihsel-materyalizm",
+    "type": "normal",
+    "title": "Bugün Tarihsel Materyalizm",
+    "subheading": "Marxist tarih anlayışının güncel geçerliliği.",
+    "author": "Can Yıldız",
+    "editorName": "Veli",
+    "place": "İstanbul",
+    "school": "Sosyoloji Bölümü, Boğaziçi",
+    "content": [
+      { "id": "b1", "type": "paragraph", "value": "Tarihsel materyalizm, toplumsal değişimi üretim ilişkileri ve sınıf mücadelesi çerçevesinde açıklar. Bu yaklaşım, günümüz kapitalist toplumlarını analiz etmek için hâlâ güçlü bir araçtır." }
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&w=800&q=80",
+    "labels": ["Tarihsel Materyalizm", "Marksizm"],
+    "category": "Tarih",
+    "issueNumber": "502",
+    "createdAt": 1747699200000,
+    "status": "not-edited"
+  },
+  {
+    "id": "art-7",
+    "slug": "avrupa-genclik-hareketleri",
+    "type": "normal",
+    "title": "Avrupa'da Gençlik Hareketleri",
+    "subheading": "Fridays for Future'dan sol gençlik örgütlerine.",
+    "author": "Zeynep Yılmaz",
+    "editorName": "Admin",
+    "place": "Berlin",
+    "school": "Bornova Anadolu Lisesi",
+    "content": [
+      { "id": "b1", "type": "paragraph", "value": "Avrupa'da gençlik hareketleri, özellikle iklim krizi ve ekonomik eşitsizlik konularında güçlü bir siyasi aktör olarak öne çıkmaktadır." }
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=800&q=80",
+    "labels": ["Gençlik Sosyolojisi", "Anti-Emperyalizm"],
+    "category": "Dünya",
+    "issueNumber": "502",
+    "createdAt": 1747612800000,
+    "status": "edited"
+  },
+  {
+    "id": "art-8",
+    "slug": "ekolojik-marksizm",
+    "type": "normal",
+    "title": "Ekolojik Marksizm",
+    "subheading": "Kapitalizm ve ekolojik yıkım arasındaki ilişki.",
+    "author": "Ahmet Demir",
+    "editorName": "Selin",
+    "place": "Londra",
+    "school": "Biyoloji Bölümü, ODTÜ",
+    "content": [
+      { "id": "b1", "type": "paragraph", "value": "Ekolojik Marksizm, kapitalist üretim tarzının doğa üzerindeki yıkıcı etkilerini analiz eder. İklim değişikliği, biyoçeşitlilik kaybı ve çevre kirliliği, bu yaklaşımın temel konularıdır." }
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?auto=format&fit=crop&w=800&q=80",
+    "labels": ["Marksizm", "Kapitalizm", "Ekoloji"],
+    "category": "Kuram",
+    "issueNumber": "501",
+    "createdAt": 1747526400000,
+    "status": "not-edited"
+  },
+  {
+    "id": "art-9",
+    "slug": "yapay-zeka-ve-sanat",
+    "type": "normal",
+    "title": "Yapay Zeka Çağında Sanat",
+    "subheading": "Makinelerin yaratıcılığı ve insanın anlam arayışı.",
+    "author": "Ali Kaya",
+    "editorName": "Veli",
+    "place": "Paris",
+    "school": "İletişim Fakültesi, Marmara",
+    "content": [
+      { "id": "b1", "type": "paragraph", "value": "Yapay zeka, sanat üretiminde devrim yarattı. Ancak bu devrim beraberinde pek çok felsefi ve etik soruyu getiriyor: Bir makine gerçekten yaratıcı olabilir mi?" }
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1542601906990-b4d3fb7d5fa5?auto=format&fit=crop&w=800&q=80",
+    "labels": ["Kültür-Sanat", "Teknoloji"],
+    "category": "Kültür-Sanat",
+    "issueNumber": "501",
+    "createdAt": 1747440000000,
+    "status": "edited"
+  },
+  {
+    "id": "art-10",
+    "slug": "emek-gelecegi",
+    "type": "normal",
+    "title": "Emeğin Geleceği",
+    "subheading": "Otomasyon, prekarizasyon ve sınıf mücadelesi.",
+    "author": "Ayşe Şahin",
+    "editorName": "Admin",
+    "place": "İstanbul",
+    "school": "Hukuk Fakültesi, Ankara Üni.",
+    "content": [
+      { "id": "b1", "type": "paragraph", "value": "Dijital dönüşüm ve otomasyon, emek piyasasını köklü biçimde dönüştürüyor. Bu süreçte milyonlarca işçi işsizlik tehdidiyle yüz yüze geliyor." }
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&w=800&q=80",
+    "labels": ["Sınıf Mücadelesi", "Sosyalizm"],
+    "category": "Güncel",
+    "issueNumber": "500",
+    "createdAt": 1747353600000,
+    "status": "not-edited"
+  },
+  {
+    "id": "art-11",
+    "slug": "hakikat-sonrasi-siyaset",
+    "type": "normal",
+    "title": "Hakikat Sonrası Siyaset",
+    "subheading": "Post-truth çağında demokrasi ve medya.",
+    "author": "Mehmet Çelik",
+    "editorName": "Selin",
+    "place": "Ankara",
+    "school": "Kadıköy Anadolu Lisesi",
+    "content": [
+      { "id": "b1", "type": "paragraph", "value": "Hakikat sonrası (post-truth) dönem, siyasi manipülasyonun ve dezenformasyonun sınırsızca yayıldığı bir çağı tanımlar. Bu ortamda demokratik kurumlar ciddi baskılarla karşı karşıyadır." }
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=800&q=80",
+    "labels": ["Sosyal Teori", "Postmodernizm"],
+    "category": "Kuram",
+    "issueNumber": "500",
+    "createdAt": 1747267200000,
+    "status": "edited"
+  },
+  {
+    "id": "art-12",
+    "slug": "kuantum-felsefesi",
+    "type": "normal",
+    "title": "Kuantum Felsefesi",
+    "subheading": "Madde, belirsizlik ve bilinç üzerine.",
+    "author": "Elif Öztürk",
+    "editorName": "Veli",
+    "place": "İzmir",
+    "school": "Biyoloji Bölümü, ODTÜ",
+    "content": [
+      { "id": "b1", "type": "paragraph", "value": "Kuantum mekaniği, fizik dünyasında devrim yaratırken beraberinde derin felsefi sorular da getirdi. Gözlemcinin rolü, belirsizlik ilkesi ve nedensellik bu soruların başında gelir." }
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=800&q=80",
+    "labels": ["Bilim Felsefesi", "Felsefe"],
+    "category": "Felsefe",
+    "issueNumber": "499",
+    "createdAt": 1747180800000,
+    "status": "not-edited"
+  }
+]

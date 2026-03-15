@@ -1,6 +1,6 @@
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { MOCK_ARTICLES } from '../data/MockArticles';
-import { ArticleCardElement } from './MainPage/ArticleCard';
+import { ArticleCardElement, ArticleCard, Labelo } from './MainPage/ArticleCard';
 
 // --- Tematik Veri ---
 interface ThematicInfo {
@@ -39,9 +39,47 @@ export const ThematicPage = () => {
         heroImage: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=1600&q=80',
     };
 
-    const articles = MOCK_ARTICLES.filter(a =>
-        a.tags?.some(t => t.name.toLowerCase() === (info.filterTag || slug || '').toLowerCase())
-    );
+    const [articles, setArticles] = useState<ArticleCard[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchArticles = async () => {
+            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+            try {
+                const res = await fetch(`${apiUrl}/articles`);
+                const data = await res.json();
+
+                const filterTag = (info.filterTag || slug || '').toLowerCase();
+
+                const filteredData = data.filter((a: any) =>
+                    a.labels && a.labels.some((l: string) => l.toLowerCase() === filterTag)
+                );
+
+                const mappedArticles = filteredData.map((a: any) => ({
+                    href: `/articles/${a.id}`,
+                    title: a.title,
+                    type: a.type || 'normal',
+                    description: a.subheading,
+                    author: a.author,
+                    place: a.place,
+                    location: a.school,
+                    issueNumber: a.issueNumber,
+                    publishedDate: new Date(a.createdAt),
+                    firstMedia: { type: 'image', src: a.imageUrl, alt: a.title, mediaLayout: 'full-width' },
+                    category: new Labelo('category', a.category),
+                    tags: a.labels?.map((l: string) => new Labelo('tag', l)) || []
+                } as ArticleCard));
+
+                setArticles(mappedArticles);
+            } catch (err) {
+                console.error("Tematik yazılar çekilirken hata oluştu:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchArticles();
+    }, [slug, info.filterTag]);
 
     return (
         <div className="min-h-screen bg-white font-bradford">
@@ -69,13 +107,16 @@ export const ThematicPage = () => {
             {/* --- ARTICLES --- */}
             <main className="px-4 sm:px-8 md:px-16 lg:px-24 xl:px-[140px] py-16">
                 <div className="max-w-[1400px] mx-auto">
-                    {articles.length > 0 ? (
+                    {loading ? (
+                        <div className="flex justify-center items-center py-32 text-gray-500">Yükleniyor...</div>
+                    ) : articles.length > 0 ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8">
                             {articles.map(article => (
                                 <ArticleCardElement
                                     key={article.href}
                                     href={article.href}
                                     title={article.title}
+                                    type={article.type}
                                     author={article.author}
                                     publishedDate={article.publishedDate}
                                     issueNumber={article.issueNumber}

@@ -1,7 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
-import { Label } from "./MainPage/ArticleCard";
-import { MOCK_ARTICLES } from "../data/MockArticles";
+import { Label, ArticleCard, Labelo } from "./MainPage/ArticleCard";
 import { ShareFloatingButton } from "../components/ShareFloatingButton";
 import { ArticleLine } from "./MainPage/MainContent/ArticleLine";
 
@@ -110,20 +109,85 @@ const EmbeddedArticleBox = ({ article }: { article: any }) => {
 
 export const FeaturedArticleDetail = () => {
   const { slug } = useParams<{ slug: string }>();
-  // Find the exact article. (The href in MOCK_ARTICLES looks like /articles/slug)
-  const article = MOCK_ARTICLES.find(a => a.href === `/articles/${slug}`) || MOCK_ARTICLES[0];
 
-
+  const [article, setArticle] = useState<ArticleCard | null>(null);
+  const [randomArticle, setRandomArticle] = useState<ArticleCard | null>(null);
+  const [relatedArticles, setRelatedArticles] = useState<ArticleCard[]>([]);
+  const [loading, setLoading] = useState(true);
   const [fontIndex, setFontIndex] = useState(1);
-  const [randomArticle] = useState(() => {
-    const otherArticles = MOCK_ARTICLES.filter(a => a.href !== article.href); // Exclude current
-    return otherArticles[Math.floor(Math.random() * otherArticles.length)];
-  });
 
-  const issueNumber = (article as any).issueNumber || 496;
+  useEffect(() => {
+    const fetchData = async () => {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+      try {
+        // Slug based fetch from API
+        const res = await fetch(`${apiUrl}/articles/${slug}`);
+        const articleData = await res.json();
+
+        if (articleData) {
+          const mappedArticle: ArticleCard = {
+            href: `/articles/${articleData.id}`,
+            title: articleData.title,
+            type: articleData.type || 'normal',
+            description: articleData.subheading || articleData.content?.substring(0, 150),
+            author: articleData.author,
+            place: articleData.place,
+            location: articleData.school,
+            issueNumber: articleData.issueNumber,
+            publishedDate: new Date(articleData.createdAt),
+            content: articleData.content || [],
+            firstMedia: { type: 'image', src: articleData.imageUrl, alt: articleData.title, mediaLayout: 'full-width' },
+            category: new Labelo('category', articleData.category),
+            tags: articleData.labels?.map((l: string) => new Labelo('tag', l)) || []
+          };
+          setArticle(mappedArticle);
+
+          // Fetch other articles for "related" and "random"
+          const allRes = await fetch(`${apiUrl}/articles`);
+          const allData = await allRes.json();
+
+          const otherData = allData.filter((a: any) => a.id !== articleData.id);
+
+          if (otherData.length > 0) {
+            const mappedOthers: ArticleCard[] = otherData.map((a: any) => ({
+              href: `/articles/${a.id}`,
+              title: a.title,
+              type: a.type || 'normal',
+              description: a.subheading || a.content?.substring(0, 150),
+              author: a.author,
+              place: a.place,
+              location: a.school,
+              issueNumber: a.issueNumber,
+              publishedDate: new Date(a.createdAt),
+              content: a.content || [],
+              firstMedia: { type: 'image', src: a.imageUrl, alt: a.title, mediaLayout: 'full-width' },
+              category: new Labelo('category', a.category),
+              tags: a.labels?.map((l: string) => new Labelo('tag', l)) || []
+            }));
+
+            setRandomArticle(mappedOthers[Math.floor(Math.random() * mappedOthers.length)]);
+
+            const related = mappedOthers.filter((item) => item.category?.name === mappedArticle.category?.name).slice(0, 3);
+            setRelatedArticles(related);
+          }
+        }
+
+      } catch (err) {
+        console.error("Yazı detayı çekilirken hata oluştu:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    if (slug) {
+      fetchData();
+    }
+  }, [slug]);
+
+  const issueNumber = article?.issueNumber || 496;
 
   // Öne Çıkan mı Sıradan mı Kontrolü — sadece "featured" type hero göster
-  const isFeatured = article.type === 'featured';
+  const isFeatured = article?.type === 'featured';
 
   const handleFontChange = (direction: 'increase' | 'decrease') => {
     if (direction === 'increase' && fontIndex < FONT_SIZES.length - 1) {
@@ -133,13 +197,8 @@ export const FeaturedArticleDetail = () => {
     }
   };
 
-  const relatedArticles = MOCK_ARTICLES.filter(
-    (item) =>
-      item.title !== article.title &&
-      item.category?.name === article.category?.name
-  ).slice(0, 3);
-
   const renderContent = () => {
+    if (!article) return null;
     const contentList = Array.isArray(article.content) ? article.content : [article.content];
     if (!contentList.length) return <p>İçerik hazırlanıyor...</p>;
 
@@ -241,7 +300,6 @@ export const FeaturedArticleDetail = () => {
           </h2>
         );
       }
-
       // --- EMBEDDED ARTICLE INJECTION (2. Bloktan Sonra) ---
       if (i === 1 && randomArticle) {
         renderedBlocks.push(
@@ -254,6 +312,7 @@ export const FeaturedArticleDetail = () => {
     return renderedBlocks;
   };
 
+  if (loading) return <div className="min-h-screen flex items-center justify-center font-serif text-gray-500">Yükleniyor...</div>;
   if (!article) return null;
 
   return (

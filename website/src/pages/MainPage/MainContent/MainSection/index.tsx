@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import gh_cover from '../../../../public/gh-kapak/gh.jpg';
@@ -6,18 +6,47 @@ import gh_499 from '../../../../public/gh-kapak/GH - Sayı_ 499 - 1 Ekim 2025_pa
 import gh_502 from '../../../../public/gh-kapak/GH - Sayı_ 502 - 12 Kasım 2025 (1)_page-0001.jpg';
 import { ArticleCardElement } from '../../ArticleCard';
 import type { ArticleCard } from '../../ArticleCard';
-import { ArticleLine } from '../ArticleLine';
-import { MOCK_ARTICLES } from '../../../../data/MockArticles';
-import { useApi, toArticleCard, type ApiSection } from '../../../../lib/ApiContext';
 
-const VISIBLE_COUNT = 4;
+// ─── RECOMMENDED ARTICLES DATA ──────────────────────────────────────────────
+
+import { Labelo } from '../../ArticleCard';
 
 // ─── CAROUSEL ────────────────────────────────────────────────────────────────
 
-const ArticleCarousel = ({ issueNumber, isLatest, articles }: { issueNumber: number; isLatest: boolean; articles: ArticleCard[] }) => {
+const ArticleCarousel = ({ issueNumber, isLatest }: { issueNumber: number; isLatest: boolean }) => {
   const [startIndex, setStartIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-  const total = articles.length;
+  const [recommendedArticles, setRecommendedArticles] = useState<ArticleCard[]>([]);
+  const VISIBLE_COUNT = 4;
+
+  useEffect(() => {
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+    fetch(`${apiUrl}/articles`)
+      .then(res => res.json())
+      .then(data => {
+        // En son eklenen 8 makaleyi al
+        const articles = data.slice(0, 8).map((a: any) => ({
+          href: `/articles/${a.id}`,
+          title: a.title,
+          type: a.type || 'normal',
+          description: a.subheading,
+          author: a.author,
+          place: a.place,
+          location: a.school,
+          issueNumber: a.issueNumber,
+          publishedDate: new Date(a.createdAt),
+          firstMedia: { type: 'image', src: a.imageUrl, alt: a.title },
+          category: new Labelo('category', a.category),
+          tags: a.labels?.map((l: string) => new Labelo('tag', l)) || []
+        } as ArticleCard));
+        setRecommendedArticles(articles);
+      })
+      .catch(err => {
+        console.error("Error fetching recommended articles:", err);
+      });
+  }, []);
+
+  const total = recommendedArticles.length;
   const canNext = startIndex + VISIBLE_COUNT < total;
   const canPrev = startIndex > 0;
 
@@ -41,7 +70,11 @@ const ArticleCarousel = ({ issueNumber, isLatest, articles }: { issueNumber: num
     return () => clearTimeout(timer);
   }, [startIndex, isPaused, canNext, next]);
 
-  const visibleArticles = articles.slice(startIndex, startIndex + VISIBLE_COUNT);
+  const visibleArticles = recommendedArticles.slice(startIndex, startIndex + VISIBLE_COUNT);
+
+  if (recommendedArticles.length === 0) {
+    return null;
+  }
 
   return (
     <div className="relative" onMouseEnter={() => setIsPaused(true)} onMouseLeave={() => setIsPaused(false)}>
@@ -88,18 +121,27 @@ interface IssueData {
   rotaContent: React.ReactNode;
 }
 
-// Hardcoded fallback issues (for issue selector)
-const fallbackIssues: IssueData[] = [
+const recentIssuesData: IssueData[] = [
   {
     number: 504,
     cover: gh_cover,
     sunuText: (
       <>
         <p className="mb-5 first-letter:text-6xl first-letter:font-black first-letter:text-black first-letter:mr-4 first-letter:float-left first-letter:leading-[0.8] first-letter:mt-1">
-          Okullarımız çoğu zaman yokluğuyla hatırlanan, varlığıyla pek fark etme şansına erişemediğimiz bir etken maddenin arayışındayız. Mesela bir sıvı sabun, dezenfektan tam da bu özellikleri karşılıyor bizim için. Günlük hayatta sessizce birikinen- ler vardır pas,kir, çeşitli mikroplar gibi; belki kabullendiğimiz belki alıştığımız.
+          Okullarımız çoğu zaman yokluğuyla hatırlanan, varlığıyla pek fark etme şansına erişemediğimiz bir etken maddenin arayışındayız. Mesela bir sıvı sabun, dezenfektan tam da bu özellikleri karşılıyor bizim için. Günlük hayatta sessizce birikiren- ler vardır pas,kir, çeşitli mikroplar gibi; belki kabullendiğimiz belki alıştığımız. Bu tarz şeyler ortak alanlarda daha hızlı da çoğalabilirler kimi zaman; kalabalıkta, ihmalde, üst üste bindikçe görünmezleşirler belki. Ancak o ortak alanları oluş turan kalabalıkların, yani her bir kişinin efor gösterdiği koşullarda, ne kadar fazla kişi "Böyle ah vah'la ne yapacağız biz ya, kalkın bir şey yapalım ya" diyerek, "Öyle oturup izleyelim mi ya, ortalığı pislik götürüyor" diyerek harekete geçme kararına katılırsa; hasta eden mikroplarla, etrafı kirletenlerin ortadan kalkması da o kadar etkili olur. Düzenli ve ısrarlı bir müdahale varsa sonuç verir.
         </p>
         <p className="mb-5">
-          İşte böyle, alanlarımızda birikenleri hatırlatıyor; temizliğin tek başına değil, birlikte mümkün olduğunu göstermek için bir araya getiriyoruz sayfalarımızı yeniden.
+          Günlük hayatta alıştığımız sorunlar da böyledir; birikir, görünmez hale gelir kanıksamaktan bazen aynı zararlı mikroorganizmalar gibi, normalleşir varlıkları. Oysa yapılan araştırmalann dezenfektanlanın bunlar üzerindeki etkisini gösterdiği gibi, tarihin de defalarca gösterdiği bir formül, kanıtladığı bir gerçeklik vardır; sınıf safında yürüyen gençlik mücadelesi kazanır. Geçmiş deneyimlerinden öğrendiği mücadele sayesinde birikmiş sorunların giderildiğini tespit etmiştir tarih, araştırmalar, geçmiş günümüz güncel ömekleri. İşte böyle, israrlı ve düzenli kullanım olduğunda sorunların %90 oranında azaldığı, bize, güvenceli bir yaşam hakkımıza, nitelikli ve parasız bir eğitime yönelik saldırıların da %100 oranın- da engellendiği görülmüştür. Yapılan gözlemler aynı zamanda şunu gösterir: birikmiş sorunlar kendiliğinden dağılmaz, kalıcı etki için de her bir kişinin önlem alması gerekir. Tek sefer kullanımına başvurulan çözümler yüzeyde etki edebilir ancak kalıcı çözüm için süreklilik gerekir. İstikrarlı ve örgütlü bir mücadele varsa kazanım gelir.
+        </p>
+        <p className="mb-5">
+          Bu sayımızda liseler yeniden açılırken, eğitim bakanının hamlelerinin öğrenciler lehine olmadığı bir kez daha açığa çıkıyor. Liseliler parasız, bilimsel ve demokratik eğitim istiyor, güvenli okullar, hijyenik koşullar, günde bir öğün ücretsiz yemek, karşılanabilir kantin fiyatları talep ediyor. Ezbere müfredat yerine ilgi alanlarına ve yeteneklerine göre öğrenmek istiyorlar; MESEM adı altında güvencesiz çalıştırılmak, iş kazalanında ya da iş cinayetlerinde hayatını kaybeden çocuk ve genç işçilerden biri olmak istemiyorlar. Bunun için de mücadeleden başka çare kalmıyor, etken maddesiyse örgütlülük olmadığı müddetçe sonuç vermiyor. İşte bu yüzden her okulda, bazı basit ihtiyaçlanın bulunması gerektiği gibi, mücadelenin de artık bir zorunluluk olarak bulunması gerekiyor.
+        </p>
+        <p>
+          İşte böyle, alanlarımızda birikenleri hatırlatıyor; temizliğin tek başına değil, birlikte mümkün olduğunu göstermek için bir araya getiriyoruz sayfalarımızı yeniden. Herkesin kullandığı yerler için tasarlanmış bir çözümden, süreklilik isteyen bir alışkanlıktan söz ediyoruz, çünkü bazı şeyler lüks değil, ihtiyaç olduğunu biliyoruz. Ve bazı şeylerin hepimizce kullanılması, her yerde bulunması gerektiğini biliyoruz.
+        </p>
+        <p>
+          Dergimizdeki yazılanın ifade ettiği gibi, "kasanın ağzı ihtiyaçlarımıza kapalı ama savaşlara ardına kadar açık bu düzende, ve enstrüman telinden daha gergin hissedebiliyoruz zaman zaman. Ama yalnız değiliz, birlikteliğimize sahibiz, gücümüzü birliğini alan işçiler gibi; biz de gücümüzü birlikte, ortak sorunlara ortak çözümler için hareket edersek buluyoruz.
+          Genç Hayat, 508. sayısıyla karşınızda.
         </p>
       </>
     ),
@@ -109,11 +151,14 @@ const fallbackIssues: IssueData[] = [
       <>
         <h4 className="text-xl md:text-2xl font-bold text-black mb-3 font-sans">Geçmişten Bugüne</h4>
         <p className="mb-5">
-          Erdal Eren'in 12 Eylül faşist cuntasınca idam edilişinin üzerinden 45 yıl geçti.
+          Erdal Eren'in 12 Eylül faşist cuntasınca idam edilişinin üzerinden 45 yıl geçti. Erdal, o dönemde Ankara Ortaöğrenimliler Derneği (ANOD) bünyesinde örgütlenmiş, işçi sınıfı mücadelesinin ilk adımlarını atan kararlı bir meslek lisesi öğrencisiydi.
+        </p>
+        <p className="mb-5">
+          <strong className="text-black bg-yellow-100/60 px-1 rounded">Yoksulluk her geçen gün daha da derinleşiyor.</strong> Bugün Erdal gibi meslek liseli olan yüz binlerce genç, MESEM adı altında, denetimsiz, sigortasız işyerlerine adeta sürülüyor.
         </p>
         <h4 className="text-xl md:text-2xl font-bold text-black mb-3 mt-6 font-sans">Mücadeleyi Güncellemek</h4>
         <p>
-          Erdal Eren'in mücadelesini güncellemek, bugünün gençliğinin en acil görevidir.
+          Erdal Eren'in mücadelesini güncellemek, bugünün gençliğinin en acil görevidir. Çünkü dün olduğu gibi bugün de özgürlük ve eşitlik mücadelesi sınavdan geçiriyor bizi.
         </p>
       </>
     )
@@ -124,10 +169,10 @@ const fallbackIssues: IssueData[] = [
     sunuText: (
       <>
         <p className="mb-5 first-letter:text-6xl first-letter:font-black first-letter:text-black first-letter:mr-4 first-letter:float-left first-letter:leading-[0.8] first-letter:mt-1">
-          503. sayımızda, kampüslerde ve sokaklarda artan sansür ve baskı ortamını ele alıyoruz.
+          503. sayımızda, kampüslerde ve sokaklarda artan sansür ve baskı ortamını ele alıyoruz. Gençlik yaratıcılığını engelleyen her türlü girişime karşı sesimizi yükseltmekten çekinmiyoruz.
         </p>
         <p>
-          Sanatın özgürleştirici gücünün engellenemeyeceğini vurguluyoruz.
+          Sanatın özgürleştirici gücünün engellenemeyeceğini ve bu zor zamanlarda da bir araya gelerek üretmeye devam edeceğimizi vurguluyoruz.
         </p>
       </>
     ),
@@ -137,7 +182,7 @@ const fallbackIssues: IssueData[] = [
       <>
         <h4 className="text-xl md:text-2xl font-bold text-black mb-3 font-sans">Sansürün Yüzleri</h4>
         <p className="mb-5">
-          Üniversite şenliklerinin iptal edilmesinden, tiyatro oyunlarının yasaklanmasına kadar uzanan engelleme.
+          Üniversite şenliklerinin iptal edilmesinden, tiyatro oyunlarının yasaklanmasına kadar uzanan bir dizi engelleme, gençliğin kültürel gelişimine ket vuruyor.
         </p>
       </>
     )
@@ -148,7 +193,7 @@ const fallbackIssues: IssueData[] = [
     sunuText: (
       <>
         <p className="mb-5 first-letter:text-6xl first-letter:font-black first-letter:text-black first-letter:mr-4 first-letter:float-left first-letter:leading-[0.8] first-letter:mt-1">
-          Barınma krizinin ulaştığı boyutlar, öğrencilerin en temel hakkı olan eğitim hakkını gasp ediyor.
+          Barınma krizinin ulaştığı boyutlar, öğrencilerin en temel hakkı olan eğitim hakkını gasp ediyor. 502. sayımızda fahiş kiralar ve yetersiz KYK yurtlarına karşı "Barınamıyoruz" hareketini yakından inceliyoruz.
         </p>
       </>
     ),
@@ -156,10 +201,26 @@ const fallbackIssues: IssueData[] = [
     rotaDesc: "Artan kiralar ve yetersiz yurt kapasitelerinin öğrenciler üzerindeki etkisi.",
     rotaContent: (
       <>
-        <h4 className="text-xl md:text-2xl font-bold text-black mb-3 font-sans">Yurt Sorunları</h4>
-        <p>KYK yurtlarındaki yetersiz koşullar ve öğrencilerin insani barınma talepleri.</p>
+        <h4 className="text-xl md:text-2xl font-bold text-black mb-3 font-sans">Yurt Sorusalları</h4>
+        <p>KYK yurtlarındaki yetersiz koşullar ve öğrencilerin insani barınma talepleri giderek daha yüksek sesle dile getiriliyor.</p>
       </>
     )
+  },
+  {
+    number: 501,
+    cover: gh_cover,
+    sunuText: <p className="mb-5">501. sayımızda gençlik ve çevre mücadelesini ele alıyoruz.</p>,
+    rotaTitle: "Ekolojik Yıkıma Karşı Gençlik",
+    rotaDesc: "Doğa katliamlarına karşı üniversiteli gençliğin eylem pratikleri.",
+    rotaContent: <div className="mb-5"><h4 className="text-xl md:text-2xl font-bold text-black mb-3 font-sans">İklim Krizi Değil Sistem Krizi</h4><p>Çevre mücadelesinin, kapitalizm karşıtı mücadeleden bağımsız düşünülemeyeceğini bir kez daha vurguluyoruz.</p></div>
+  },
+  {
+    number: 500,
+    cover: gh_cover,
+    sunuText: <p className="mb-5 text-xl font-bold">500. sayıya ulaşmanın gururunu yaşıyoruz!</p>,
+    rotaTitle: "Yarım Asırlık Çınar",
+    rotaDesc: "Yayın hayatımızdaki 500. sayımızın anlamı ve önemi.",
+    rotaContent: <div className="mb-5"><h4 className="text-xl md:text-2xl font-bold text-black mb-3 font-sans">Geçmişten Geleceğe</h4><p>500 sayıdır kesintisiz bir şekilde gençliğin sesi olmaya devam ediyoruz.</p></div>
   },
   {
     number: 499,
@@ -168,45 +229,12 @@ const fallbackIssues: IssueData[] = [
     rotaTitle: "Kadınlar Birlikte Güçlü",
     rotaDesc: "Kampüslerdeki kadın dayanışma ağlarının büyümesi.",
     rotaContent: <div className="mb-5"><h4 className="text-xl md:text-2xl font-bold text-black mb-3 font-sans">Eşitlik İstiyoruz</h4><p>8 Mart'a giderken kampüslerdeki kadın hareketinin dinamiklerini inceliyoruz.</p></div>
-  },
+  }
 ];
 
-// Build IssueData from API main-row section
-function buildIssueFromApi(mainRow: ApiSection): IssueData {
-  const num = parseInt(mainRow.issueNumber || '0') || 0;
-  const cover = mainRow.coverImage || gh_cover;
-
-  const sunuText = mainRow.preface ? (
-    <>
-      {mainRow.preface.split(/\n\n+/).map((para, i) => (
-        <p key={i} className={`mb-5 ${i === 0 ? 'first-letter:text-6xl first-letter:font-black first-letter:text-black first-letter:mr-4 first-letter:float-left first-letter:leading-[0.8] first-letter:mt-1' : ''}`}>
-          {para}
-        </p>
-      ))}
-    </>
-  ) : <p className="mb-5 text-gray-400 italic">Sunu metni henüz girilmedi.</p>;
-
-  const rotaTitle = mainRow.routeArticle?.title || '';
-  const rotaDesc = mainRow.routeArticle?.subheading || '';
-  const rotaContent = mainRow.routeArticle?.content ? (
-    <>
-      {mainRow.routeArticle.content.map((block) => {
-        if (block.type === 'paragraph') return <p key={block.id} className="mb-5">{block.value}</p>;
-        if (block.type === 'subheading') return <h4 key={block.id} className="text-xl md:text-2xl font-bold text-black mb-3 mt-6 font-sans">{block.value}</h4>;
-        if (block.type === 'image') return <img key={block.id} src={block.value} className="rounded-lg my-4 max-h-64 object-cover w-full" />;
-        return null;
-      })}
-    </>
-  ) : <p className="text-gray-400 italic">İçerik girilmedi.</p>;
-
-  return { number: num, cover, sunuText, rotaTitle, rotaDesc, rotaContent };
-}
-
-// ─── SUNU / ROTA PANEL ────────────────────────────────────────────────────────
+// ─── SUNU / ROTA : MODERN LIGHT DESIGN ────────────────────────────────────────
 
 type ActivePanel = 'sunu' | 'rota';
-
-const FUTURA_STYLE = "font-['Futura_BLK_BT','Futura','Arial_Black',sans-serif] font-black";
 
 export const SunuRotaPanel = ({ issueData, expanded: externalExpanded, onToggleExpand }: { issueData: IssueData, expanded?: boolean; onToggleExpand?: () => void }) => {
   const [activePanel, setActivePanel] = useState<ActivePanel>('sunu');
@@ -312,7 +340,7 @@ export const SunuRotaPanel = ({ issueData, expanded: externalExpanded, onToggleE
                 >
                   <div className="mb-6 relative z-30">
                     <h3 className="text-3xl md:text-4xl lg:text-5xl font-black text-black leading-tight tracking-tight mb-3">
-                      {issueData.rotaTitle || <span className="text-gray-300">Rota başlığı girilmedi</span>}
+                      {issueData.rotaTitle}
                     </h3>
                     <p className="text-xl md:text-2xl text-zinc-500 font-serif italic mb-2">
                       {issueData.rotaDesc}
@@ -355,9 +383,11 @@ export const SunuRotaPanel = ({ issueData, expanded: externalExpanded, onToggleE
 const VISIBLE_ISSUES = 3;
 
 const CoverCard = ({ issueData, issuesList, onSelectIssue }: { issueData: IssueData, issuesList: IssueData[], onSelectIssue: (issue: IssueData) => void }) => {
+  // Tüm sayılar sabit sırada: en büyükten küçüğe
   const allNumbers = [...issuesList].sort((a, b) => b.number - a.number).map(i => i.number);
 
   const [issueOffset, setIssueOffset] = useState(() => {
+    // Başlangıçta seçili sayının görünür olduğu offset'i bul
     const idx = allNumbers.indexOf(issueData.number);
     return Math.max(0, Math.min(idx, allNumbers.length - VISIBLE_ISSUES));
   });
@@ -405,8 +435,9 @@ const CoverCard = ({ issueData, issuesList, onSelectIssue }: { issueData: IssueD
         </div>
       </Link>
 
-      {/* Issue Selector */}
+      {/* Issue Selector — sabit sıra, sadece seçili vurgulanır */}
       <div className="relative z-20 flex gap-1 justify-center items-center mb-6 shrink-0 min-h-[32px]">
+        {/* Önceki (daha yeni sayılar) */}
         {issueOffset > 0 && (
           <button
             onClick={handlePrevIssues}
@@ -426,8 +457,8 @@ const CoverCard = ({ issueData, issuesList, onSelectIssue }: { issueData: IssueD
               key={num}
               onClick={() => handleSelectNumber(num)}
               className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap ${isSelected
-                  ? 'bg-red-600 text-white shadow-md cursor-default'
-                  : 'bg-white border border-gray-200 text-zinc-600 hover:border-black hover:text-black'
+                ? 'bg-red-600 text-white shadow-md cursor-default'
+                : 'bg-white border border-gray-200 text-zinc-600 hover:border-black hover:text-black'
                 }`}
             >
               {num}
@@ -435,6 +466,7 @@ const CoverCard = ({ issueData, issuesList, onSelectIssue }: { issueData: IssueD
           );
         })}
 
+        {/* Sonraki (daha eski sayılar) */}
         {issueOffset + VISIBLE_ISSUES < allNumbers.length && (
           <button
             onClick={handleNextIssues}
@@ -447,6 +479,7 @@ const CoverCard = ({ issueData, issuesList, onSelectIssue }: { issueData: IssueD
           </button>
         )}
       </div>
+
     </div>
   );
 };
@@ -454,19 +487,25 @@ const CoverCard = ({ issueData, issuesList, onSelectIssue }: { issueData: IssueD
 
 // ─── MOBILE LAYOUT ──────────────────────────────────────────────────────────
 
-const MobileLayout = ({ selectedIssue, issuesList, onSelectIssue, articles }: { selectedIssue: IssueData, issuesList: IssueData[], onSelectIssue: (issue: IssueData) => void, articles: ArticleCard[] }) => {
+const MobileLayout = ({ selectedIssue, issuesList, onSelectIssue }: { selectedIssue: IssueData, issuesList: IssueData[], onSelectIssue: (issue: IssueData) => void }) => {
   const latestIssueNumber = Math.max(...issuesList.map(i => i.number));
   const isLatest = selectedIssue.number === latestIssueNumber;
   const heading = isLatest ? 'Son Sayının Önerilen Yazıları' : `${selectedIssue.number}. Sayının Önerilen Yazıları`;
 
   return (
     <div className="flex flex-col gap-8">
+      {/* 1. Cover */}
       <CoverCard issueData={selectedIssue} issuesList={issuesList} onSelectIssue={onSelectIssue} />
+
+      {/* 2. Sunu/Rota dark box */}
       <SunuRotaPanel issueData={selectedIssue} />
+
+      {/* 3. Önerilen Yazılar */}
       <div>
         <span className="text-xs font-bold text-zinc-400 uppercase tracking-widest pl-4">{heading}</span>
         <div className="h-0.5 w-12 bg-black mt-1.5 mb-2 ml-4" />
-        <ArticleLine articles={articles} className="!py-0" />
+        {/* Mobile carousel is handled separately, for now we will skip showing recommended statically here or we can just render ArticleCarousel. Let's just use ArticleCarousel */}
+        <ArticleCarousel issueNumber={selectedIssue.number} isLatest={isLatest} />
       </div>
     </div>
   );
@@ -475,45 +514,16 @@ const MobileLayout = ({ selectedIssue, issuesList, onSelectIssue, articles }: { 
 // ─── MAIN SECTION ────────────────────────────────────────────────────────────
 
 export const MainSection = () => {
-  const { data } = useApi();
-
-  const mainRow = data?.sections.find(s => s.type === 'main-row');
-
-  // Build current issue from API data
-  const apiIssue = useMemo(() => {
-    if (!mainRow) return null;
-    return buildIssueFromApi(mainRow);
-  }, [mainRow]);
-
-  // Combine API issue with fallback issues (dedup by number)
-  const issuesList = useMemo(() => {
-    if (!apiIssue) return fallbackIssues;
-    const filtered = fallbackIssues.filter(i => i.number !== apiIssue.number);
-    return [apiIssue, ...filtered];
-  }, [apiIssue]);
-
-  const [selectedIssue, setSelectedIssue] = useState<IssueData>(fallbackIssues[0]);
+  const [selectedIssue, setSelectedIssue] = useState<IssueData>(recentIssuesData[0]);
   const [isExpanded, setIsExpanded] = useState(false);
-
-  // Update selected issue when API data loads
-  useEffect(() => {
-    if (apiIssue) {
-      setSelectedIssue(apiIssue);
-    }
-  }, [apiIssue]);
 
   const handleSelectIssue = (issue: IssueData) => {
     setSelectedIssue(issue);
     setIsExpanded(false);
   };
 
-  const latestIssueNumber = Math.max(...issuesList.map(i => i.number));
+  const latestIssueNumber = Math.max(...recentIssuesData.map(i => i.number));
   const isLatest = selectedIssue.number === latestIssueNumber;
-
-  // Recommended articles: from API main-row or MOCK fallback
-  const recommendedArticles: ArticleCard[] = mainRow?.articles.length
-    ? mainRow.articles.map(toArticleCard)
-    : MOCK_ARTICLES.slice(0, 8);
 
   return (
     <section className="py-16 md:py-24 bg-white font-bradford">
@@ -521,7 +531,7 @@ export const MainSection = () => {
 
         {/* MOBILE */}
         <div className="block lg:hidden">
-          <MobileLayout selectedIssue={selectedIssue} issuesList={issuesList} onSelectIssue={handleSelectIssue} articles={recommendedArticles} />
+          <MobileLayout selectedIssue={selectedIssue} issuesList={recentIssuesData} onSelectIssue={setSelectedIssue} />
         </div>
 
         {/* DESKTOP */}
@@ -531,7 +541,7 @@ export const MainSection = () => {
           <div className="relative w-full h-[600px] flex items-stretch">
             {/* The Cover Layer */}
             <div className={`w-[41.666%] h-full transition-all duration-700 ease-in-out ${isExpanded ? 'scale-[0.98] opacity-50 blur-[2px]' : 'scale-100 opacity-100'}`}>
-              <CoverCard issueData={selectedIssue} issuesList={issuesList} onSelectIssue={handleSelectIssue} />
+              <CoverCard issueData={selectedIssue} issuesList={recentIssuesData} onSelectIssue={handleSelectIssue} />
             </div>
 
             {/* The Sunu/Rota Overlay */}
@@ -542,7 +552,7 @@ export const MainSection = () => {
 
           {/* Row 2: Carousel */}
           <div className="border-t border-gray-100 pt-10">
-            <ArticleCarousel issueNumber={selectedIssue.number} isLatest={isLatest} articles={recommendedArticles} />
+            <ArticleCarousel issueNumber={selectedIssue.number} isLatest={isLatest} />
           </div>
         </div>
       </div>

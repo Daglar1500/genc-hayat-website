@@ -29,9 +29,14 @@ export const VideoSection = ({ videos, channelUrl }: { videos: VideoItem[], chan
       <div className="w-full max-w-[1600px] mx-auto px-4 md:px-10 lg:px-[140px] relative z-10">
         <div className="flex items-end justify-between mb-8 md:mb-10 border-b border-white/10 pb-4 md:pb-6">
           <div>
-            <span className="text-red-600 font-bold tracking-widest text-[10px] md:text-xs uppercase mb-1 md:mb-2 block">
-              Genç Hayat YouTube
-            </span>
+            <div className="flex items-center gap-2 mb-1 md:mb-2">
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 md:w-6 md:h-6 text-red-600" aria-label="YouTube">
+                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+              </svg>
+              <span className="text-red-600 font-bold tracking-widest text-[10px] md:text-xs uppercase block">
+                Genç Hayat YouTube
+              </span>
+            </div>
             <h2 className="text-3xl md:text-5xl font-labil font-bold text-white leading-tight">
               Son Videolar
             </h2>

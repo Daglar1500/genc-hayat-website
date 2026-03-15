@@ -1,0 +1,87 @@
+[
+    {
+        "id": "issue-504",
+        "title": "Sayı 504",
+        "number": 504,
+        "date": "2025-11-20",
+        "coverMedia": {
+            "type": "image",
+            "src": "/gh-kapak/gh.jpg",
+            "alt": "Genç Hayat Sayı 504 Kapak",
+            "mediaLayout": "full-width"
+        },
+        "sunuArticleId": "art-0",
+        "rotaArticleId": "art-1",
+        "recommendedArticleIds": [
+            "art-2",
+            "art-3",
+            "art-5",
+            "art-7"
+        ],
+        "otherArticleIds": [
+            "art-4",
+            "art-6",
+            "art-8",
+            "art-9",
+            "art-10",
+            "art-11",
+            "art-12"
+        ]
+    },
+    {
+        "id": "issue-503",
+        "title": "Sayı 503",
+        "number": 503,
+        "date": "2025-10-15",
+        "coverMedia": {
+            "type": "image",
+            "src": "/gh-kapak/gh.jpg",
+            "alt": "Genç Hayat Sayı 503 Kapak",
+            "mediaLayout": "full-width"
+        },
+        "sunuArticleId": "art-0",
+        "rotaArticleId": "art-1",
+        "recommendedArticleIds": [
+            "art-3",
+            "art-4",
+            "art-8",
+            "art-10"
+        ],
+        "otherArticleIds": [
+            "art-5",
+            "art-6",
+            "art-7",
+            "art-9",
+            "art-11",
+            "art-12"
+        ]
+    },
+    {
+        "id": "issue-502",
+        "title": "Sayı 502",
+        "number": 502,
+        "date": "2025-11-12",
+        "coverMedia": {
+            "type": "image",
+            "src": "/gh-kapak/GH - Sayı_ 502 - 12 Kasım 2025 (1)_page-0001.jpg",
+            "alt": "Genç Hayat Sayı 502 Kapak",
+            "mediaLayout": "full-width"
+        },
+        "sunuArticleId": "art-0",
+        "rotaArticleId": "art-1",
+        "recommendedArticleIds": [
+            "art-2",
+            "art-5",
+            "art-6",
+            "art-7"
+        ],
+        "otherArticleIds": [
+            "art-3",
+            "art-4",
+            "art-8",
+            "art-9",
+            "art-10",
+            "art-11"
+        ]
+    }
+]

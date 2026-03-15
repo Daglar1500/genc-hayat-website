@@ -1,8 +1,6 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { ArticleCardElement } from "./MainPage/ArticleCard";
-
-import { MOCK_ARTICLES } from "../data/MockArticles";
+import { ArticleCardElement, ArticleCard, Labelo } from "./MainPage/ArticleCard";
 
 // --- KATEGORİ GÖRSELLERİ ---
 const CATEGORY_IMAGES: Record<string, string> = {
@@ -29,7 +27,44 @@ export const CategoryPage = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isTagFilterVisible, setIsTagFilterVisible] = useState(false);
 
+  const [articles, setArticles] = useState<ArticleCard[]>([]);
+  const [loading, setLoading] = useState(true);
+
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Fetch articles on mount
+  useEffect(() => {
+    const fetchArticles = async () => {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+      try {
+        const res = await fetch(`${apiUrl}/articles`);
+        const data = await res.json();
+
+        const mappedArticles = data.map((a: any) => ({
+          href: `/articles/${a.id}`,
+          title: a.title,
+          type: a.type || 'normal',
+          description: a.subheading,
+          author: a.author,
+          place: a.place,
+          location: a.school,
+          issueNumber: a.issueNumber,
+          publishedDate: new Date(a.createdAt),
+          firstMedia: { type: 'image', src: a.imageUrl, alt: a.title, mediaLayout: 'full-width' },
+          category: new Labelo('category', a.category),
+          tags: a.labels?.map((l: string) => new Labelo('tag', l)) || []
+        } as ArticleCard));
+
+        setArticles(mappedArticles);
+      } catch (err) {
+        console.error("Yazılar çekilirken hata oluştu:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchArticles();
+  }, []);
 
   // URL params değişince state güncelle (navigasyon ile sayfa yeniden rendar edilince)
   useEffect(() => {
@@ -57,18 +92,18 @@ export const CategoryPage = () => {
   // --- VERİ HAZIRLIĞI ---
 
   const categories = useMemo(() => {
-    const names = MOCK_ARTICLES.map(article => article.category?.name).filter(Boolean);
+    const names = articles.map(article => article.category?.name).filter(Boolean);
     const uniqueCats = new Set(names);
     return ["Tümü", ...Array.from(uniqueCats)];
-  }, []);
+  }, [articles]);
 
   const allTags = useMemo(() => {
-    const tags = MOCK_ARTICLES.flatMap(article => article.tags || []).map(t => t.name);
+    const tags = articles.flatMap(article => article.tags || []).map(t => t.name);
     return Array.from(new Set(tags)).sort();
-  }, []);
+  }, [articles]);
 
   const filteredArticles = useMemo(() => {
-    let filtered = MOCK_ARTICLES;
+    let filtered = articles;
 
     // A. Kategori Filtresi
     if (selectedCategory !== "Tümü") {
@@ -89,7 +124,7 @@ export const CategoryPage = () => {
     return filtered.sort((a, b) =>
       new Date(b.publishedDate).getTime() - new Date(a.publishedDate).getTime()
     );
-  }, [selectedCategory, selectedTags]);
+  }, [articles, selectedCategory, selectedTags]);
 
   const currentHeroImage = CATEGORY_IMAGES[selectedCategory.toLowerCase()] || CATEGORY_IMAGES["tümü"];
 
@@ -259,7 +294,9 @@ export const CategoryPage = () => {
               onClick={handleGridClick}
               className={filteredArticles.length > 0 ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8" : ""}
             >
-              {filteredArticles.length > 0 ? (
+              {loading ? (
+                <div className="flex justify-center items-center py-20 text-gray-500 col-span-full">Yükleniyor...</div>
+              ) : filteredArticles.length > 0 ? (
                 filteredArticles.map((article) => (
                   <ArticleCardElement
                     key={article.href}

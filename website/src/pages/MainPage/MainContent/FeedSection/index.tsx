@@ -1,9 +1,6 @@
 import { useDiscover } from "./DiscoverContext";
 import { useState, useEffect } from "react";
-import { MOCK_ARTICLES } from "../../../../data/MockArticles";
 import { media } from "../../../MainPage/ArticleCard";
-import { FEED_ARTICLES } from "../../../../data/MockArticles";
-import { useApi, toArticleCard } from "../../../../lib/ApiContext";
 
 // Tarih formatlayıcı
 const getTimeAgo = (date: Date) => {
@@ -57,7 +54,7 @@ export type FeedCardProps = {
   title: string;
   source: string;
   timeAgo: string;
-  description?: string; // Hata almamak için burayı opsiyonel (?) string yaptık
+  description?: string;
 };
 
 export const FeedCard = (props: FeedCardProps) => {
@@ -67,32 +64,28 @@ export const FeedCard = (props: FeedCardProps) => {
         href={props.href}
         className="bg-zinc-100 hover:bg-red-600/10 transition-colors duration-200 flex h-full group"
       >
-        {/* Görsel Alanı */}
         <div className="relative aspect-square min-w-[93px] md:aspect-[120/109] md:min-w-[120px] h-full">
           <div className="h-0 w-full overflow-hidden">
             <div className="absolute inset-0">
               <img
-                alt={props.media.alt}
-                src={props.media.src}
+                alt={props.media.alt || props.title}
+                src={props.media.src || '/placeholder.jpg'}
                 className="absolute inset-0 w-full h-full object-cover"
               />
             </div>
           </div>
         </div>
 
-        {/* Metin Alanı */}
         <div className="p-3 md:p-4 flex flex-col justify-between w-full font-medium">
           <p className="text-zinc-800 text-[13px] leading-[18.2px] group-hover:text-red-600 transition-colors duration-200 line-clamp-3 overflow-hidden">
             {props.title}
           </p>
 
           <div className="flex justify-between items-center gap-2">
-            {/* Kaynak (Yazı Olarak) */}
             <span className="text-stone-500 text-[11px] leading-[15.4px] block">
               {props.source}
             </span>
 
-            {/* Zaman */}
             <span className="text-stone-500/40 text-[11px] leading-[15.4px] block">
               {props.timeAgo}
             </span>
@@ -103,56 +96,48 @@ export const FeedCard = (props: FeedCardProps) => {
   );
 };
 
-// --- DATA MERGE LOGIC (2 Mock - 1 Feed) ---
-// Bu veriyi burada hazırlayıp export ediyoruz ki DiscoverFeed de aynısını kullansın.
-
-// 1. Standart Format
-const formattedMocks = MOCK_ARTICLES.map(m => ({
-  href: m.href,
-  media: m.firstMedia!,
-  title: m.title,
-  source: "Genç Hayat",
-  timeAgo: getTimeAgo(m.publishedDate),
-  description: m.description // Mock datadan gelen description (undefined olabilir)
-}));
-
-const formattedFeeds = FEED_ARTICLES.map(f => ({
-  href: f.href,
-  media: f.media,
-  title: f.title,
-  source: f.source,
-  timeAgo: f.timeAgo,
-  description: f.description || f.title // Feed datada description yoksa title kullan
-}));
-
-// 2. Birleştirme (2 Mock, 1 Feed döngüsü)
-export const COMBINED_FEED_DATA: FeedCardProps[] = [];
-let mIndex = 0;
-let fIndex = 0;
-
-while (mIndex < formattedMocks.length || fIndex < formattedFeeds.length) {
-  if (mIndex < formattedMocks.length) COMBINED_FEED_DATA.push(formattedMocks[mIndex++]);
-  if (mIndex < formattedMocks.length) COMBINED_FEED_DATA.push(formattedMocks[mIndex++]);
-  if (fIndex < formattedFeeds.length) COMBINED_FEED_DATA.push(formattedFeeds[fIndex++]);
-}
-
 // 4. FeedCarousel
 export const FeedCarousel = () => {
-  const { getFeedArticles, loading } = useApi();
   const [itemsToShow, setItemsToShow] = useState(4);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [feedData, setFeedData] = useState<FeedCardProps[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // API'den gelen makaleler varsa onları kullan, yoksa mock data
-  const apiArticles = getFeedArticles();
-  const feedData = apiArticles.length > 0
-    ? apiArticles.map(a => ({
-        href: `/articles/${a.id}`,
-        media: { src: a.imageUrl, alt: a.title } as media,
-        title: a.title,
-        source: "Genç Hayat",
-        timeAgo: getTimeAgo(new Date(a.createdAt)),
-      }))
-    : COMBINED_FEED_DATA;
+  // Veri Çekme İşlemi (MainContent ile benzer mantık)
+  useEffect(() => {
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+    fetch(`${apiUrl}/init`)
+      .then(res => res.json())
+      .then(data => {
+        // Feed kısmı için admin panelindeki 'article-feed' (Haber Akışı) isimli section'ı arıyoruz.
+        // Eğer o yoksa, tüm layout'taki makalelerden fallback yapabiliriz veya sadece ilk feed section'ı alırız.
+        const feedSection = data.sections.find((s: any) => s.type === 'article-feed');
+        let articlesRaw: any[] = [];
+
+        if (feedSection && feedSection.articles) {
+          articlesRaw = feedSection.articles;
+        } else {
+          // Fallback: tüm makalelerden ilk 10 tanesi
+          articlesRaw = data.articles.slice(0, 10);
+        }
+
+        const mappedFeedData: FeedCardProps[] = articlesRaw.map((m: any) => ({
+          href: `/articles/${m.id}`,
+          media: { type: 'image', src: m.imageUrl, alt: m.title },
+          title: m.title,
+          source: m.author || "Genç Hayat",
+          timeAgo: getTimeAgo(new Date(m.createdAt)),
+          description: m.subheading
+        }));
+
+        setFeedData(mappedFeedData);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Feed API Error:", err);
+        setLoading(false);
+      });
+  }, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -171,19 +156,28 @@ export const FeedCarousel = () => {
 
   // 3 Saniyelik Otomatik Geçiş
   useEffect(() => {
+    if (feedData.length === 0) return;
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % feedData.length);
     }, 3000);
 
     return () => clearInterval(interval);
-  }, [feedData.length]);
+  }, [feedData]);
 
-  if (loading) return null;
+  if (loading) {
+    return <div className="h-32 flex justify-center items-center bg-zinc-100 text-stone-500 text-sm">Akış Yükleniyor...</div>;
+  }
+
+  if (feedData.length === 0) {
+    return <div className="h-32 flex justify-center items-center bg-zinc-100 text-stone-500 text-sm">Akışta henüz haber yok.</div>;
+  }
 
   const visibleItems = [];
   for (let i = 0; i < itemsToShow; i++) {
-    const index = (currentIndex + i) % feedData.length;
-    visibleItems.push(feedData[index]);
+    if (feedData.length > 0) {
+      const index = (currentIndex + i) % feedData.length;
+      visibleItems.push(feedData[index]);
+    }
   }
 
   return (
@@ -191,7 +185,6 @@ export const FeedCarousel = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-0 h-auto">
         {visibleItems.map((item, i) => (
           <FeedCard
-            // Key, animasyonun düzgün çalışması için benzersiz olmalı
             key={`${item.title}-${i}-${currentIndex}`}
             href={item.href}
             media={item.media}

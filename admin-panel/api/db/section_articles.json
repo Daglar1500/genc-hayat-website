@@ -1,0 +1,92 @@
+[
+    {
+        "sectionId": "sec-feed",
+        "articleId": "art-3",
+        "sortOrder": 0
+    },
+    {
+        "sectionId": "sec-feed",
+        "articleId": "art-2",
+        "sortOrder": 1
+    },
+    {
+        "sectionId": "sec-feed",
+        "articleId": "art-4",
+        "sortOrder": 2
+    },
+    {
+        "sectionId": "sec-feed",
+        "articleId": "art-5",
+        "sortOrder": 3
+    },
+    {
+        "sectionId": "sec-feed",
+        "articleId": "art-6",
+        "sortOrder": 4
+    },
+    {
+        "sectionId": "sec-feed",
+        "articleId": "art-7",
+        "sortOrder": 5
+    },
+    {
+        "sectionId": "sec-feed",
+        "articleId": "art-8",
+        "sortOrder": 6
+    },
+    {
+        "sectionId": "sec-feed",
+        "articleId": "art-9",
+        "sortOrder": 7
+    },
+    {
+        "sectionId": "sec-feed",
+        "articleId": "art-10",
+        "sortOrder": 8
+    },
+    {
+        "sectionId": "sec-feed",
+        "articleId": "art-11",
+        "sortOrder": 9
+    },
+    {
+        "sectionId": "sec-ord",
+        "articleId": "art-2",
+        "sortOrder": 0
+    },
+    {
+        "sectionId": "sec-ord",
+        "articleId": "art-7",
+        "sortOrder": 1
+    },
+    {
+        "sectionId": "sec-ord",
+        "articleId": "art-3",
+        "sortOrder": 2
+    },
+    {
+        "sectionId": "sec-ord",
+        "articleId": "art-8",
+        "sortOrder": 3
+    },
+    {
+        "sectionId": "sec-spot",
+        "articleId": "art-2",
+        "sortOrder": 0
+    },
+    {
+        "sectionId": "sec-cat-1",
+        "articleId": "art-5",
+        "sortOrder": 0
+    },
+    {
+        "sectionId": "sec-cat-1",
+        "articleId": "art-6",
+        "sortOrder": 1
+    },
+    {
+        "sectionId": "sec-cat-1",
+        "articleId": "art-12",
+        "sortOrder": 2
+    }
+]
