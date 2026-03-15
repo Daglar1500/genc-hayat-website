@@ -1,0 +1,44 @@
+services:
+
+  # PHP Backend (Admin Panel API)
+  backend:
+    build:
+      context: ./admin-panel/api
+      dockerfile: Dockerfile
+    container_name: gh-backend
+    ports:
+      - "3001:80"
+    volumes:
+      - backend-data:/var/www/html/data
+    restart: unless-stopped
+
+  # Admin Panel (CMS Arayüzü)
+  admin:
+    build:
+      context: ./admin-panel
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: http://localhost:3001/api
+    container_name: gh-admin
+    ports:
+      - "5174:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  # Website (Public Site)
+  website:
+    build:
+      context: ./website
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: http://localhost:3001/api
+    container_name: gh-website
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  backend-data:

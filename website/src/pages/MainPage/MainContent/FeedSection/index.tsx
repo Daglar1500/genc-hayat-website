@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { MOCK_ARTICLES } from "../../../../data/MockArticles";
 import { media } from "../../../MainPage/ArticleCard";
 import { FEED_ARTICLES } from "../../../../data/MockArticles";
+import { useApi, toArticleCard } from "../../../../lib/ApiContext";
 
 // Tarih formatlayıcı
 const getTimeAgo = (date: Date) => {
@@ -137,8 +138,21 @@ while (mIndex < formattedMocks.length || fIndex < formattedFeeds.length) {
 
 // 4. FeedCarousel
 export const FeedCarousel = () => {
+  const { getFeedArticles, loading } = useApi();
   const [itemsToShow, setItemsToShow] = useState(4);
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  // API'den gelen makaleler varsa onları kullan, yoksa mock data
+  const apiArticles = getFeedArticles();
+  const feedData = apiArticles.length > 0
+    ? apiArticles.map(a => ({
+        href: `/articles/${a.id}`,
+        media: { src: a.imageUrl, alt: a.title } as media,
+        title: a.title,
+        source: "Genç Hayat",
+        timeAgo: getTimeAgo(new Date(a.createdAt)),
+      }))
+    : COMBINED_FEED_DATA;
 
   useEffect(() => {
     const handleResize = () => {
@@ -158,16 +172,18 @@ export const FeedCarousel = () => {
   // 3 Saniyelik Otomatik Geçiş
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % COMBINED_FEED_DATA.length);
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % feedData.length);
     }, 3000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [feedData.length]);
+
+  if (loading) return null;
 
   const visibleItems = [];
   for (let i = 0; i < itemsToShow; i++) {
-    const index = (currentIndex + i) % COMBINED_FEED_DATA.length;
-    visibleItems.push(COMBINED_FEED_DATA[index]);
+    const index = (currentIndex + i) % feedData.length;
+    visibleItems.push(feedData[index]);
   }
 
   return (

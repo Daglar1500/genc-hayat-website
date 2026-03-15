@@ -1,10 +1,8 @@
-import { Label, ArticleCard, Labelo } from "../../ArticleCard";
-import { MOCK_ARTICLES } from "../../../../data/MockArticles";
+import { Label } from "../../ArticleCard";
+import type { ArticleCard } from "../../ArticleCard";
 
-export const FeaturedArticle = () => {
-  const featuredArticleData = MOCK_ARTICLES[0];
-
-  if (!featuredArticleData) return null;
+export const FeaturedArticle = ({ article }: { article: ArticleCard }) => {
+  const featuredArticleData = article;
 
   return (
     <section className="relative w-full min-h-screen flex items-center">
