@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { Label, ArticleCard, Labelo } from "./MainPage/ArticleCard";
 import { ShareFloatingButton } from "../components/ShareFloatingButton";
 import { ArticleLine } from "./MainPage/MainContent/ArticleLine";
+import { useSeo } from "../lib/useSeo";
 
 // --- BİLEŞENLER ---
 
@@ -183,6 +184,12 @@ export const FeaturedArticleDetail = () => {
       fetchData();
     }
   }, [slug]);
+
+  useSeo({
+    title: article?.title,
+    description: article?.description,
+    image: article?.firstMedia?.src,
+  });
 
   const issueNumber = article?.issueNumber || 496;
 

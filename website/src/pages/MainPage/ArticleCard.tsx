@@ -401,7 +401,7 @@ export const ArticleCardElement = (card: ArticleCard) => {
           <div className="box-border caret-transparent block tracking-[0.108px] pt-3 md:tracking-[0.09px] px-5 md:px-0">
             <a href={card.href} className="block group">
               {/* TITLE */}
-              <h3 className="text-lg box-border caret-transparent tracking-[1px] leading-6 font-labilvariable md:leading-[23px] hover:text-red-600 transition-colors duration-200">
+              <h3 className="text-lg box-border caret-transparent tracking-[1px] leading-6 font-labilvariable md:leading-[23px] hover:text-red-600 transition-colors duration-200 line-clamp-3">
                 <span className="box-border caret-transparent leading-6 md:leading-[23px]">
                   {card.title}
                 </span>

@@ -85,37 +85,43 @@ export const SpotifySection = ({ playlists, profileUrl }: { playlists: PlaylistI
             </a>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
-            {/* Featured playlist - flex-1 fills the row height set by right column */}
-            <div className="lg:col-span-7 flex flex-col">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+            {/* Featured playlist - always 352px */}
+            <div className="lg:col-span-7">
               {featured && getSpotifyEmbedUrl(featured.url) && (
                 <iframe
                   src={getSpotifyEmbedUrl(featured.url)}
                   width="100%"
+                  height="352"
                   allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                   loading="lazy"
-                  className="flex-1 min-h-0 rounded-xl border-0 block"
+                  className="rounded-xl border-0 block w-full"
+                  style={{ height: '352px' }}
                 />
               )}
             </div>
 
-            {/* Rest of playlists + button */}
-            <div className="lg:col-span-5 flex flex-col gap-2">
+            {/* Right column: fixed 352px when 1 rest item (full), auto when 2+ (compact) */}
+            <div
+              className="lg:col-span-5 flex flex-col gap-2"
+              style={rest.length === 1 ? { height: '352px' } : undefined}
+            >
               {rest.map((p) => {
                 const embedUrl = getSpotifyEmbedUrl(p.url);
                 if (!embedUrl) return null;
                 return rest.length === 1 ? (
-                  /* Single item: full mode, fills available height */
-                  <iframe
-                    key={p.id}
-                    src={embedUrl}
-                    width="100%"
-                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                    loading="lazy"
-                    className="flex-1 min-h-0 rounded-xl border-0 block"
-                  />
+                  /* Full mode: div gets flex-1, iframe fills it with h-full */
+                  <div key={p.id} className="flex-1 min-h-0">
+                    <iframe
+                      src={embedUrl}
+                      width="100%"
+                      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                      loading="lazy"
+                      className="w-full h-full rounded-xl border-0 block"
+                    />
+                  </div>
                 ) : (
-                  /* Multiple items: compact mode, fixed 152px */
+                  /* Compact mode: fixed 152px */
                   <iframe
                     key={p.id}
                     src={embedUrl}
@@ -123,7 +129,7 @@ export const SpotifySection = ({ playlists, profileUrl }: { playlists: PlaylistI
                     height="152"
                     allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                     loading="lazy"
-                    className="shrink-0 h-[152px] rounded-xl border-0 block"
+                    className="shrink-0 rounded-xl border-0 block"
                     style={{ height: '152px' }}
                   />
                 );

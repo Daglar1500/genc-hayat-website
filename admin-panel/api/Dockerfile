@@ -14,6 +14,6 @@ RUN echo '<Directory /var/www/html>\n\
 COPY . /var/www/html/
 
 # Data klasörü oluştur ve izin ver
-RUN mkdir -p /var/www/html/data && chmod 777 /var/www/html/data
+RUN mkdir -p /var/www/html/data /var/www/html/uploads && chmod 777 /var/www/html/data /var/www/html/uploads
 
 EXPOSE 80

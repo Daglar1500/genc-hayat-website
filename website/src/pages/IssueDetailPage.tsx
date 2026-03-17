@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArticleLine } from './MainPage/MainContent/ArticleLine';
 import { ArticleCard, Labelo } from './MainPage/ArticleCard';
+import { useSeo } from '../lib/useSeo';
 
 // Kapak görselleri
 import img1 from "../public/gh-kapak/GH - Sayı 505 - 24 Aralık 2025_page-0001.jpg";
@@ -185,6 +186,11 @@ export const IssueDetailPage = () => {
     const { id } = useParams<{ id: string }>();
     const issueNumber = parseInt(id || '0', 10);
     const issueInfo = ISSUE_COVERS[id || ''];
+
+    useSeo({
+        title: issueInfo ? `Sayı ${issueNumber}: ${issueInfo.title}` : `Sayı ${issueNumber}`,
+        description: issueInfo ? `${issueInfo.date} — Genç Hayat Dergisi` : undefined,
+    });
 
     const [articles, setArticles] = useState<ArticleCard[]>([]);
     const [loading, setLoading] = useState(true);

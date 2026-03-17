@@ -235,6 +235,23 @@ if ($method === 'GET' && $uri === '/api/init') {
     respond(['sections' => array_values($fullSections), 'articles' => $articles, 'categories' => $categories, 'labels' => $labels]);
 }
 
+// GET /api/articles (all)
+elseif ($method === 'GET' && $uri === '/api/articles') {
+    respond(readJson('articles.json') ?? []);
+}
+
+// GET /api/articles/:id
+elseif ($method === 'GET' && preg_match('#^/api/articles/(.+)$#', $uri, $m)) {
+    $id = $m[1];
+    $articles = readJson('articles.json') ?? [];
+    foreach ($articles as $a) {
+        if ($a['id'] === $id || ($a['slug'] ?? '') === $id) {
+            respond($a);
+        }
+    }
+    respond(['error' => 'Not found'], 404);
+}
+
 // POST /api/articles
 elseif ($method === 'POST' && $uri === '/api/articles') {
     $newArticle = json_decode(file_get_contents('php://input'), true);
@@ -373,6 +390,90 @@ elseif ($method === 'DELETE' && preg_match('#^/api/issues/(.+)$#', $uri, $m)) {
     $issues = array_values(array_filter($issues, fn($iss) => $iss['id'] !== $id));
     writeJson('issues.json', $issues);
     respond(['success' => true]);
+}
+
+// DELETE /api/articles/:id
+elseif ($method === 'DELETE' && preg_match('#^/api/articles/(.+)$#', $uri, $m)) {
+    $id = $m[1];
+    $articles = readJson('articles.json') ?? [];
+    $articles = array_values(array_filter($articles, fn($a) => $a['id'] !== $id));
+    writeJson('articles.json', $articles);
+    // Also clean up section_articles
+    $sa = readJson('section_articles.json') ?? [];
+    $sa = array_values(array_filter($sa, fn($rel) => $rel['articleId'] !== $id));
+    writeJson('section_articles.json', $sa);
+    respond(['success' => true]);
+}
+
+// GET /api/search?q=...
+elseif ($method === 'GET' && $uri === '/api/search') {
+    $q = strtolower(trim($_GET['q'] ?? ''));
+    if (strlen($q) < 2) { echo json_encode([]); exit; }
+    $articles = readJson('articles.json') ?? [];
+    $results = array_values(array_filter($articles, function($a) use ($q) {
+        return str_contains(strtolower($a['title'] ?? ''), $q)
+            || str_contains(strtolower($a['author'] ?? ''), $q)
+            || str_contains(strtolower($a['subheading'] ?? ''), $q);
+    }));
+    $results = array_slice($results, 0, 20);
+    echo json_encode($results, JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+// POST /api/upload
+elseif ($method === 'POST' && $uri === '/api/upload') {
+    if (empty($_FILES['file'])) {
+        respond(['error' => 'No file uploaded'], 400);
+    }
+    $uploadsDir = __DIR__ . '/uploads/';
+    if (!is_dir($uploadsDir)) mkdir($uploadsDir, 0755, true);
+
+    $file = $_FILES['file'];
+    $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+    $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+    if (!in_array($ext, $allowed)) respond(['error' => 'Geçersiz dosya türü'], 400);
+    if ($file['size'] > 5 * 1024 * 1024) respond(['error' => 'Dosya çok büyük (max 5MB)'], 400);
+
+    $filename = uniqid('img_', true) . '.' . $ext;
+    $dest = $uploadsDir . $filename;
+    move_uploaded_file($file['tmp_name'], $dest);
+
+    // Resize if it's an image wider than 1200px
+    if (in_array($ext, ['jpg', 'jpeg', 'png', 'webp'])) {
+        $maxW = 1200;
+        $imageInfo = @getimagesize($dest);
+        if ($imageInfo) {
+            list($w, $h) = $imageInfo;
+            if ($w > $maxW) {
+                $newH = intval($h * $maxW / $w);
+                $src = match($ext) {
+                    'jpg', 'jpeg' => imagecreatefromjpeg($dest),
+                    'png' => imagecreatefrompng($dest),
+                    'webp' => imagecreatefromwebp($dest),
+                    default => null
+                };
+                if ($src) {
+                    $dst = imagecreatetruecolor($maxW, $newH);
+                    if ($ext === 'png') {
+                        imagealphablending($dst, false);
+                        imagesavealpha($dst, true);
+                    }
+                    imagecopyresampled($dst, $src, 0, 0, 0, 0, $maxW, $newH, $w, $h);
+                    match($ext) {
+                        'jpg', 'jpeg' => imagejpeg($dst, $dest, 85),
+                        'png' => imagepng($dst, $dest),
+                        'webp' => imagewebp($dst, $dest, 85),
+                        default => null
+                    };
+                    imagedestroy($src);
+                    imagedestroy($dst);
+                }
+            }
+        }
+    }
+
+    $baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'];
+    respond(['url' => $baseUrl . '/uploads/' . $filename]);
 }
 
 else {

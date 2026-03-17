@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { ArticleCardElement, ArticleCard, Labelo } from "./MainPage/ArticleCard";
+import { useSeo } from "../lib/useSeo";
 
 // --- KATEGORİ GÖRSELLERİ ---
 const CATEGORY_IMAGES: Record<string, string> = {
@@ -25,6 +26,11 @@ export const CategoryPage = () => {
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
   const [selectedTags, setSelectedTags] = useState<string[]>(initialTag ? [initialTag] : []);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const seoTitle = selectedTags.length > 0
+    ? `Etiket: ${selectedTags.join(', ')}`
+    : selectedCategory !== 'Tümü' ? selectedCategory : 'Tüm Yazılar';
+  useSeo({ title: seoTitle, description: `Genç Hayat — ${seoTitle}` });
   const [isTagFilterVisible, setIsTagFilterVisible] = useState(false);
 
   const [articles, setArticles] = useState<ArticleCard[]>([]);

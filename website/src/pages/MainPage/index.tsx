@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSeo } from "../../lib/useSeo";
 import { BreakoutGame } from "./MainContent/BreakoutGame";
 import { FeedSection } from "./MainContent/FeedSection/index";
 import { ArticleLine } from "./MainContent/ArticleLine";
@@ -13,6 +14,7 @@ import { LetterboxdSection } from "./MainContent/LetterboxdSection";
 import { ArticleCard, Labelo } from "../../pages/MainPage/ArticleCard";
 
 export const MainContent = () => {
+  useSeo({ title: undefined, description: 'Genç Hayat — Gençliğin Sesi' });
 
   const [sections, setSections] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
