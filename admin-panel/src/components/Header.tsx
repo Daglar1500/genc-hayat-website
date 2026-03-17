@@ -1,7 +1,7 @@
 import React from 'react';
 import {
     Menu, X, Plus, Settings,
-    Layout, BookOpen, List,
+    Layout, BookOpen,
     RotateCcw, RotateCw
 } from 'lucide-react';
 import type { Section } from '../types';
@@ -102,9 +102,9 @@ export default function Header({
                 </div>
                 <div className="w-px h-6 bg-gray-200 mx-1" />
 
-                {/* Group 3: Sayılar, + Makale Ekle, Dashboard */}
+                {/* Group 3: Sayılar, + Makale Ekle */}
                 <button
-                    onClick={() => setView('issues')}
+                    onClick={() => setView(view === 'issues' ? 'dashboard' : 'issues')}
                     className={`px-4 py-2 rounded-lg font-bold shadow-sm transition ${view === 'issues' ? 'bg-purple-600 text-white hover:bg-purple-700' : 'bg-purple-100 text-purple-700 hover:bg-purple-200'}`}
                 >
                     <BookOpen size={16} className="inline mr-1" />Sayılar
@@ -114,12 +114,6 @@ export default function Header({
                     className="px-4 py-2 bg-orange-500 text-white rounded-lg font-bold shadow-sm hover:bg-orange-600"
                 >
                     + Makale Ekle
-                </button>
-                <button
-                    onClick={() => setView('dashboard')}
-                    className={`px-4 py-2 rounded-lg font-bold shadow-sm transition ${view === 'dashboard' ? 'bg-gray-900 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
-                >
-                    <List size={16} className="inline mr-1" />Dashboard
                 </button>
                 <div className="w-px h-6 bg-gray-200 mx-1" />
 
