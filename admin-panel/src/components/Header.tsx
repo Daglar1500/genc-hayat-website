@@ -44,84 +44,104 @@ export default function Header({
     templates, loadTemplate, deleteTemplate, saveTemplate,
 }: HeaderProps) {
     return (
-        <div className="flex justify-between items-center mb-10 sticky top-4 z-30 bg-white/90 backdrop-blur-md px-5 py-3 rounded-2xl border shadow-sm">
-            <div className="flex items-center gap-4">
-                <button onClick={() => setMenuOpen(!menuOpen)} className="p-2 hover:bg-gray-100 rounded-lg"><Menu /></button>
-                <h1 className="text-xl font-black text-gray-900 tracking-tight flex items-center">
-                    <span className="w-2 h-2 rounded-full bg-blue-600 inline-block mr-2" />Genç Hayat CMS
-                </h1>
+        <div className="flex justify-between items-center mb-8 sticky top-3 z-30 bg-white/95 backdrop-blur-sm px-5 py-2.5 rounded-2xl border border-gray-200/80 shadow-sm">
+            <div className="flex items-center gap-3">
+                <button
+                    onClick={() => setMenuOpen(!menuOpen)}
+                    className="p-2 hover:bg-gray-100 rounded-lg text-gray-500 transition-colors"
+                >
+                    <Menu size={18} />
+                </button>
+                <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-blue-600 inline-block" />
+                    <h1 className="text-base font-bold text-gray-900 tracking-tight">Genç Hayat CMS</h1>
+                </div>
             </div>
-            <div className="flex gap-2 items-center">
-                {/* Group 1: Undo/Redo/Settings */}
+
+            <div className="flex gap-1.5 items-center">
+                {/* Undo / Redo / Settings */}
                 <button
                     onClick={undoSections}
                     disabled={historySize === 0}
                     title="Geri Al (Ctrl+Z)"
-                    className={`p-2 rounded-lg transition ${historySize === 0 ? 'text-gray-300 cursor-not-allowed' : 'hover:bg-gray-100 text-gray-600'}`}
+                    className={`p-2 rounded-lg transition-colors ${historySize === 0 ? 'text-gray-300 cursor-not-allowed' : 'hover:bg-gray-100 text-gray-500'}`}
                 >
-                    <RotateCcw size={16} />
+                    <RotateCcw size={15} />
                 </button>
                 <button
                     onClick={redoSections}
                     disabled={futureSize === 0}
                     title="İleri Al (Ctrl+Shift+Z)"
-                    className={`p-2 rounded-lg transition ${futureSize === 0 ? 'text-gray-300 cursor-not-allowed' : 'hover:bg-gray-100 text-gray-600'}`}
+                    className={`p-2 rounded-lg transition-colors ${futureSize === 0 ? 'text-gray-300 cursor-not-allowed' : 'hover:bg-gray-100 text-gray-500'}`}
                 >
-                    <RotateCw size={16} />
+                    <RotateCw size={15} />
                 </button>
-                <button onClick={() => setSettingsOpen(true)} className="p-2 hover:bg-gray-100 rounded-lg text-gray-600"><Settings /></button>
-                <div className="w-px h-6 bg-gray-200 mx-1" />
+                <button
+                    onClick={() => setSettingsOpen(true)}
+                    className="p-2 hover:bg-gray-100 rounded-lg text-gray-500 transition-colors"
+                    title="Ayarlar"
+                >
+                    <Settings size={15} />
+                </button>
+                <div className="w-px h-5 bg-gray-200 mx-0.5" />
 
-                {/* Group 2: Templates */}
+                {/* Templates */}
                 <div className="relative">
                     <button
                         onClick={() => setShowTemplates(!showTemplates)}
-                        className="px-4 py-2 bg-white border rounded-lg font-bold text-gray-600 hover:bg-gray-50 shadow-sm flex items-center gap-1"
+                        className="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 hover:border-gray-300 flex items-center gap-1.5 transition-colors"
                         title="Şablonlar"
                     >
-                        <Layout size={16} /> Şablonlar
+                        <Layout size={14} /> Şablonlar
                     </button>
                     {showTemplates && (
-                        <div className="absolute right-0 top-full mt-2 w-64 bg-white border rounded-xl shadow-xl z-50 p-3 space-y-2">
-                            <div className="text-xs font-bold text-gray-500 uppercase mb-2">Kaydedilmiş Şablonlar</div>
-                            {templates.length === 0 && <div className="text-sm text-gray-400 py-2 text-center">Henüz şablon yok</div>}
+                        <div className="absolute right-0 top-full mt-2 w-64 bg-white border border-gray-200 rounded-xl shadow-xl z-50 p-3 space-y-1.5">
+                            <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider px-1 mb-2">Kaydedilmiş Şablonlar</div>
+                            {templates.length === 0 && (
+                                <div className="text-sm text-gray-400 py-3 text-center">Henüz şablon yok</div>
+                            )}
                             {templates.map((t, i) => (
-                                <div key={i} className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg">
-                                    <span className="flex-1 text-sm truncate">{t.name}</span>
-                                    <button onClick={() => loadTemplate(t)} className="text-xs text-blue-600 font-medium hover:underline">Yükle</button>
-                                    <button onClick={() => deleteTemplate(i)} className="text-red-400 hover:text-red-600"><X size={12} /></button>
+                                <div key={i} className="flex items-center gap-2 px-2 py-1.5 hover:bg-gray-50 rounded-lg">
+                                    <span className="flex-1 text-sm text-gray-700 truncate">{t.name}</span>
+                                    <button onClick={() => loadTemplate(t)} className="text-xs text-blue-600 font-medium hover:underline shrink-0">Yükle</button>
+                                    <button onClick={() => deleteTemplate(i)} className="text-gray-300 hover:text-red-500 transition-colors shrink-0"><X size={12} /></button>
                                 </div>
                             ))}
-                            <div className="border-t pt-2">
-                                <button onClick={saveTemplate} className="w-full text-sm text-green-600 font-bold hover:underline flex items-center gap-1 justify-center">
-                                    <Plus size={14} /> Mevcut Düzeni Şablon Olarak Kaydet
+                            <div className="border-t border-gray-100 pt-2 mt-2">
+                                <button
+                                    onClick={saveTemplate}
+                                    className="w-full text-sm text-emerald-600 font-medium hover:text-emerald-700 flex items-center gap-1 justify-center py-1"
+                                >
+                                    <Plus size={13} /> Mevcut Düzeni Kaydet
                                 </button>
                             </div>
                         </div>
                     )}
                 </div>
-                <div className="w-px h-6 bg-gray-200 mx-1" />
+                <div className="w-px h-5 bg-gray-200 mx-0.5" />
 
-                {/* Group 3: Sayılar, + Makale Ekle */}
+                {/* Sayılar toggle */}
                 <button
                     onClick={() => setView(view === 'issues' ? 'dashboard' : 'issues')}
-                    className={`px-4 py-2 rounded-lg font-bold shadow-sm transition ${view === 'issues' ? 'bg-purple-600 text-white hover:bg-purple-700' : 'bg-purple-100 text-purple-700 hover:bg-purple-200'}`}
+                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5 ${view === 'issues' ? 'bg-violet-600 text-white hover:bg-violet-700' : 'bg-violet-50 text-violet-700 hover:bg-violet-100'}`}
                 >
-                    <BookOpen size={16} className="inline mr-1" />Sayılar
+                    <BookOpen size={14} />Sayılar
                 </button>
+
+                {/* Makale Ekle */}
                 <button
                     onClick={() => { setSelectedArticle(null); setView('log'); }}
-                    className="px-4 py-2 bg-orange-500 text-white rounded-lg font-bold shadow-sm hover:bg-orange-600"
+                    className="px-3 py-1.5 bg-orange-500 text-white rounded-lg text-sm font-medium hover:bg-orange-600 transition-colors flex items-center gap-1"
                 >
-                    + Makale Ekle
+                    <Plus size={14} /> Makale Ekle
                 </button>
-                <div className="w-px h-6 bg-gray-200 mx-1" />
+                <div className="w-px h-5 bg-gray-200 mx-0.5" />
 
-                {/* Group 4: Düzeni Kaydet */}
+                {/* Düzeni Kaydet */}
                 <button
                     onClick={saveLayout}
                     disabled={isSaving}
-                    className={`px-6 py-2 rounded-lg font-bold shadow-lg transition ${isSaving ? 'bg-gray-400 cursor-not-allowed' : 'bg-gray-900 hover:bg-gray-800'} text-white`}
+                    className={`px-5 py-1.5 rounded-lg text-sm font-semibold shadow-sm transition-all ${isSaving ? 'bg-gray-300 cursor-not-allowed text-gray-500' : 'bg-gray-900 hover:bg-gray-800 text-white'}`}
                 >
                     {isSaving ? 'Kaydediliyor...' : 'Düzeni Kaydet'}
                 </button>

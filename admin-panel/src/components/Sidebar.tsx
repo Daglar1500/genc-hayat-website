@@ -41,7 +41,7 @@ export default function Sidebar({
             key={a.id}
             draggable
             onDragStart={e => handleDragStart(e, 'sidebar', a.id)}
-            className="relative p-3 border border-slate-700 rounded-xl bg-slate-800 hover:shadow-lg cursor-grab active:cursor-grabbing flex gap-3 group transition-all hover:border-blue-500 overflow-hidden"
+            className="relative p-2.5 border border-slate-800 rounded-xl bg-slate-800/60 hover:bg-slate-800 cursor-grab active:cursor-grabbing flex gap-2.5 group transition-all hover:border-slate-600 overflow-hidden"
         >
             {/* Bulk select checkbox */}
             <input
@@ -51,22 +51,19 @@ export default function Sidebar({
                 onClick={e => e.stopPropagation()}
                 className="absolute top-2 left-2 z-10 opacity-0 group-hover:opacity-100 w-4 h-4 cursor-pointer"
             />
-            <div className={`absolute left-0 top-0 bottom-0 w-2 ${a.status === 'edited' ? 'bg-green-500' : 'bg-red-500'}`}></div>
-            <img src={a.imageUrl} className="w-12 h-12 rounded-lg object-cover bg-gray-100 ml-2 shrink-0" />
-            <div className="flex-1 min-w-0 ml-1">
-                <div className="font-medium text-xs text-slate-100 line-clamp-2 leading-tight mb-0.5 pr-6">{a.title}</div>
-                {a.school && <div className="text-[10px] text-blue-400 font-semibold truncate">{a.school}</div>}
+            <div className={`absolute left-0 top-0 bottom-0 w-1 rounded-l-xl ${a.status === 'edited' ? 'bg-emerald-500' : 'bg-rose-500'}`} />
+            <img src={a.imageUrl} className="w-10 h-10 rounded-lg object-cover bg-slate-700 ml-1.5 shrink-0" />
+            <div className="flex-1 min-w-0">
+                <div className="font-medium text-xs text-slate-200 line-clamp-2 leading-tight mb-0.5 pr-5">{a.title}</div>
+                {a.school && <div className="text-[10px] text-blue-400 truncate">{a.school}</div>}
                 <div className="flex justify-between items-center mt-1">
-                    <span className="text-[10px] text-slate-400 font-medium truncate max-w-[80px]">{a.author}</span>
-                    <span className="text-[10px] text-slate-500">{formatLogDate(a.createdAt)}</span>
+                    <span className="text-[10px] text-slate-500 truncate max-w-20">{a.author}</span>
+                    <span className="text-[10px] text-slate-600">{formatLogDate(a.createdAt)}</span>
                 </div>
-            </div>
-            <div className="absolute bottom-2 right-2 text-[10px] font-bold text-slate-500">
-                {(a.editorName?.[0] ?? '?').toUpperCase()}
             </div>
             <button
                 onClick={e => { e.stopPropagation(); deleteArticle(a.id); }}
-                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 bg-red-900/40 hover:bg-red-900/70 text-red-400 hover:text-red-300 rounded"
+                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 bg-slate-900/60 hover:bg-red-900/60 text-slate-500 hover:text-red-400 rounded-md"
             >
                 <Trash2 size={12} />
             </button>
@@ -148,33 +145,35 @@ export default function Sidebar({
     };
 
     return (
-        <div className={`fixed inset-y-0 left-0 z-40 w-80 bg-slate-900 border-r border-slate-700 transform transition-transform duration-300 ${menuOpen ? 'translate-x-0' : '-translate-x-full'} shadow-2xl flex flex-col`}>
-            <div className="p-4 flex justify-between items-center border-b border-slate-700 bg-slate-800">
-                <h2 className="font-semibold text-white">Haber Kütüphanesi</h2>
-                <button onClick={() => setMenuOpen(false)} className="text-slate-400 hover:text-white"><X size={18} /></button>
+        <div className={`fixed inset-y-0 left-0 z-40 w-80 bg-slate-900 border-r border-slate-800 transform transition-transform duration-300 ${menuOpen ? 'translate-x-0' : '-translate-x-full'} shadow-2xl flex flex-col`}>
+            <div className="px-4 py-3.5 flex justify-between items-center border-b border-slate-800">
+                <div className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 inline-block" />
+                    <h2 className="text-sm font-semibold text-slate-200">Haber Kütüphanesi</h2>
+                </div>
+                <button onClick={() => setMenuOpen(false)} className="p-1.5 text-slate-500 hover:text-slate-300 hover:bg-slate-800 rounded-lg transition-colors"><X size={16} /></button>
             </div>
-            <div className="px-4 py-3 border-b border-slate-700 bg-slate-900">
+            <div className="px-4 py-3 border-b border-slate-800">
                 <div className="relative">
-                    <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />
+                    <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600 pointer-events-none" />
                     <input
                         value={sidebarSearch}
                         onChange={e => setSidebarSearch(e.target.value)}
                         placeholder="Başlık, yazar, okul ara..."
-                        className="w-full pl-8 pr-3 py-2 text-sm border border-slate-700 rounded-lg bg-slate-800 text-slate-100 placeholder:text-slate-500 focus:ring-2 focus:ring-blue-500 outline-none"
+                        className="w-full pl-8 pr-3 py-2 text-sm border border-slate-800 rounded-lg bg-slate-800/80 text-slate-200 placeholder:text-slate-600 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
                     />
                     {sidebarSearch && (
-                        <button onClick={() => setSidebarSearch('')} className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300">
+                        <button onClick={() => setSidebarSearch('')} className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-600 hover:text-slate-400 transition-colors">
                             <X size={12} />
                         </button>
                     )}
                 </div>
-                {/* Sort row */}
                 <div className="flex gap-1 mt-2 flex-wrap">
                     {(['issue', 'date-desc', 'date-asc', 'category', 'author'] as const).map(s => (
                         <button
                             key={s}
                             onClick={() => setSidebarSort(s)}
-                            className={`text-xs px-2 py-1 rounded font-medium transition-colors ${sidebarSort === s ? 'bg-blue-600 text-white' : 'bg-slate-700 text-slate-400 hover:bg-slate-600'}`}
+                            className={`text-[11px] px-2 py-1 rounded-md font-medium transition-colors ${sidebarSort === s ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-500 hover:bg-slate-700 hover:text-slate-300'}`}
                         >
                             {s === 'issue' ? 'Sayı ↓' : s === 'date-desc' ? 'Tarih ↓' : s === 'date-asc' ? 'Tarih ↑' : s === 'category' ? 'Kategori' : 'Yazar'}
                         </button>
