@@ -10,6 +10,7 @@ services:
       - "3001:80"
     volumes:
       - backend-data:/var/www/html/data
+      - backend-uploads:/var/www/html/uploads
     restart: unless-stopped
 
   # Admin Panel (CMS Arayüzü)
@@ -42,3 +43,4 @@ services:
 
 volumes:
   backend-data:
+  backend-uploads:

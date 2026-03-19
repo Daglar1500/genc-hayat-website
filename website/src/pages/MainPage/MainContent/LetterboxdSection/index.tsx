@@ -4,6 +4,9 @@ import { motion, useMotionValue, PanInfo } from 'framer-motion';
 type FilmItem = {
   id: string;
   url: string;
+  title?: string;
+  year?: string;
+  posterUrl?: string;
 };
 
 function getFilmSlug(url: string): string {
@@ -17,29 +20,54 @@ function formatSlug(slug: string): string {
 
 const FilmCard = ({ film, index }: { film: FilmItem; index: number }) => {
   const slug = useMemo(() => getFilmSlug(film.url), [film.url]);
-  const label = useMemo(() => formatSlug(slug), [slug]);
+  const label = film.title || formatSlug(slug);
 
   return (
     <a
       href={film.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="group block relative aspect-[2/3] bg-zinc-900 rounded-sm overflow-hidden border border-white/10 hover:border-[#00c030]/60 transition-all duration-300 shadow-lg"
+      className="group block relative aspect-[2/3] rounded-md overflow-hidden shadow-lg transition-all duration-300 hover:scale-[1.03] hover:shadow-2xl hover:shadow-black/50"
     >
-      <div className="absolute inset-0 flex flex-col items-center justify-center p-3 text-center">
-        {index === 0 && (
-          <span className="text-[#00c030] text-[9px] font-bold tracking-widest uppercase mb-2 block">En Son</span>
-        )}
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="w-8 h-8 text-white/20 mb-3 group-hover:text-[#00c030]/40 transition-colors">
-          <rect x="2" y="3" width="20" height="14" rx="2" />
-          <path d="M8 21h8M12 17v4" />
-          <circle cx="12" cy="10" r="3" />
-        </svg>
-        <p className="text-white text-xs font-bold leading-tight line-clamp-3 group-hover:text-[#00c030] transition-colors">
+      {/* Poster image or dark placeholder */}
+      {film.posterUrl ? (
+        <img
+          src={film.posterUrl}
+          alt={label}
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+        />
+      ) : (
+        <div className="w-full h-full bg-zinc-900 flex flex-col items-center justify-center gap-2 p-3 text-center">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="w-7 h-7 text-zinc-600">
+            <rect x="2" y="3" width="20" height="14" rx="2" />
+            <path d="M8 21h8M12 17v4" />
+            <circle cx="12" cy="10" r="3" />
+          </svg>
+        </div>
+      )}
+
+      {/* Gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+
+      {/* "En Son" badge */}
+      {index === 0 && (
+        <span className="absolute top-2 left-2 text-[#00c030] text-[9px] font-bold tracking-widest uppercase bg-black/70 px-1.5 py-0.5 rounded">
+          En Son
+        </span>
+      )}
+
+      {/* Letterboxd green ring on hover */}
+      <div className="absolute inset-0 ring-1 ring-inset ring-white/10 group-hover:ring-[#00c030]/70 rounded-md transition-all duration-300" />
+
+      {/* Title + year at bottom */}
+      <div className="absolute bottom-0 left-0 right-0 p-3">
+        <p className="text-white text-xs font-bold leading-tight line-clamp-2 group-hover:text-[#00c030] transition-colors duration-200">
           {label}
         </p>
+        {film.year && (
+          <p className="text-white/40 text-[10px] mt-0.5 font-mono">{film.year}</p>
+        )}
       </div>
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
     </a>
   );
 };
@@ -184,7 +212,7 @@ export const LetterboxdSection = ({ films, profileUrl }: { films: FilmItem[], pr
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-            {/* Featured film */}
+            {/* Featured film — larger */}
             <div className="lg:col-span-3">
               {films[0] && <FilmCard film={films[0]} index={0} />}
             </div>

@@ -112,7 +112,7 @@ const MobileCarousel = ({ articles }: { articles: any[] }) => {
   const activeIndex = articles.length === 0 ? 0 : loop ? (position - 1 + articles.length) % articles.length : Math.min(position, articles.length - 1);
 
   return (
-    <div ref={containerRef} className="relative overflow-hidden w-full touch-pan-y h-full">
+    <div ref={containerRef} className="relative overflow-hidden w-full touch-pan-y h-full" style={{ WebkitOverflowScrolling: 'touch' }}>
       <motion.div
         className="flex"
         drag={isAnimating ? false : 'x'}

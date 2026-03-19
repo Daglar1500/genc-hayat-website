@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { Label, ArticleCard, Labelo } from "./MainPage/ArticleCard";
 import { ShareFloatingButton } from "../components/ShareFloatingButton";
 import { ArticleLine } from "./MainPage/MainContent/ArticleLine";
+import { useSeo } from "../lib/useSeo";
 
 // --- BİLEŞENLER ---
 
@@ -115,6 +116,8 @@ export const FeaturedArticleDetail = () => {
   const [relatedArticles, setRelatedArticles] = useState<ArticleCard[]>([]);
   const [loading, setLoading] = useState(true);
   const [fontIndex, setFontIndex] = useState(1);
+  const [commentText, setCommentText] = useState('');
+  const [commentStatus, setCommentStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -125,6 +128,17 @@ export const FeaturedArticleDetail = () => {
         const articleData = await res.json();
 
         if (articleData) {
+          // Normalize content blocks from API format {type, value} to FeaturedArticleDetail format {blockContent: {...}}
+          const normalizeBlocks = (blocks: any[]): any[] => {
+            if (!Array.isArray(blocks)) return [];
+            return blocks.map((b: any) => {
+              if (b.blockContent) return b; // already normalized
+              if (b.type === 'image') return { blockContent: { type: 'image', src: b.value, alt: b.alt || '' } };
+              if (b.type === 'subheading') return { blockContent: { type: 'subheading', textContent: b.value || '' } };
+              return { blockContent: { type: 'paragraph', textContent: b.value || b.textContent || '' } };
+            });
+          };
+
           const mappedArticle: ArticleCard = {
             href: `/articles/${articleData.id}`,
             title: articleData.title,
@@ -135,10 +149,10 @@ export const FeaturedArticleDetail = () => {
             location: articleData.school,
             issueNumber: articleData.issueNumber,
             publishedDate: new Date(articleData.createdAt),
-            content: articleData.content || [],
+            content: normalizeBlocks(articleData.content),
             firstMedia: { type: 'image', src: articleData.imageUrl, alt: articleData.title, mediaLayout: 'full-width' },
-            category: new Labelo('category', articleData.category),
-            tags: articleData.labels?.map((l: string) => new Labelo('tag', l)) || []
+            category: new Labelo('category', articleData.category || ''),
+            tags: (articleData.labels || []).filter(Boolean).map((l: string) => new Labelo('tag', l))
           };
           setArticle(mappedArticle);
 
@@ -184,6 +198,39 @@ export const FeaturedArticleDetail = () => {
     }
   }, [slug]);
 
+  // Click tracking
+  useEffect(() => {
+    if (!slug) return;
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+    fetch(`${apiUrl}/articles/${slug}/view`, { method: 'POST' }).catch(() => {});
+  }, [slug]);
+
+  const handleCommentSubmit = () => {
+    if (!commentText.trim() || !slug || commentStatus === 'sending') return;
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+    setCommentStatus('sending');
+    fetch(`${apiUrl}/articles/${slug}/comments`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: commentText.trim() }),
+    })
+      .then(res => {
+        if (res.ok) {
+          setCommentStatus('sent');
+          setCommentText('');
+        } else {
+          setCommentStatus('error');
+        }
+      })
+      .catch(() => setCommentStatus('error'));
+  };
+
+  useSeo({
+    title: article?.title,
+    description: article?.description,
+    image: article?.firstMedia?.src,
+  });
+
   const issueNumber = article?.issueNumber || 496;
 
   // Öne Çıkan mı Sıradan mı Kontrolü — sadece "featured" type hero göster
@@ -226,17 +273,15 @@ export const FeaturedArticleDetail = () => {
                   <ImageCaption alt={altText} />
                 </div>
                 <div className="w-full lg:col-span-5 order-2 lg:order-none">
-                  <p className={`${currentFontClass} leading-normal text-gray-800 font-serif text-left transition-all duration-300`}>
-                    {textVal}
-                  </p>
+                  <div className={`${currentFontClass} leading-normal text-gray-800 font-serif text-left transition-all duration-300`}
+                    dangerouslySetInnerHTML={{ __html: textVal }} />
                 </div>
               </>
             ) : (
               <>
                 <div className="w-full lg:col-span-5 order-2 lg:order-none">
-                  <p className={`${currentFontClass} leading-normal text-gray-800 font-serif text-left transition-all duration-300`}>
-                    {textVal}
-                  </p>
+                  <div className={`${currentFontClass} leading-normal text-gray-800 font-serif text-left transition-all duration-300`}
+                    dangerouslySetInnerHTML={{ __html: textVal }} />
                 </div>
                 <div className="w-full lg:col-span-5 order-1 lg:order-none">
                   <img src={imageSrc} className="w-full h-auto shadow-sm" alt={altText} />
@@ -282,13 +327,12 @@ export const FeaturedArticleDetail = () => {
       else if (content.type === 'text' || content.type === 'paragraph') {
         const isFirstParagraph = i === 0;
         renderedBlocks.push(
-          <p
+          <div
             key={i}
             className={`mb-6 ${currentFontClass} leading-normal text-gray-800 font-serif text-left transition-all duration-300
               ${isFirstParagraph ? 'first-letter:text-5xl lg:first-letter:text-7xl first-letter:font-bold first-letter:text-black first-letter:mr-3 first-letter:float-left' : ''}`}
-          >
-            {content.textContent}
-          </p>
+            dangerouslySetInnerHTML={{ __html: content.textContent }}
+          />
         );
       }
 
@@ -377,48 +421,30 @@ export const FeaturedArticleDetail = () => {
           </div>
 
         ) : (
-          // --- NORMAL HEADER --- kategori, başlık, açıklama, görsel; meta sidebar'da
-          <div className="pt-20 lg:pt-24 pb-0">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-              <div className="hidden lg:block lg:col-span-1"></div>
+          // --- NORMAL HEADER (Pluribus gibi: başlık → açıklama → görsel, hero yok) ---
+          <div className="pt-20 lg:pt-24">
+            <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-8 mb-6 lg:mb-8 border-b border-gray-200 pb-6 lg:pb-8">
+              <div className="hidden lg:block lg:col-span-3"></div>
 
-              {/* META SIDEBAR — desktop'ta sol sütun, mobile'da content'in üstünde */}
-              <aside className="col-span-1 lg:col-span-2 flex flex-col items-start lg:items-end text-left lg:text-right order-2 lg:order-none">
-                <div className="flex flex-col gap-1 items-start lg:items-end mb-4 w-full">
-                  <div className="text-sm lg:text-base font-bold text-black">{article.author}</div>
-                  {article.place && <div className="text-xs text-gray-500 font-serif italic">{article.place}</div>}
-                  <div className="text-xs text-gray-400 font-medium mb-2">
-                    {article.publishedDate.toLocaleDateString('tr-TR', { year: 'numeric', month: 'long', day: 'numeric' })}
-                  </div>
-                  <div className="w-full flex items-center justify-between lg:justify-end mt-1">
-                    <IssueLabel number={issueNumber} />
-                    <div className="flex gap-1 lg:hidden">
-                      <FontButton label="A-" onClick={() => handleFontChange('decrease')} disabled={fontIndex === 0} />
-                      <FontButton label="A+" onClick={() => handleFontChange('increase')} disabled={fontIndex === FONT_SIZES.length - 1} />
-                    </div>
-                  </div>
-                </div>
-              </aside>
-
-              {/* MAIN CONTENT */}
-              <div className="col-span-1 lg:col-span-6 order-1 lg:order-none">
-                {/* Kategori etiketi */}
+              <header className="col-span-1 lg:col-span-6 text-left relative">
                 {article.category && (
                   <div className="mb-4">
                     <Label label={article.category.name} />
                   </div>
                 )}
-                {/* Başlık */}
-                <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold leading-tight mb-4 text-balance tracking-tight">
+                <h1 className="text-3xl md:text-5xl lg:text-7xl font-bold leading-tight mb-6 lg:mb-8 text-balance tracking-tight">
                   {article.title}
                 </h1>
-                {/* Açıklama */}
                 {article.description && (
-                  <p className="text-lg md:text-xl text-gray-600 font-serif italic leading-relaxed mb-6">
+                  <p className="text-lg md:text-xl lg:text-3xl text-gray-600 font-serif italic leading-relaxed mb-6">
                     {article.description}
                   </p>
                 )}
-                {/* Kapak Görseli */}
+                {/* Mobile font buttons */}
+                <div className="flex gap-1 lg:hidden mb-6">
+                  <FontButton label="A-" onClick={() => handleFontChange('decrease')} disabled={fontIndex === 0} />
+                  <FontButton label="A+" onClick={() => handleFontChange('increase')} disabled={fontIndex === FONT_SIZES.length - 1} />
+                </div>
                 {article.firstMedia?.src && (
                   <div className="w-full mb-6">
                     <img
@@ -429,9 +455,22 @@ export const FeaturedArticleDetail = () => {
                     <ImageCaption alt={article.firstMedia.alt || article.title} />
                   </div>
                 )}
-              </div>
+              </header>
 
               <div className="hidden lg:block lg:col-span-3"></div>
+
+              {/* Desktop font buttons at the border line */}
+              <div className="absolute bottom-0 left-0 w-full translate-y-1/2 z-10 hidden lg:block pointer-events-none">
+                <div className="grid grid-cols-12 gap-8 w-full">
+                  <div className="col-span-4"></div>
+                  <div className="col-span-8 pl-1">
+                    <div className="flex gap-1 pointer-events-auto">
+                      <FontButton label="A-" onClick={() => handleFontChange('decrease')} disabled={fontIndex === 0} />
+                      <FontButton label="A+" onClick={() => handleFontChange('increase')} disabled={fontIndex === FONT_SIZES.length - 1} />
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -444,9 +483,8 @@ export const FeaturedArticleDetail = () => {
 
           <div className="hidden lg:block lg:col-span-1"></div>
 
-          {/* --- SIDEBAR (sadece featured için) --- */}
-          {isFeatured && (
-            <aside className="col-span-1 lg:col-span-2 relative flex flex-col items-start lg:items-end text-left lg:text-right">
+          {/* --- SIDEBAR --- */}
+          <aside className="col-span-1 lg:col-span-2 relative flex flex-col items-start lg:items-end text-left lg:text-right">
               <div className="w-full pt-0 lg:pt-0 border-t-0 lg:border-t-0 border-black lg:w-auto">
 
                 <div className="flex flex-col gap-1 items-start lg:items-end mb-6 w-full">
@@ -497,10 +535,9 @@ export const FeaturedArticleDetail = () => {
 
               </div>
             </aside>
-          )}
 
           {/* Content */}
-          <div className={`${isFeatured ? 'col-span-1 lg:col-span-6' : 'col-span-1 lg:col-span-6 lg:col-start-4'} relative z-0`}>
+          <div className="col-span-1 lg:col-span-6 relative z-0">
             <article className="w-full">
               <div className="w-full">
                 {renderContent()}
@@ -511,8 +548,8 @@ export const FeaturedArticleDetail = () => {
             <section className="mt-12 lg:mt-16 border-t border-gray-200 pt-8 lg:pt-12">
               {/* Etiketler: featured mobile'da içeriğin altında, normal her zaman altında */}
               {article.tags && article.tags.length > 0 && (
-                <div className={`flex flex-wrap gap-2 mb-8 pb-8 border-b border-gray-100 ${isFeatured ? 'lg:hidden' : ''}`}>
-                  {isFeatured && article.category && (
+                <div className="flex flex-wrap gap-2 mb-8 pb-8 border-b border-gray-100 lg:hidden">
+                  {article.category && (
                     <Link to={`/category?category=${encodeURIComponent(article.category.name)}`} className="inline-block">
                       <Label label={article.category.name} />
                     </Link>
@@ -532,17 +569,30 @@ export const FeaturedArticleDetail = () => {
               <p className="text-gray-500 mb-6 italic text-sm">
                 Yorumlarınız doğrudan Genç Hayat yazı kuruluna gitmektedir.
               </p>
-              <div>
-                <textarea
-                  className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black outline-none resize-y font-serif text-base bg-gray-50 min-h-[120px]"
-                  placeholder="Notunuzu buraya yazın..."
-                />
-                <div className="mt-4 flex justify-end">
-                  <button className="px-8 py-2 bg-black text-white font-bold text-sm rounded-full hover:bg-gray-800 transition-transform transform hover:scale-105">
-                    Gönder
-                  </button>
+              {commentStatus === 'sent' ? (
+                <p className="text-emerald-600 font-serif italic text-base py-4">Görüşünüz iletildi. Teşekkürler.</p>
+              ) : (
+                <div>
+                  {commentStatus === 'error' && (
+                    <p className="text-red-500 text-sm mb-4 font-serif">Yorum gönderilemedi. Lütfen tekrar deneyin.</p>
+                  )}
+                  <textarea
+                    value={commentText}
+                    onChange={e => { setCommentText(e.target.value); if (commentStatus === 'error') setCommentStatus('idle'); }}
+                    className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black outline-none resize-y font-serif text-base bg-gray-50 min-h-[120px]"
+                    placeholder="Notunuzu buraya yazın..."
+                  />
+                  <div className="mt-4 flex justify-end">
+                    <button
+                      onClick={handleCommentSubmit}
+                      disabled={commentStatus === 'sending' || !commentText.trim()}
+                      className="px-8 py-2 bg-black text-white font-bold text-sm rounded-full hover:bg-gray-800 transition-transform transform hover:scale-105 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
+                    >
+                      {commentStatus === 'sending' ? 'Gönderiliyor...' : 'Gönder'}
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )}
             </section>
           </div>
 

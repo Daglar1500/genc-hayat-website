@@ -179,6 +179,10 @@ function initializeData() {
         writeJson('issues.json', []);
     }
 
+    if (!file_exists(DATA_DIR . 'editors.json')) {
+        writeJson('editors.json', ['Admin', 'Selin', 'Veli']);
+    }
+
     if (!file_exists(DATA_DIR . 'section_articles.json')) {
         $sa = [];
         for ($i = 0; $i < 45; $i++) {
@@ -232,7 +236,25 @@ if ($method === 'GET' && $uri === '/api/init') {
         return array_merge($section, ['articles' => $sectionArticlesList, 'routeArticle' => $routeArticle]);
     }, $sections);
 
-    respond(['sections' => array_values($fullSections), 'articles' => $articles, 'categories' => $categories, 'labels' => $labels]);
+    $editors = readJson('editors.json') ?? [];
+    respond(['sections' => array_values($fullSections), 'articles' => $articles, 'categories' => $categories, 'labels' => $labels, 'editors' => $editors]);
+}
+
+// GET /api/articles (all)
+elseif ($method === 'GET' && $uri === '/api/articles') {
+    respond(readJson('articles.json') ?? []);
+}
+
+// GET /api/articles/:id
+elseif ($method === 'GET' && preg_match('#^/api/articles/(.+)$#', $uri, $m)) {
+    $id = $m[1];
+    $articles = readJson('articles.json') ?? [];
+    foreach ($articles as $a) {
+        if ($a['id'] === $id || ($a['slug'] ?? '') === $id) {
+            respond($a);
+        }
+    }
+    respond(['error' => 'Not found'], 404);
 }
 
 // POST /api/articles
@@ -373,6 +395,197 @@ elseif ($method === 'DELETE' && preg_match('#^/api/issues/(.+)$#', $uri, $m)) {
     $issues = array_values(array_filter($issues, fn($iss) => $iss['id'] !== $id));
     writeJson('issues.json', $issues);
     respond(['success' => true]);
+}
+
+// DELETE /api/articles/:id
+elseif ($method === 'DELETE' && preg_match('#^/api/articles/(.+)$#', $uri, $m)) {
+    $id = $m[1];
+    $articles = readJson('articles.json') ?? [];
+    $articles = array_values(array_filter($articles, fn($a) => $a['id'] !== $id));
+    writeJson('articles.json', $articles);
+    // Also clean up section_articles
+    $sa = readJson('section_articles.json') ?? [];
+    $sa = array_values(array_filter($sa, fn($rel) => $rel['articleId'] !== $id));
+    writeJson('section_articles.json', $sa);
+    respond(['success' => true]);
+}
+
+// POST /api/articles/:id/view
+elseif ($method === 'POST' && preg_match('#^/api/articles/([^/]+)/view$#', $uri, $m)) {
+    $id = $m[1];
+    $views = readJson('views.json') ?? [];
+    $views[$id] = ($views[$id] ?? 0) + 1;
+    writeJson('views.json', $views);
+    respond(['success' => true, 'views' => $views[$id]]);
+}
+
+// POST /api/articles/:id/comments
+elseif ($method === 'POST' && preg_match('#^/api/articles/([^/]+)/comments$#', $uri, $m)) {
+    $identifier = $m[1];
+    // Resolve slug to canonical article id
+    $allArticles = readJson('articles.json') ?? [];
+    $resolvedId = $identifier;
+    foreach ($allArticles as $a) {
+        if (($a['id'] ?? '') === $identifier || ($a['slug'] ?? '') === $identifier) {
+            $resolvedId = $a['id'];
+            break;
+        }
+    }
+    $body = json_decode(file_get_contents('php://input'), true);
+    $text = trim($body['text'] ?? '');
+    if (!$text) respond(['error' => 'No text'], 400);
+    $comments = readJson('comments.json') ?? [];
+    $comment = [
+        'id'        => 'cmt-' . round(microtime(true) * 1000),
+        'articleId' => $resolvedId,
+        'text'      => $text,
+        'createdAt' => round(microtime(true) * 1000),
+        'isRead'    => false,
+    ];
+    array_unshift($comments, $comment);
+    writeJson('comments.json', $comments);
+    respond($comment);
+}
+
+// GET /api/stats
+elseif ($method === 'GET' && $uri === '/api/stats') {
+    $articles = readJson('articles.json') ?? [];
+    $views    = readJson('views.json')    ?? [];
+    $comments = readJson('comments.json') ?? [];
+
+    $commentsByArticle = [];
+    foreach ($comments as $c) {
+        $commentsByArticle[$c['articleId']][] = $c;
+    }
+
+    $stats = array_map(function($a) use ($views, $commentsByArticle) {
+        $aid  = $a['id'];
+        $artC = $commentsByArticle[$aid] ?? [];
+        return [
+            'id'          => $aid,
+            'title'       => $a['title'],
+            'author'      => $a['author'],
+            'category'    => $a['category'],
+            'issueNumber' => $a['issueNumber'],
+            'imageUrl'    => $a['imageUrl'],
+            'views'       => $views[$aid] ?? 0,
+            'commentCount'=> count($artC),
+            'unreadCount' => count(array_filter($artC, fn($c) => !$c['isRead'])),
+            'comments'    => $artC,
+        ];
+    }, $articles);
+
+    respond(array_values($stats));
+}
+
+// PATCH /api/comments/:id/read
+elseif ($method === 'PATCH' && preg_match('#^/api/comments/([^/]+)/read$#', $uri, $m)) {
+    $id = $m[1];
+    $comments = readJson('comments.json') ?? [];
+    foreach ($comments as &$c) {
+        if ($c['id'] === $id) { $c['isRead'] = true; break; }
+    }
+    unset($c);
+    writeJson('comments.json', $comments);
+    respond(['success' => true]);
+}
+
+// GET /api/editors
+elseif ($method === 'GET' && $uri === '/api/editors') {
+    respond(readJson('editors.json') ?? []);
+}
+
+// POST /api/editors
+elseif ($method === 'POST' && $uri === '/api/editors') {
+    $body = json_decode(file_get_contents('php://input'), true);
+    $name = trim($body['name'] ?? '');
+    if (!$name) respond(['error' => 'No name'], 400);
+    $editors = readJson('editors.json') ?? [];
+    if (!in_array($name, $editors)) {
+        $editors[] = $name;
+        writeJson('editors.json', $editors);
+    }
+    respond(['success' => true, 'name' => $name]);
+}
+
+// DELETE /api/editors/:name
+elseif ($method === 'DELETE' && preg_match('#^/api/editors/(.+)$#', $uri, $m)) {
+    $name = urldecode($m[1]);
+    $editors = readJson('editors.json') ?? [];
+    $editors = array_values(array_filter($editors, fn($e) => $e !== $name));
+    writeJson('editors.json', $editors);
+    respond(['success' => true]);
+}
+
+// GET /api/search?q=...
+elseif ($method === 'GET' && $uri === '/api/search') {
+    $q = strtolower(trim($_GET['q'] ?? ''));
+    if (strlen($q) < 2) { echo json_encode([]); exit; }
+    $articles = readJson('articles.json') ?? [];
+    $results = array_values(array_filter($articles, function($a) use ($q) {
+        return str_contains(strtolower($a['title'] ?? ''), $q)
+            || str_contains(strtolower($a['author'] ?? ''), $q)
+            || str_contains(strtolower($a['subheading'] ?? ''), $q);
+    }));
+    $results = array_slice($results, 0, 20);
+    echo json_encode($results, JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+// POST /api/upload
+elseif ($method === 'POST' && $uri === '/api/upload') {
+    if (empty($_FILES['file'])) {
+        respond(['error' => 'No file uploaded'], 400);
+    }
+    $uploadsDir = __DIR__ . '/uploads/';
+    if (!is_dir($uploadsDir)) mkdir($uploadsDir, 0755, true);
+
+    $file = $_FILES['file'];
+    $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+    $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+    if (!in_array($ext, $allowed)) respond(['error' => 'Geçersiz dosya türü'], 400);
+    if ($file['size'] > 5 * 1024 * 1024) respond(['error' => 'Dosya çok büyük (max 5MB)'], 400);
+
+    $filename = uniqid('img_', true) . '.' . $ext;
+    $dest = $uploadsDir . $filename;
+    move_uploaded_file($file['tmp_name'], $dest);
+
+    // Resize if it's an image wider than 1200px
+    if (in_array($ext, ['jpg', 'jpeg', 'png', 'webp'])) {
+        $maxW = 1200;
+        $imageInfo = @getimagesize($dest);
+        if ($imageInfo) {
+            list($w, $h) = $imageInfo;
+            if ($w > $maxW) {
+                $newH = intval($h * $maxW / $w);
+                $src = match($ext) {
+                    'jpg', 'jpeg' => imagecreatefromjpeg($dest),
+                    'png' => imagecreatefrompng($dest),
+                    'webp' => imagecreatefromwebp($dest),
+                    default => null
+                };
+                if ($src) {
+                    $dst = imagecreatetruecolor($maxW, $newH);
+                    if ($ext === 'png') {
+                        imagealphablending($dst, false);
+                        imagesavealpha($dst, true);
+                    }
+                    imagecopyresampled($dst, $src, 0, 0, 0, 0, $maxW, $newH, $w, $h);
+                    match($ext) {
+                        'jpg', 'jpeg' => imagejpeg($dst, $dest, 85),
+                        'png' => imagepng($dst, $dest),
+                        'webp' => imagewebp($dst, $dest, 85),
+                        default => null
+                    };
+                    imagedestroy($src);
+                    imagedestroy($dst);
+                }
+            }
+        }
+    }
+
+    $baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'];
+    respond(['url' => $baseUrl . '/uploads/' . $filename]);
 }
 
 else {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 type PlaylistItem = {
   id: string;
@@ -10,6 +10,10 @@ function getSpotifyEmbedUrl(url: string): string {
   if (!match) return '';
   return `https://open.spotify.com/embed/${match[1]}/${match[2]}`;
 }
+
+const COMPACT_H = 152; // Spotify compact iframe height (px)
+const ROW_GAP   = 8;   // gap-2 = 0.5rem = 8px
+const BTN_H     = 52;  // py-4 + text-sm ≈ 52px
 
 const SpotifyIcon = () => (
   <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 md:w-6 md:h-6">
@@ -28,6 +32,17 @@ export const SpotifySection = ({ playlists, profileUrl }: { playlists: PlaylistI
   }, []);
 
   const [featured, ...rest] = playlists;
+
+  // Featured iframe needs ≥ 352px to show full format (Spotify threshold).
+  // Right column total height = N × compactH + N × rowGap + btnH.
+  // If that total < 352, clamp featured to 352 and stretch right items to fill.
+  const N = rest.length;
+  const computedRightH = N > 0 ? N * (COMPACT_H + ROW_GAP) + BTN_H : 352;
+  const featuredHeight = Math.max(352, computedRightH);
+  // Each right item gets equal share of whatever height remains after gap + button.
+  const rightItemHeight = N > 0
+    ? Math.round((featuredHeight - BTN_H - N * ROW_GAP) / N)
+    : COMPACT_H;
 
   return (
     <section className="bg-black py-16 md:py-24 font-bradford text-white overflow-hidden relative">
@@ -85,46 +100,37 @@ export const SpotifySection = ({ playlists, profileUrl }: { playlists: PlaylistI
             </a>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
-            {/* Featured playlist - flex-1 fills the row height set by right column */}
-            <div className="lg:col-span-7 flex flex-col">
+          <div className="flex gap-8">
+            {/* Featured playlist — height matches right column total */}
+            <div className="flex-1">
               {featured && getSpotifyEmbedUrl(featured.url) && (
                 <iframe
                   src={getSpotifyEmbedUrl(featured.url)}
                   width="100%"
+                  height={featuredHeight}
                   allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                   loading="lazy"
-                  className="flex-1 min-h-0 rounded-xl border-0 block"
+                  className="rounded-xl border-0 block w-full"
+                  style={{ height: featuredHeight }}
                 />
               )}
             </div>
 
-            {/* Rest of playlists + button */}
-            <div className="lg:col-span-5 flex flex-col gap-2">
+            {/* Right column: remaining playlists + button */}
+            <div className="flex-1 flex flex-col gap-2">
               {rest.map((p) => {
                 const embedUrl = getSpotifyEmbedUrl(p.url);
                 if (!embedUrl) return null;
-                return rest.length === 1 ? (
-                  /* Single item: full mode, fills available height */
+                return (
                   <iframe
                     key={p.id}
                     src={embedUrl}
                     width="100%"
+                    height={rightItemHeight}
                     allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                     loading="lazy"
-                    className="flex-1 min-h-0 rounded-xl border-0 block"
-                  />
-                ) : (
-                  /* Multiple items: compact mode, fixed 152px */
-                  <iframe
-                    key={p.id}
-                    src={embedUrl}
-                    width="100%"
-                    height="152"
-                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                    loading="lazy"
-                    className="shrink-0 h-[152px] rounded-xl border-0 block"
-                    style={{ height: '152px' }}
+                    className="rounded-xl border-0 block w-full shrink-0"
+                    style={{ height: rightItemHeight }}
                   />
                 );
               })}
@@ -132,7 +138,7 @@ export const SpotifySection = ({ playlists, profileUrl }: { playlists: PlaylistI
                 href={profileUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="shrink-0 mt-auto w-full flex items-center justify-center gap-3 bg-[#1DB954] hover:bg-[#1ed760] text-black font-bold py-4 rounded-lg transition-all uppercase tracking-wide text-sm"
+                className="mt-auto w-full flex items-center justify-center gap-3 bg-[#1DB954] hover:bg-[#1ed760] text-black font-bold py-4 rounded-lg transition-all uppercase tracking-wide text-sm"
               >
                 <SpotifyIcon />
                 Spotify'da Takip Et

@@ -1,9 +1,21 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LabeloDefault, Label } from '../pages/MainPage/ArticleCard';
 import { NAV_DATA } from './Footer';
 import { SocialIcons, Logo, CloseButton } from './SiteHeader';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+
+interface SearchResult {
+  id: string;
+  title: string;
+  subheading?: string;
+  author: string;
+  imageUrl: string;
+  category: string;
+  issueNumber: string;
+}
 
 interface SearchOverlayProps {
     isOpen: boolean;
@@ -25,6 +37,9 @@ const POPULAR_COUNT = 12;
 export const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [showAllTags, setShowAllTags] = useState(false);
+    const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+    const [searchLoading, setSearchLoading] = useState(false);
+    const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const allTags = LabeloDefault.filter(l => l.type === 'tag');
     const popularTags = allTags.slice(0, POPULAR_COUNT);
@@ -33,6 +48,23 @@ export const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
     const filteredTags = searchTerm
         ? allTags.filter(tag => tag.name.toLowerCase().includes(searchTerm.toLowerCase()))
         : null;
+
+    useEffect(() => {
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+        if (searchTerm.length < 2) {
+            setSearchResults([]);
+            setSearchLoading(false);
+            return;
+        }
+        setSearchLoading(true);
+        debounceRef.current = setTimeout(() => {
+            fetch(`${API_URL}/search?q=${encodeURIComponent(searchTerm)}`)
+                .then(r => r.json())
+                .then(data => { setSearchResults(Array.isArray(data) ? data : []); setSearchLoading(false); })
+                .catch(() => { setSearchResults([]); setSearchLoading(false); });
+        }, 300);
+        return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
+    }, [searchTerm]);
 
     if (!isOpen) return null;
 
@@ -74,6 +106,45 @@ export const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
                         </div>
 
                         <div className="w-full max-w-5xl mx-auto space-y-10 flex-grow">
+
+                            {/* ── 0. Article Search Results ── */}
+                            {searchTerm.length >= 2 && (
+                                <div className="space-y-4">
+                                    <h3 className="text-lg font-bold opacity-80 border-b border-white/20 pb-1 text-center">
+                                        {searchLoading ? 'Aranıyor...' : 'Yazı Sonuçları'}
+                                    </h3>
+                                    {!searchLoading && searchResults.length === 0 && (
+                                        <p className="text-white/50 italic text-center">Sonuç bulunamadı</p>
+                                    )}
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                                        {searchResults.map(result => (
+                                            <Link
+                                                key={result.id}
+                                                to={`/articles/${result.id}`}
+                                                onClick={onClose}
+                                                className="flex gap-3 bg-white/10 hover:bg-white/20 transition-colors p-3 rounded-lg group"
+                                            >
+                                                {result.imageUrl && (
+                                                    <img
+                                                        src={result.imageUrl}
+                                                        alt={result.title}
+                                                        className="w-16 h-16 object-cover rounded shrink-0"
+                                                    />
+                                                )}
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-white font-bold text-sm leading-snug line-clamp-2 group-hover:underline">
+                                                        {result.title}
+                                                    </p>
+                                                    <p className="text-white/60 text-xs mt-1 truncate">{result.author}</p>
+                                                    {result.subheading && (
+                                                        <p className="text-white/50 text-xs mt-0.5 line-clamp-1">{result.subheading}</p>
+                                                    )}
+                                                </div>
+                                            </Link>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
 
                             {/* ── 1. Categories Grid ── */}
                             {!searchTerm && (
