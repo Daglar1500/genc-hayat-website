@@ -175,8 +175,8 @@ export const FeaturedArticleDetail = () => {
               publishedDate: new Date(a.createdAt),
               content: a.content || [],
               firstMedia: { type: 'image', src: a.imageUrl, alt: a.title, mediaLayout: 'full-width' },
-              category: new Labelo('category', a.category),
-              tags: a.labels?.map((l: string) => new Labelo('tag', l)) || []
+              category: new Labelo('category', a.category || ''),
+              tags: (a.labels || []).filter(Boolean).map((l: string) => new Labelo('tag', l))
             }));
 
             setRandomArticle(mappedOthers[Math.floor(Math.random() * mappedOthers.length)]);
