@@ -3,7 +3,7 @@ import { API_URL } from '../config';
 import type { Article, Category, Section, Issue } from '../types';
 
 export function useAdminData() {
-    const [view, setView] = useState<'dashboard' | 'log' | 'read' | 'issues'>('dashboard');
+    const [view, setView] = useState<'dashboard' | 'log' | 'read' | 'issues' | 'stats'>('dashboard');
     const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
     const [settingsOpen, setSettingsOpen] = useState(false);
 
@@ -12,6 +12,7 @@ export function useAdminData() {
     const [loggedArticles, setLoggedArticles] = useState<Article[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
     const [labels, setLabels] = useState<string[]>([]);
+    const [editors, setEditors] = useState<string[]>([]);
     const [issues, setIssues] = useState<Issue[]>([]);
     const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
     const [issueFormOpen, setIssueFormOpen] = useState(false);
@@ -34,8 +35,8 @@ export function useAdminData() {
     const [historySize, setHistorySize] = useState(0);
     const [futureSize, setFutureSize] = useState(0);
 
-    // Templates
-    const [templates, setTemplates] = useState<{ name: string; sections: Omit<Section, 'articles' | 'routeArticle'>[] }[]>(() => {
+    // Templates — now include articles for non-feed sections
+    const [templates, setTemplates] = useState<{ name: string; sections: Section[] }[]>(() => {
         try { return JSON.parse(localStorage.getItem('cms-templates') || '[]'); } catch { return []; }
     });
     const [showTemplates, setShowTemplates] = useState(false);
@@ -89,21 +90,24 @@ export function useAdminData() {
     }, []);
 
     // --- Template Functions ---
+    // Saves all section content except article-feed articles
     const saveTemplate = () => {
         const name = prompt('Şablon adı:');
         if (!name) return;
-        const templateSections = sections.map(({ articles, routeArticle, ...rest }) => rest);
+        const templateSections = sections.map(s => ({
+            ...s,
+            articles: s.type === 'article-feed' ? [] : s.articles,
+        }));
         const newTemplates = [...templates, { name, sections: templateSections }];
         setTemplates(newTemplates);
         localStorage.setItem('cms-templates', JSON.stringify(newTemplates));
         showToast(`"${name}" şablonu kaydedildi`);
     };
 
-    const loadTemplate = (template: { name: string; sections: Omit<Section, 'articles' | 'routeArticle'>[] }) => {
-        if (!confirm(`"${template.name}" şablonu yüklensin mi? Mevcut düzen korunur, sadece bölüm yapısı değişir.`)) return;
+    const loadTemplate = (template: { name: string; sections: Section[] }) => {
+        if (!confirm(`"${template.name}" şablonu yüklensin mi? Mevcut düzen değişecek.`)) return;
         recordHistory(sections);
-        const newSections = template.sections.map(s => ({ ...s, articles: [], routeArticle: undefined }));
-        setSections(newSections as Section[]);
+        setSections(template.sections as Section[]);
         setShowTemplates(false);
         showToast(`"${template.name}" şablonu yüklendi`);
     };
@@ -118,13 +122,16 @@ export function useAdminData() {
     useEffect(() => {
         Promise.all([
             fetch(`${API_URL}/init`).then(r => r.json()),
-            fetch(`${API_URL}/issues`).then(r => r.json())
-        ]).then(([d, issData]) => {
+            fetch(`${API_URL}/issues`).then(r => r.json()),
+            fetch(`${API_URL}/editors`).then(r => r.json()).catch(() => []),
+        ]).then(([d, issData, editorsData]) => {
             setSections(d.sections);
             setLoggedArticles(d.articles);
             setCategories(d.categories);
             setLabels(d.labels);
             if (Array.isArray(issData)) setIssues(issData);
+            if (Array.isArray(editorsData)) setEditors(editorsData);
+            else if (d.editors && Array.isArray(d.editors)) setEditors(d.editors);
             setIsLoading(false);
         });
     }, []);
@@ -198,6 +205,20 @@ export function useAdminData() {
         fetch(`${API_URL}/labels/${l}`, { method: 'DELETE' }).then(() => setLabels(labels.filter(lb => lb !== l)));
     };
 
+    const addEditor = () => {
+        const name = prompt("Editör Adı:");
+        if (!name) return;
+        fetch(`${API_URL}/editors`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name })
+        }).then(r => r.json()).then(d => d.success && !editors.includes(name) && setEditors([...editors, name]));
+    };
+
+    const deleteEditor = (name: string) => {
+        if (!confirm("Editörü silmek istediğinize emin misiniz?")) return;
+        fetch(`${API_URL}/editors/${encodeURIComponent(name)}`, { method: 'DELETE' })
+            .then(() => setEditors(editors.filter(e => e !== name)));
+    };
+
     const deleteArticleFromSection = (sectionId: string, articleId: string) => {
         recordHistory(sections);
         setSections(prev => prev.map(s => {
@@ -264,7 +285,7 @@ export function useAdminData() {
         e.dataTransfer.effectAllowed = 'copyMove';
     };
 
-    const handleDrop = (e: React.DragEvent, targetSecId: string, targetIndex?: number) => {
+    const handleDrop = (e: React.DragEvent, targetSecId: string, targetIndex?: number, mode?: 'replace') => {
         e.preventDefault();
         e.stopPropagation();
         const dragged = dragItem.current;
@@ -281,19 +302,45 @@ export function useAdminData() {
         const targetSection = newSections[targetSecIdx];
 
         let art: Article | undefined;
+        let sourceIdx = -1;
 
         if (dragged.type === 'sidebar') {
             const found = loggedArticles.find(a => a.id === dragged.id);
             if (found) art = { ...found };
         } else if (sourceSecIdx !== -1) {
             const sourceSection = newSections[sourceSecIdx];
-            const idx = sourceSection.articles.findIndex(a => a.id === dragged.id);
-            if (idx !== -1) {
-                [art] = sourceSection.articles.splice(idx, 1);
+            sourceIdx = sourceSection.articles.findIndex(a => a.id === dragged.id);
+            if (sourceIdx !== -1) {
+                [art] = sourceSection.articles.splice(sourceIdx, 1);
             }
         }
 
         if (!art) return;
+
+        if (targetSection.type === 'main-row') {
+            targetSection.routeArticle = art;
+            setSections(newSections);
+            dragItem.current = null;
+            return;
+        }
+
+        // Replace mode: replace from sidebar, swap when from a section
+        if (mode === 'replace' && targetIndex !== undefined) {
+            if (targetIndex < targetSection.articles.length) {
+                const displaced = targetSection.articles[targetIndex];
+                targetSection.articles[targetIndex] = art;
+                if (dragged.type !== 'sidebar' && sourceSecIdx !== -1 && sourceIdx !== -1) {
+                    newSections[sourceSecIdx].articles.splice(sourceIdx, 0, displaced);
+                }
+            } else {
+                targetSection.articles.push(art);
+            }
+            setSections(newSections);
+            dragItem.current = null;
+            return;
+        }
+
+        const maxArticles = targetSection.type === 'category-row' ? 3 : targetSection.type === 'ordinary-row' ? 4 : null;
 
         if (targetSection.type === 'article-feed') {
             if (targetIndex !== undefined && targetIndex < targetSection.articles.length) {
@@ -302,22 +349,20 @@ export function useAdminData() {
                 targetSection.articles.unshift(art);
             }
         } else {
+            const atMax = maxArticles !== null && targetSection.articles.length >= maxArticles;
             if (targetIndex !== undefined && targetIndex < targetSection.articles.length) {
-                if (dragged.type === 'sidebar') {
+                if (atMax) {
                     targetSection.articles[targetIndex] = art;
                 } else {
                     targetSection.articles.splice(targetIndex, 0, art);
-                    const limit = targetSection.type === 'category-row' ? 3 : 4;
-                    if (targetSection.articles.length > limit) {
-                        targetSection.articles = targetSection.articles.slice(0, limit);
-                    }
                 }
             } else {
-                targetSection.articles.unshift(art);
-                const limit = targetSection.type === 'category-row' ? 3 : 4;
-                if (targetSection.articles.length > limit) {
-                    targetSection.articles.pop();
+                if (atMax) {
+                    showToast(`Bu bölüme maksimum ${maxArticles} makale eklenebilir`, 'error');
+                    dragItem.current = null;
+                    return;
                 }
+                targetSection.articles.unshift(art);
             }
         }
 
@@ -335,6 +380,7 @@ export function useAdminData() {
         loggedArticles, setLoggedArticles,
         categories, setCategories,
         labels, setLabels,
+        editors,
         issues, setIssues,
         selectedIssue, setSelectedIssue,
         issueFormOpen, setIssueFormOpen,
@@ -374,6 +420,8 @@ export function useAdminData() {
         deleteCategory,
         addLabel,
         deleteLabel,
+        addEditor,
+        deleteEditor,
         deleteArticleFromSection,
         deleteArticle,
         updateSectionConfig,

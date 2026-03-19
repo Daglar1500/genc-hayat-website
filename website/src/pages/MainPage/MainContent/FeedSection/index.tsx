@@ -139,6 +139,15 @@ export const FeedCarousel = () => {
       });
   }, []);
 
+  // 3 Saniyelik Otomatik Geçiş
+  useEffect(() => {
+    if (feedData.length === 0) return;
+    const interval = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % feedData.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [feedData]);
+
   useEffect(() => {
     const handleResize = () => {
       if (typeof window === 'undefined') return;
@@ -153,16 +162,6 @@ export const FeedCarousel = () => {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-
-  // 3 Saniyelik Otomatik Geçiş
-  useEffect(() => {
-    if (feedData.length === 0) return;
-    const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % feedData.length);
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, [feedData]);
 
   if (loading) {
     return <div className="h-32 flex justify-center items-center bg-zinc-100 text-stone-500 text-sm">Akış Yükleniyor...</div>;

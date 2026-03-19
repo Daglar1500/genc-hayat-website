@@ -5,9 +5,13 @@ export interface Category {
 }
 
 export interface ContentBlock {
-    id: string;
-    type: 'paragraph' | 'subheading' | 'image';
-    value: string;
+    id?: string;
+    type?: 'paragraph' | 'subheading' | 'image';
+    value?: string;
+    // New block format fields
+    blockContent?: { type: string; textContent?: string; src?: string; alt?: string; mediaLayout?: string };
+    media?: { type: string; src: string; alt: string };
+    blockLayout?: string;
 }
 
 export interface Article {

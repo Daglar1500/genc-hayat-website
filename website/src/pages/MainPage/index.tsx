@@ -18,8 +18,9 @@ export const MainContent = () => {
 
   const [sections, setSections] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [, setFetchError] = useState(false);
 
-  useEffect(() => {
+  const fetchSections = () => {
     const apiUrl = (import.meta as any).env?.VITE_API_URL ?? 'http://localhost:3001/api';
     fetch(`${apiUrl}/init`)
       .then(res => res.json())
@@ -37,8 +38,8 @@ export const MainContent = () => {
             issueNumber: a.issueNumber,
             publishedDate: new Date(a.createdAt),
             firstMedia: { type: 'image', src: a.imageUrl, alt: a.title },
-            category: new Labelo('category', a.category),
-            tags: a.labels?.map((l: string) => new Labelo('tag', l)) || []
+            category: new Labelo('category', a.category || 'Güncel'),
+            tags: (a.labels || []).filter(Boolean).map((l: string) => new Labelo('tag', l))
           } as ArticleCard))
         }));
         setSections(mappedSections);
@@ -46,8 +47,13 @@ export const MainContent = () => {
       })
       .catch((err) => {
         console.error("API Fetch Error:", err);
+        setFetchError(true);
         setLoading(false);
       });
+  };
+
+  useEffect(() => {
+    fetchSections();
   }, []);
 
   if (loading) {
@@ -65,8 +71,11 @@ export const MainContent = () => {
         if (sec.type === 'category-row') {
           return <CategorySection key={sec.id} categoryTitle={sec.title || "Kategori"} articles={sec.articles} />;
         }
-        if (sec.type === 'ordinary-row' || sec.type === 'spot-row') {
+        if (sec.type === 'ordinary-row') {
           return <ArticleLine key={sec.id} articles={sec.articles} />;
+        }
+        if (sec.type === 'spot-row') {
+          return <FeaturedArticle key={sec.id} article={sec.articles[0]} />;
         }
         if (sec.type === 'video-row' && sec.config) {
           return <VideoSection key={sec.id} videos={sec.config.videos || []} channelUrl={sec.config.channelUrl || ''} />;
@@ -80,7 +89,6 @@ export const MainContent = () => {
         return null;
       })}
 
-      <FeaturedArticle />
       <ArchiveSection />
 
       <div className="hidden lg:block">

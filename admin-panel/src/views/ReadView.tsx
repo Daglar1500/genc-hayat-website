@@ -4,15 +4,16 @@ import ReadArticle from '../components/ReadArticle';
 
 interface ReadViewProps {
     selectedArticle: Article;
-    setView: (v: 'dashboard' | 'log' | 'read' | 'issues') => void;
+    setView: (v: 'dashboard' | 'log' | 'read' | 'issues' | 'stats') => void;
+    setSelectedArticle: (article: Article | null) => void;
 }
 
-export default function ReadView({ selectedArticle, setView }: ReadViewProps) {
+export default function ReadView({ selectedArticle, setView, setSelectedArticle }: ReadViewProps) {
     return (
         <ReadArticle
             article={selectedArticle}
-            onClose={() => setView('dashboard')}
-            onEdit={() => { setView('log'); }}
+            onClose={() => { setView('dashboard'); setSelectedArticle(null); }}
+            onEdit={() => setView('log')}
         />
     );
 }

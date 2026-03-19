@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef, useLayoutEffect } from 'react';
 
 type VideoItem = {
   id: string;
@@ -10,10 +10,14 @@ function getYouTubeEmbedUrl(url: string): string {
   return match ? `https://www.youtube.com/embed/${match[1]}` : '';
 }
 
+const YT_COL_GAP = 32;  // gap-8 = 2rem = 32px
+const YT_ROW_GAP = 16;  // gap-4 = 1rem = 16px
+const BTN_H      = 52;  // py-4 + text-sm ≈ 52px
+
 export const VideoSection = ({ videos, channelUrl }: { videos: VideoItem[], channelUrl: string }) => {
   const [isMobile, setIsMobile] = useState(false);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 1024);
     check();
     window.addEventListener('resize', check);
@@ -21,6 +25,34 @@ export const VideoSection = ({ videos, channelUrl }: { videos: VideoItem[], chan
   }, []);
 
   const [featured, ...rest] = videos;
+
+  // Compute left column width so that left video height === right column height.
+  // Left height  = w_L × 9/16
+  // Right height = N × (w_R × 9/16) + N × rowGap + btnH
+  // Equal when: w_L = N × w_R + (N × rowGap + btnH) × 16/9
+  // With w_L + colGap + w_R = W:
+  //   w_R = [(W - colGap) - (N × rowGap + btnH) × 16/9] / (N + 1)
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [leftWidth, setLeftWidth] = useState<number | null>(null);
+
+  useLayoutEffect(() => {
+    const N = rest.length;
+    if (N === 0) { setLeftWidth(null); return; }
+
+    const calc = () => {
+      if (!containerRef.current) return;
+      const W = containerRef.current.offsetWidth;
+      const rightW = ((W - YT_COL_GAP) - (N * YT_ROW_GAP + BTN_H) * (16 / 9)) / (N + 1);
+      const leftW  = W - YT_COL_GAP - rightW;
+      if (leftW > 50 && rightW > 50) setLeftWidth(Math.round(leftW));
+    };
+
+    calc();
+    const ro = new ResizeObserver(calc);
+    const el = containerRef.current;
+    if (el) ro.observe(el);
+    return () => ro.disconnect();
+  }, [rest.length]);
 
   return (
     <section className="bg-black py-16 md:py-24 font-bradford text-white overflow-hidden relative">
@@ -81,9 +113,12 @@ export const VideoSection = ({ videos, channelUrl }: { videos: VideoItem[], chan
             </a>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
-            {/* Featured video */}
-            <div className="lg:col-span-7">
+          <div
+            ref={containerRef}
+            className="flex gap-8"
+          >
+            {/* Featured video — width computed so heights match */}
+            <div style={leftWidth ? { width: leftWidth, flexShrink: 0 } : { flex: '7 1 0%' }}>
               {featured && getYouTubeEmbedUrl(featured.url) && (
                 <div className="w-full aspect-video rounded-lg overflow-hidden border border-white/10">
                   <iframe
@@ -97,7 +132,7 @@ export const VideoSection = ({ videos, channelUrl }: { videos: VideoItem[], chan
             </div>
 
             {/* Rest of videos + button */}
-            <div className="lg:col-span-5 flex flex-col gap-4">
+            <div className="flex-1 flex flex-col gap-4">
               {rest.map((v) => {
                 const embedUrl = getYouTubeEmbedUrl(v.url);
                 if (!embedUrl) return null;

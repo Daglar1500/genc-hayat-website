@@ -1,11 +1,16 @@
 import { useState, useEffect } from "react";
 import { Label, ArticleCardElement, ArticleCard, Labelo } from "../../ArticleCard";
 
-export const FeaturedArticle = () => {
-  const [featuredArticleData, setFeaturedArticleData] = useState<ArticleCard | null>(null);
-  const [loading, setLoading] = useState(true);
+interface FeaturedArticleProps {
+  article?: ArticleCard;
+}
+
+export const FeaturedArticle = ({ article: articleProp }: FeaturedArticleProps = {}) => {
+  const [featuredArticleData, setFeaturedArticleData] = useState<ArticleCard | null>(articleProp ?? null);
+  const [loading, setLoading] = useState(!articleProp);
 
   useEffect(() => {
+    if (articleProp) return;
     const fetchFeaturedArticle = async () => {
       const apiUrl = (import.meta as any).env?.VITE_API_URL ?? 'http://localhost:3001/api';
       try {
@@ -41,7 +46,7 @@ export const FeaturedArticle = () => {
     };
 
     fetchFeaturedArticle();
-  }, []);
+  }, [articleProp]);
 
   if (loading) return <div className="min-h-screen flex items-center justify-center text-gray-400">Yükleniyor...</div>;
   if (!featuredArticleData) return null;

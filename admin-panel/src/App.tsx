@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { useAdminData } from './hooks/useAdminData';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
@@ -8,12 +9,15 @@ import DashboardView from './views/DashboardView';
 import LogView from './views/LogView';
 import ReadView from './views/ReadView';
 import IssuesView from './views/IssuesView';
+import StatsView from './views/StatsView';
 
 export default function App() {
     const data = useAdminData();
+    const [darkMode, setDarkMode] = useState(() => localStorage.getItem('admin-dark') === 'true');
+    useEffect(() => { localStorage.setItem('admin-dark', String(darkMode)); }, [darkMode]);
 
     return (
-        <div className="min-h-screen bg-gray-50 font-sans text-gray-800 flex">
+        <div className={`min-h-screen bg-gray-50 dark:bg-gray-950 font-sans text-gray-800 dark:text-gray-200 flex${darkMode ? ' dark' : ''}`}>
             <Sidebar
                 menuOpen={data.menuOpen}
                 setMenuOpen={data.setMenuOpen}
@@ -34,6 +38,7 @@ export default function App() {
                 recordHistory={data.recordHistory}
                 setSections={data.setSections}
                 showToast={data.showToast}
+                setPreviewArticle={data.setPreviewArticle}
             />
 
             <div className={`flex-1 transition-all duration-300 p-8 ${data.menuOpen ? 'ml-80' : ''}`}>
@@ -56,6 +61,8 @@ export default function App() {
                     loadTemplate={data.loadTemplate}
                     deleteTemplate={data.deleteTemplate}
                     saveTemplate={data.saveTemplate}
+                    darkMode={darkMode}
+                    toggleDarkMode={() => setDarkMode(d => !d)}
                 />
 
                 <div className="space-y-16 max-w-7xl mx-auto pb-20">
@@ -66,7 +73,7 @@ export default function App() {
                                 <div className="text-sm font-medium">Yükleniyor...</div>
                             </div>
                         </div>
-                    ) : data.view === 'dashboard' ? (
+                    ) : (data.view === 'dashboard' || data.view === 'log' || data.view === 'read') ? (
                         <DashboardView
                             sections={data.sections}
                             setSections={data.setSections}
@@ -89,6 +96,8 @@ export default function App() {
                             removeConfigItem={data.removeConfigItem}
                             updateConfigItem={data.updateConfigItem}
                         />
+                    ) : data.view === 'stats' ? (
+                        <StatsView />
                     ) : data.view === 'issues' ? (
                         <IssuesView
                             issues={data.issues}
@@ -98,6 +107,7 @@ export default function App() {
                             issueFormOpen={data.issueFormOpen}
                             setIssueFormOpen={data.setIssueFormOpen}
                             loggedArticles={data.loggedArticles}
+                            setLoggedArticles={data.setLoggedArticles}
                         />
                     ) : null}
                 </div>
@@ -109,15 +119,18 @@ export default function App() {
                     selectedArticle={data.selectedArticle}
                     categories={data.categories}
                     labels={data.labels}
+                    editors={data.editors}
                     setLoggedArticles={data.setLoggedArticles}
                     setView={data.setView}
                     setSelectedArticle={data.setSelectedArticle}
+                    setPreviewArticle={data.setPreviewArticle}
                 />
             )}
             {data.view === 'read' && data.selectedArticle && (
                 <ReadView
                     selectedArticle={data.selectedArticle}
                     setView={data.setView}
+                    setSelectedArticle={data.setSelectedArticle}
                 />
             )}
 
@@ -136,10 +149,13 @@ export default function App() {
                 setSettingsOpen={data.setSettingsOpen}
                 categories={data.categories}
                 labels={data.labels}
+                editors={data.editors}
                 addCategory={data.addCategory}
                 deleteCategory={data.deleteCategory}
                 addLabel={data.addLabel}
                 deleteLabel={data.deleteLabel}
+                addEditor={data.addEditor}
+                deleteEditor={data.deleteEditor}
             />
 
             <Toast toasts={data.toasts} />
