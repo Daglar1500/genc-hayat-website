@@ -20,6 +20,7 @@ export default function App() {
     const [logMinimized, setLogMinimized] = useState(false);
     const [logDirty, setLogDirty] = useState(false);
     const [logCloseConfirm, setLogCloseConfirm] = useState(false);
+    const [logSaveTrigger, setLogSaveTrigger] = useState(0);
     // Tracks the position of the edit tab among preview tabs (set when minimized)
     const [logTabPosition, setLogTabPosition] = useState<number>(0);
     useEffect(() => {
@@ -143,6 +144,7 @@ export default function App() {
                     onMinimize={() => { setLogMinimized(true); setLogTabPosition(data.previewTabs.length); }}
                     externalMinimized={logMinimized || !!data.activePreviewId}
                     onDirtyChange={setLogDirty}
+                    saveTrigger={logSaveTrigger}
                 />
             )}
             {data.view === 'read' && data.selectedArticle && (
@@ -281,7 +283,7 @@ export default function App() {
                             <button
                                 onClick={() => {
                                     setLogCloseConfirm(false);
-                                    (document.getElementById('log-article-form') as HTMLFormElement | null)?.requestSubmit();
+                                    setLogSaveTrigger(t => t + 1);
                                 }}
                                 className="px-4 py-2 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700"
                             >

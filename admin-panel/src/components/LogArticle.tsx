@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { X, Plus, Edit3, CheckSquare, Square, Image as ImageIcon, Maximize2, Minimize2 } from 'lucide-react';
 import type { Article, Category } from '../types';
 import { API_URL } from '../config';
@@ -25,6 +25,7 @@ const LogArticle = ({
     onMinimize,
     externalMinimized,
     onDirtyChange,
+    saveTrigger,
 }: {
     isEdit: boolean;
     initialData: Article | null;
@@ -37,6 +38,7 @@ const LogArticle = ({
     onMinimize: () => void;
     externalMinimized: boolean;
     onDirtyChange: (dirty: boolean) => void;
+    saveTrigger?: number;
 }) => {
     const slugTouched = useRef(false);
     const submitAction = useRef<'close' | 'view'>('close');
@@ -92,15 +94,12 @@ const LogArticle = ({
             .catch(() => alert('Yükleme başarısız'));
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
+    const saveArticle = () => {
         if (!formData.title || !formData.author) { alert("Başlık ve Yazar gereklidir!"); return; }
-
         const content = htmlToBlocks(editorHtml);
         const articleData = { ...formData, content, text: null, id: isEdit && initialData ? initialData.id : undefined };
         const method = isEdit ? 'PUT' : 'POST';
         const url = isEdit ? `${API_URL}/articles/${initialData?.id}` : `${API_URL}/articles`;
-
         fetch(url, {
             method,
             headers: { 'Content-Type': 'application/json' },
@@ -115,6 +114,12 @@ const LogArticle = ({
                 }
             });
     };
+
+    const handleSubmit = (e: React.FormEvent) => { e.preventDefault(); saveArticle(); };
+
+    useEffect(() => {
+        if (saveTrigger && saveTrigger > 0) { submitAction.current = 'close'; saveArticle(); }
+    }, [saveTrigger]); // eslint-disable-line react-hooks/exhaustive-deps
 
     if (externalMinimized) return null;
 

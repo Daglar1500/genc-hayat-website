@@ -14,12 +14,13 @@ interface LogViewProps {
     onMinimize: () => void;
     externalMinimized: boolean;
     onDirtyChange: (dirty: boolean) => void;
+    saveTrigger?: number;
 }
 
 export default function LogView({
     selectedArticle, categories, labels, editors,
     setLoggedArticles, setView, setSelectedArticle, setPreviewArticle,
-    onMinimize, externalMinimized, onDirtyChange,
+    onMinimize, externalMinimized, onDirtyChange, saveTrigger,
 }: LogViewProps) {
     const handleSuccess = (art: Article) => {
         setLoggedArticles(prev => selectedArticle ? prev.map(a => a.id === art.id ? art : a) : [art, ...prev]);
@@ -48,6 +49,7 @@ export default function LogView({
             onMinimize={onMinimize}
             externalMinimized={externalMinimized}
             onDirtyChange={onDirtyChange}
+            saveTrigger={saveTrigger}
         />
     );
 }
