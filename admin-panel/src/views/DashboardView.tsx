@@ -830,22 +830,29 @@ export default function DashboardView({
                                         >
                                             <GripVertical size={14} className="text-gray-300 dark:text-gray-600 cursor-grab shrink-0" />
                                             <div className="flex flex-col gap-1 flex-1 min-w-0">
-                                                <input className="w-full p-1.5 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-emerald-400" placeholder="Başlık" value={f.title || ''} onChange={e => updateConfigItem(section.id, 'films', i, { title: e.target.value })} />
+                                                <input className="w-full p-1.5 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-400" placeholder="Liste adı" value={f.title || ''} onChange={e => updateConfigItem(section.id, 'films', i, { title: e.target.value })} />
                                                 <div className="flex gap-1">
                                                     <input
-                                                        className="flex-1 p-1.5 border border-gray-200 dark:border-gray-700 rounded-lg text-xs bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-emerald-400"
+                                                        className="flex-1 p-1.5 border border-gray-200 dark:border-gray-700 rounded-lg text-xs bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-400"
                                                         placeholder="Letterboxd URL"
                                                         value={f.url}
                                                         onChange={e => updateConfigItem(section.id, 'films', i, { url: e.target.value })}
                                                     />
-                                                    <input className="w-14 p-1.5 border border-gray-200 dark:border-gray-700 rounded-lg text-xs bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-emerald-400" placeholder="Yıl" value={f.year || ''} onChange={e => updateConfigItem(section.id, 'films', i, { year: e.target.value })} />
+                                                    <input
+                                                        type="number"
+                                                        min="0"
+                                                        className="w-20 p-1.5 border border-gray-200 dark:border-gray-700 rounded-lg text-xs bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                                                        placeholder="Film sayısı"
+                                                        value={f.filmCount ?? ''}
+                                                        onChange={e => updateConfigItem(section.id, 'films', i, { filmCount: e.target.value === '' ? '' : Number(e.target.value) })}
+                                                    />
                                                 </div>
                                             </div>
                                             <button onClick={() => removeConfigItem(section.id, 'films', i)} className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors shrink-0"><Trash2 size={14} /></button>
                                         </div>
                                     ))}
                                     <button
-                                        onClick={() => addConfigItem(section.id, 'films', { id: `f-${Date.now()}`, url: '', title: '', year: '' })}
+                                        onClick={() => addConfigItem(section.id, 'films', { id: `f-${Date.now()}`, url: '', title: '', filmCount: '' })}
                                         className="text-sm text-gray-500 font-medium hover:text-emerald-700 flex items-center gap-1 transition-colors"
                                     >
                                         <Plus size={14} /> Film / Liste Ekle
