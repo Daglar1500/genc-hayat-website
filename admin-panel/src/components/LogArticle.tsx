@@ -11,7 +11,7 @@ const generateSlug = (title: string) =>
         .replace(/[^a-z0-9\s-]/g, '')
         .trim().replace(/\s+/g, '-');
 
-type WindowState = 'normal' | 'maximized' | 'minimized';
+type WindowState = 'normal' | 'maximized';
 
 const LogArticle = ({
     isEdit,
@@ -22,6 +22,9 @@ const LogArticle = ({
     onClose,
     onSuccess,
     onSaveAndView,
+    onMinimize,
+    externalMinimized,
+    onDirtyChange,
 }: {
     isEdit: boolean;
     initialData: Article | null;
@@ -31,9 +34,13 @@ const LogArticle = ({
     onClose: () => void;
     onSuccess: (article: Article) => void;
     onSaveAndView?: (article: Article) => void;
+    onMinimize: () => void;
+    externalMinimized: boolean;
+    onDirtyChange: (dirty: boolean) => void;
 }) => {
     const slugTouched = useRef(false);
     const submitAction = useRef<'close' | 'view'>('close');
+    const hasEdited = useRef(false);
 
     const [windowState, setWindowState] = useState<WindowState>('normal');
 
@@ -51,12 +58,27 @@ const LogArticle = ({
         return initialData.text || '';
     });
 
+    const markDirty = () => {
+        if (!hasEdited.current) { hasEdited.current = true; onDirtyChange(true); }
+    };
+
     const toggleLabel = (lbl: string) => {
+        markDirty();
         setFormData(prev => {
             const current = prev.labels || [];
             if (current.includes(lbl)) return { ...prev, labels: current.filter(l => l !== lbl) };
             return { ...prev, labels: [...current, lbl] };
         });
+    };
+
+    const setFormDataDirty: typeof setFormData = (value) => {
+        markDirty();
+        setFormData(value);
+    };
+
+    const setEditorHtmlDirty: typeof setEditorHtml = (value) => {
+        markDirty();
+        setEditorHtml(value);
     };
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -94,29 +116,7 @@ const LogArticle = ({
             });
     };
 
-    // Minimized: tab bar at bottom
-    if (windowState === 'minimized') {
-        return (
-            <div className="fixed bottom-0 left-0 right-0 z-50 flex items-stretch bg-white border-t border-gray-200 shadow-lg h-9">
-                <button
-                    onClick={() => setWindowState('normal')}
-                    className="flex items-center gap-2 px-4 text-sm text-gray-700 hover:bg-gray-50 transition-colors border-r border-gray-200 max-w-xs"
-                >
-                    <span className="text-gray-400 shrink-0">
-                        {isEdit ? <Edit3 size={12} /> : <Plus size={12} />}
-                    </span>
-                    <span className="truncate">{formData.title || (isEdit ? 'Makaleyi Düzenle' : 'Yeni Makale')}</span>
-                </button>
-                <button
-                    onClick={onClose}
-                    className="ml-auto flex items-center px-3 text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors"
-                    title="Kapat"
-                >
-                    <X size={14} />
-                </button>
-            </div>
-        );
-    }
+    if (externalMinimized) return null;
 
     const isMaximized = windowState === 'maximized';
 
@@ -134,7 +134,7 @@ const LogArticle = ({
                             className="w-5 h-5 rounded-full bg-green-400 hover:bg-green-500 transition-colors flex items-center justify-center group">
                             <Maximize2 size={9} className="opacity-0 group-hover:opacity-100 text-green-900" />
                         </button>
-                        <button type="button" onClick={() => setWindowState('minimized')} title="Alta Al"
+                        <button type="button" onClick={() => onMinimize()} title="Alta Al"
                             className="w-5 h-5 rounded-full bg-yellow-400 hover:bg-yellow-500 transition-colors flex items-center justify-center group">
                             <Minimize2 size={9} className="opacity-0 group-hover:opacity-100 text-yellow-900" />
                         </button>
@@ -146,8 +146,8 @@ const LogArticle = ({
                 </div>
                 <div className="overflow-y-auto p-8 flex-1">
                     <FormBody
-                        isEdit={isEdit} formData={formData} setFormData={setFormData}
-                        editorHtml={editorHtml} setEditorHtml={setEditorHtml}
+                        isEdit={isEdit} formData={formData} setFormData={setFormDataDirty}
+                        editorHtml={editorHtml} setEditorHtml={setEditorHtmlDirty}
                         slugTouched={slugTouched} toggleLabel={toggleLabel}
                         handleImageUpload={handleImageUpload} handleSubmit={handleSubmit}
                         submitAction={submitAction} categories={categories} labels={labels} editors={editors}
@@ -204,8 +204,8 @@ const LogArticle = ({
                 {/* Scrollable form */}
                 <div className="overflow-y-auto flex-1 p-5">
                     <FormBody
-                        isEdit={isEdit} formData={formData} setFormData={setFormData}
-                        editorHtml={editorHtml} setEditorHtml={setEditorHtml}
+                        isEdit={isEdit} formData={formData} setFormData={setFormDataDirty}
+                        editorHtml={editorHtml} setEditorHtml={setEditorHtmlDirty}
                         slugTouched={slugTouched} toggleLabel={toggleLabel}
                         handleImageUpload={handleImageUpload} handleSubmit={handleSubmit}
                         submitAction={submitAction} categories={categories} labels={labels} editors={editors}

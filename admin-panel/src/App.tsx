@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FileText, X } from 'lucide-react';
+import { FileText, X, Edit3 } from 'lucide-react';
 import { useAdminData } from './hooks/useAdminData';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
@@ -16,6 +16,12 @@ export default function App() {
     const data = useAdminData();
     const [darkMode, setDarkMode] = useState(() => localStorage.getItem('admin-dark') === 'true');
     useEffect(() => { localStorage.setItem('admin-dark', String(darkMode)); }, [darkMode]);
+
+    const [logMinimized, setLogMinimized] = useState(false);
+    const [logDirty, setLogDirty] = useState(false);
+    useEffect(() => {
+        if (data.view !== 'log') { setLogMinimized(false); setLogDirty(false); }
+    }, [data.view]);
 
     return (
         <div className={`min-h-screen bg-gray-50 dark:bg-gray-950 font-sans text-gray-800 dark:text-gray-200 flex${darkMode ? ' dark' : ''}`}>
@@ -125,6 +131,9 @@ export default function App() {
                     setView={data.setView}
                     setSelectedArticle={data.setSelectedArticle}
                     setPreviewArticle={data.setPreviewArticle}
+                    onMinimize={() => setLogMinimized(true)}
+                    externalMinimized={logMinimized}
+                    onDirtyChange={setLogDirty}
                 />
             )}
             {data.view === 'read' && data.selectedArticle && (
@@ -135,8 +144,8 @@ export default function App() {
                 />
             )}
 
-            {/* Bottom tab bar — all open preview tabs */}
-            {data.previewTabs.length > 0 && (
+            {/* Bottom tab bar — preview tabs + log article tab in one row */}
+            {(data.previewTabs.length > 0 || (data.view === 'log' && logMinimized)) && (
                 <div className="fixed bottom-0 left-0 right-0 z-40 flex items-stretch bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 shadow-lg h-9">
                     {data.previewTabs.map(tab => {
                         const isActive = tab.id === data.activePreviewId;
@@ -147,18 +156,13 @@ export default function App() {
                             >
                                 <button
                                     onClick={() => data.setActivePreviewId(tab.id)}
-                                    className="flex items-center gap-1.5 pl-3 pr-1 text-sm min-w-0 flex-1"
+                                    className="flex items-center gap-1.5 pl-3 pr-1 min-w-0 flex-1"
                                 >
                                     <FileText size={12} className={`shrink-0 ${isActive ? 'text-blue-400' : 'text-gray-400'}`} />
                                     <span className={`truncate text-xs ${isActive ? 'text-blue-700 dark:text-blue-300 font-medium' : 'text-gray-600 dark:text-gray-400'}`}>{tab.title}</span>
                                 </button>
                                 <button
-                                    onClick={() => {
-                                        if (tab.id === data.editingArticleId) {
-                                            if (!confirm('Bu makale düzenleniyor. Sekmeyi kapatmak istediğinizden emin misiniz?')) return;
-                                        }
-                                        data.closePreviewTab(tab.id);
-                                    }}
+                                    onClick={() => data.closePreviewTab(tab.id)}
                                     className="flex items-center px-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 shrink-0"
                                     title="Kapat"
                                 >
@@ -167,6 +171,31 @@ export default function App() {
                             </div>
                         );
                     })}
+
+                    {data.view === 'log' && logMinimized && (
+                        <div className="flex items-stretch border-r border-gray-200 dark:border-gray-700 max-w-55 min-w-0 hover:bg-gray-50 dark:hover:bg-gray-800">
+                            <button
+                                onClick={() => setLogMinimized(false)}
+                                className="flex items-center gap-1.5 pl-3 pr-1 min-w-0 flex-1"
+                            >
+                                <Edit3 size={12} className="shrink-0 text-orange-400" />
+                                <span className="truncate text-xs text-gray-600 dark:text-gray-400">
+                                    {data.selectedArticle?.title || 'Yeni Makale'}
+                                </span>
+                            </button>
+                            <button
+                                onClick={() => {
+                                    if (logDirty && !confirm('Kaydedilmemiş değişiklikler var. Kapatmak istediğinizden emin misiniz?')) return;
+                                    data.setView('dashboard');
+                                    data.setSelectedArticle(null);
+                                }}
+                                className="flex items-center px-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 shrink-0"
+                                title="Kapat"
+                            >
+                                <X size={12} />
+                            </button>
+                        </div>
+                    )}
                 </div>
             )}
 
@@ -176,12 +205,7 @@ export default function App() {
                 return activeArticle ? (
                     <PreviewModal
                         article={activeArticle}
-                        onClose={() => {
-                            if (activeArticle.id === data.editingArticleId) {
-                                if (!confirm('Bu makale düzenleniyor. Sekmeyi kapatmak istediğinizden emin misiniz?')) return;
-                            }
-                            data.closePreviewTab(activeArticle.id);
-                        }}
+                        onClose={() => data.closePreviewTab(activeArticle.id)}
                         onMinimize={() => data.setActivePreviewId(null)}
                         onEdit={data.startEditArticle}
                         getCategoryColor={data.getCategoryColor}

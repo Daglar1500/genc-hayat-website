@@ -47,8 +47,6 @@ export function useAdminData() {
     // Quick preview tabs
     const [previewTabs, setPreviewTabs] = useState<Article[]>([]);
     const [activePreviewId, setActivePreviewId] = useState<string | null>(null);
-    const [editingArticleId, setEditingArticleId] = useState<string | null>(null);
-
     const openPreviewArticle = useCallback((article: Article) => {
         setPreviewTabs(prev => {
             if (prev.find(a => a.id === article.id)) return prev;
@@ -292,7 +290,6 @@ export function useAdminData() {
     const startEditArticle = (article: Article) => {
         setSelectedArticle(article);
         setView('log');
-        setEditingArticleId(article.id);
     };
 
     const saveLayout = () => {
@@ -435,7 +432,7 @@ export function useAdminData() {
         sidebarSort, setSidebarSort,
         // Preview tabs
         previewTabs, activePreviewId, setActivePreviewId,
-        openPreviewArticle, closePreviewTab, editingArticleId,
+        openPreviewArticle, closePreviewTab,
         setPreviewArticle,
         // Bulk
         bulkSelected, setBulkSelected,
