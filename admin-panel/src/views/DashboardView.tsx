@@ -3,7 +3,7 @@ import {
     FileText, CheckCircle, XCircle, Layers, BookMarked,
     Pin, Eye, EyeOff, ChevronUp, ChevronDown, Trash2, Edit3,
     AlignLeft, MapPin, Plus, X, GripVertical, Upload,
-    Eraser, ChevronRight, Film,
+    Eraser, ChevronRight,
 } from 'lucide-react';
 import type { Article, Section, Category } from '../types';
 import { getSectionLabel } from '../utils/sectionHelpers';
@@ -829,33 +829,14 @@ export default function DashboardView({
                                             className="flex gap-2 items-center p-2 border border-gray-100 dark:border-gray-800 rounded-xl bg-gray-50/50 dark:bg-gray-800/40 cursor-default"
                                         >
                                             <GripVertical size={14} className="text-gray-300 dark:text-gray-600 cursor-grab shrink-0" />
-                                            {/* Poster thumbnail */}
-                                            <div className="w-8 h-12 rounded overflow-hidden bg-zinc-800 shrink-0 border border-zinc-700">
-                                                {f.posterUrl
-                                                    ? <img src={f.posterUrl} alt="" className="w-full h-full object-cover" />
-                                                    : <div className="w-full h-full flex items-center justify-center text-zinc-500"><Film size={12} /></div>
-                                                }
-                                            </div>
                                             <div className="flex flex-col gap-1 flex-1 min-w-0">
-                                                <input className="w-full p-1.5 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-emerald-400" placeholder="Başlık (otomatik doldurulur)" value={f.title || ''} onChange={e => updateConfigItem(section.id, 'films', i, { title: e.target.value })} />
+                                                <input className="w-full p-1.5 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-emerald-400" placeholder="Başlık" value={f.title || ''} onChange={e => updateConfigItem(section.id, 'films', i, { title: e.target.value })} />
                                                 <div className="flex gap-1">
                                                     <input
                                                         className="flex-1 p-1.5 border border-gray-200 dark:border-gray-700 rounded-lg text-xs bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-emerald-400"
                                                         placeholder="Letterboxd URL"
                                                         value={f.url}
                                                         onChange={e => updateConfigItem(section.id, 'films', i, { url: e.target.value })}
-                                                        onBlur={async e => {
-                                                            const url = e.target.value;
-                                                            if (!url) return;
-                                                            try {
-                                                                const res = await fetch(`https://noembed.com/embed?url=${encodeURIComponent(url)}`);
-                                                                const data = await res.json();
-                                                                const patch: Record<string, string> = {};
-                                                                if (!f.title && data.title) patch.title = data.title;
-                                                                if (!f.posterUrl && data.thumbnail_url) patch.posterUrl = data.thumbnail_url;
-                                                                if (Object.keys(patch).length > 0) updateConfigItem(section.id, 'films', i, patch);
-                                                            } catch { /* silent */ }
-                                                        }}
                                                     />
                                                     <input className="w-14 p-1.5 border border-gray-200 dark:border-gray-700 rounded-lg text-xs bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-emerald-400" placeholder="Yıl" value={f.year || ''} onChange={e => updateConfigItem(section.id, 'films', i, { year: e.target.value })} />
                                                 </div>
@@ -864,7 +845,7 @@ export default function DashboardView({
                                         </div>
                                     ))}
                                     <button
-                                        onClick={() => addConfigItem(section.id, 'films', { id: `f-${Date.now()}`, url: '', title: '', year: '', director: '', rating: 0, posterUrl: '' })}
+                                        onClick={() => addConfigItem(section.id, 'films', { id: `f-${Date.now()}`, url: '', title: '', year: '' })}
                                         className="text-sm text-gray-500 font-medium hover:text-emerald-700 flex items-center gap-1 transition-colors"
                                     >
                                         <Plus size={14} /> Film / Liste Ekle
