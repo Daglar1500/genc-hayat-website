@@ -190,7 +190,7 @@ const LogArticle = ({
                             className="w-5 h-5 rounded-full bg-green-400 hover:bg-green-500 transition-colors flex items-center justify-center group shadow">
                             <Maximize2 size={9} className="opacity-0 group-hover:opacity-100 text-green-900" />
                         </button>
-                        <button type="button" onClick={(e) => { e.stopPropagation(); setWindowState('minimized'); }} title="Alta Al"
+                        <button type="button" onClick={(e) => { e.stopPropagation(); onMinimize(); }} title="Alta Al"
                             className="w-5 h-5 rounded-full bg-yellow-400 hover:bg-yellow-500 transition-colors flex items-center justify-center group shadow">
                             <Minimize2 size={9} className="opacity-0 group-hover:opacity-100 text-yellow-900" />
                         </button>
