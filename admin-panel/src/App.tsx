@@ -19,6 +19,7 @@ export default function App() {
 
     const [logMinimized, setLogMinimized] = useState(false);
     const [logDirty, setLogDirty] = useState(false);
+    const [logCloseConfirm, setLogCloseConfirm] = useState(false);
     useEffect(() => {
         if (data.view !== 'log') { setLogMinimized(false); setLogDirty(false); }
     }, [data.view]);
@@ -196,7 +197,7 @@ export default function App() {
                             </button>
                             <button
                                 onClick={() => {
-                                    if (logDirty && !confirm('Kaydedilmemiş değişiklikler var. Kapatmak istediğinizden emin misiniz?')) return;
+                                    if (logDirty) { setLogCloseConfirm(true); return; }
                                     data.setView('dashboard');
                                     data.setSelectedArticle(null);
                                 }}
@@ -240,6 +241,34 @@ export default function App() {
             />
 
             <Toast toasts={data.toasts} />
+
+            {/* Close confirmation modal for dirty edit form */}
+            {logCloseConfirm && (
+                <div className="fixed inset-0 z-200 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+                    <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-sm mx-4 p-6">
+                        <h3 className="text-base font-bold text-gray-900 dark:text-gray-100 mb-1">Kaydedilmemiş değişiklikler var</h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">Düzenleme formunu kapatmak istediğinizden emin misiniz? Kaydedilmemiş değişiklikler kaybolacak.</p>
+                        <div className="flex gap-2 justify-end">
+                            <button
+                                onClick={() => setLogCloseConfirm(false)}
+                                className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
+                            >
+                                İptal
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setLogCloseConfirm(false);
+                                    data.setView('dashboard');
+                                    data.setSelectedArticle(null);
+                                }}
+                                className="px-4 py-2 text-sm font-bold text-white bg-red-500 rounded-lg hover:bg-red-600"
+                            >
+                                Kaydetmeden Kapat
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
