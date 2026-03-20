@@ -151,7 +151,7 @@ export default function App() {
             )}
 
             {/* Bottom tab bar — preview tabs + log article tab in one row */}
-            {(data.previewTabs.length > 0 || (data.view === 'log' && logMinimized)) && (
+            {(data.previewTabs.length > 0 || data.view === 'log') && (
                 <div className="fixed bottom-0 left-0 right-0 z-100 flex items-stretch bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 shadow-lg h-9">
                     {data.previewTabs.map(tab => {
                         const isActive = tab.id === data.activePreviewId;
@@ -178,14 +178,19 @@ export default function App() {
                         );
                     })}
 
-                    {data.view === 'log' && logMinimized && (
-                        <div className="flex items-stretch border-r border-gray-200 dark:border-gray-700 max-w-55 min-w-0 hover:bg-gray-50 dark:hover:bg-gray-800">
+                    {data.view === 'log' && (() => {
+                        const isActive = !logMinimized && !data.activePreviewId;
+                        return (
+                        <div className={`flex items-stretch border-r border-gray-200 dark:border-gray-700 max-w-55 min-w-0 ${isActive ? 'bg-orange-50 dark:bg-orange-950 border-t-2 border-t-orange-400' : 'hover:bg-gray-50 dark:hover:bg-gray-800'}`}>
                             <button
-                                onClick={() => { data.setActivePreviewId(null); setLogMinimized(false); }}
+                                onClick={() => {
+                                    if (isActive) { setLogMinimized(true); }
+                                    else { data.setActivePreviewId(null); setLogMinimized(false); }
+                                }}
                                 className="flex items-center gap-1.5 pl-3 pr-1 min-w-0 flex-1"
                             >
-                                <Edit3 size={12} className="shrink-0 text-orange-400" />
-                                <span className="truncate text-xs text-gray-600 dark:text-gray-400">
+                                <Edit3 size={12} className={`shrink-0 ${isActive ? 'text-orange-500' : 'text-orange-400'}`} />
+                                <span className={`truncate text-xs ${isActive ? 'text-orange-700 dark:text-orange-300 font-medium' : 'text-gray-600 dark:text-gray-400'}`}>
                                     {data.selectedArticle?.title || 'Yeni Makale'}
                                 </span>
                             </button>
@@ -201,7 +206,8 @@ export default function App() {
                                 <X size={12} />
                             </button>
                         </div>
-                    )}
+                        );
+                    })()}
                 </div>
             )}
 
