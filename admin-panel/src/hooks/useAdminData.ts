@@ -325,6 +325,7 @@ export function useAdminData() {
         }
 
         // Replace mode: replace from sidebar, swap when from a section
+        const replaceMax = targetSection.type === 'category-row' ? 3 : targetSection.type === 'ordinary-row' ? 4 : null;
         if (mode === 'replace' && targetIndex !== undefined) {
             if (targetIndex < targetSection.articles.length) {
                 const displaced = targetSection.articles[targetIndex];
@@ -332,8 +333,12 @@ export function useAdminData() {
                 if (dragged.type !== 'sidebar' && sourceSecIdx !== -1 && sourceIdx !== -1) {
                     newSections[sourceSecIdx].articles.splice(sourceIdx, 0, displaced);
                 }
-            } else {
+            } else if (replaceMax === null || targetSection.articles.length < replaceMax) {
                 targetSection.articles.push(art);
+            } else {
+                showToast(`Bu bölüme maksimum ${replaceMax} makale eklenebilir`, 'error');
+                dragItem.current = null;
+                return;
             }
             setSections(newSections);
             dragItem.current = null;

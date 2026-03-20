@@ -398,6 +398,12 @@ export default function DashboardView({
                             <span className={`w-2 h-2 rounded-full shrink-0 ${sectionTypeColor(section.type)}`} />
                             {section.isPinned && <Pin size={11} fill="currentColor" className="text-blue-500" />}
                             <span className="text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">{getSectionLabel(section.type)}</span>
+                            {section.type === 'category-row' && (
+                                <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${section.articles.length >= 3 ? 'bg-red-50 text-red-500 border border-red-200' : 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500'}`}>{section.articles.length}/3</span>
+                            )}
+                            {section.type === 'ordinary-row' && (
+                                <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${section.articles.length >= 4 ? 'bg-red-50 text-red-500 border border-red-200' : 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500'}`}>{section.articles.length}/4</span>
+                            )}
                             {!(section.isVisible ?? true) && (
                                 <span className="text-[10px] text-amber-600 font-medium bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded-full">Gizli</span>
                             )}
