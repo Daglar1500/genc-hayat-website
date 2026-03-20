@@ -196,11 +196,7 @@ export default function App() {
                                 </span>
                             </button>
                             <button
-                                onClick={() => {
-                                    if (logDirty) { setLogCloseConfirm(true); return; }
-                                    data.setView('dashboard');
-                                    data.setSelectedArticle(null);
-                                }}
+                                onClick={() => setLogCloseConfirm(true)}
                                 className="flex items-center px-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 shrink-0"
                                 title="Kapat"
                             >
@@ -246,8 +242,14 @@ export default function App() {
             {logCloseConfirm && (
                 <div className="fixed inset-0 z-200 flex items-center justify-center bg-black/40 backdrop-blur-sm">
                     <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-sm mx-4 p-6">
-                        <h3 className="text-base font-bold text-gray-900 dark:text-gray-100 mb-1">Kaydedilmemiş değişiklikler var</h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">Düzenleme formunu kapatmak istediğinizden emin misiniz? Kaydedilmemiş değişiklikler kaybolacak.</p>
+                        <h3 className="text-base font-bold text-gray-900 dark:text-gray-100 mb-1">
+                            {logDirty ? 'Kaydedilmemiş değişiklikler var' : 'Formu kapat'}
+                        </h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">
+                            {logDirty
+                                ? 'Düzenleme formunu kapatmak istediğinizden emin misiniz? Kaydedilmemiş değişiklikler kaybolacak.'
+                                : 'Düzenleme formunu kapatmak istediğinizden emin misiniz?'}
+                        </p>
                         <div className="flex gap-2 justify-end">
                             <button
                                 onClick={() => setLogCloseConfirm(false)}
