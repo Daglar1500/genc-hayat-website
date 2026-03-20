@@ -207,7 +207,7 @@ export default function App() {
                         article={activeArticle}
                         onClose={() => data.closePreviewTab(activeArticle.id)}
                         onMinimize={() => data.setActivePreviewId(null)}
-                        onEdit={data.startEditArticle}
+                        onEdit={(article) => { setLogMinimized(false); setLogDirty(false); data.startEditArticle(article); }}
                         getCategoryColor={data.getCategoryColor}
                     />
                 ) : null;

@@ -49,7 +49,8 @@ export function useAdminData() {
     const [activePreviewId, setActivePreviewId] = useState<string | null>(null);
     const openPreviewArticle = useCallback((article: Article) => {
         setPreviewTabs(prev => {
-            if (prev.find(a => a.id === article.id)) return prev;
+            const exists = prev.find(a => a.id === article.id);
+            if (exists) return prev.map(a => a.id === article.id ? article : a);
             return [...prev, article];
         });
         setActivePreviewId(article.id);
