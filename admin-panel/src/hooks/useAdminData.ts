@@ -57,14 +57,8 @@ export function useAdminData() {
     }, []);
 
     const closePreviewTab = useCallback((id: string) => {
-        setPreviewTabs(prev => {
-            const remaining = prev.filter(a => a.id !== id);
-            setActivePreviewId(curr => {
-                if (curr !== id) return curr;
-                return null;
-            });
-            return remaining;
-        });
+        setPreviewTabs(prev => prev.filter(a => a.id !== id));
+        setActivePreviewId(curr => curr === id ? null : curr);
     }, []);
 
     // Backwards-compatible alias: accepts Article | null, ignores null
