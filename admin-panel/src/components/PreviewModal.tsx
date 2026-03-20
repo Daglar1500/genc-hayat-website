@@ -6,6 +6,7 @@ import { API_URL } from '../config';
 interface PreviewModalProps {
     article: Article;
     onClose: () => void;
+    onMinimize: () => void;
     onEdit: (article: Article) => void;
     getCategoryColor: (name: string) => string;
 }
@@ -25,7 +26,7 @@ interface ArticleStats {
     comments: Comment[];
 }
 
-type WindowState = 'normal' | 'maximized' | 'minimized';
+type WindowState = 'normal' | 'maximized';
 
 function caption(alt: string): string {
     if (!alt) return '';
@@ -99,7 +100,7 @@ function exportCommentsAsDoc(article: Article, comments: Comment[]) {
 
 const emptyStats: ArticleStats = { views: 0, commentCount: 0, unreadCount: 0, comments: [] };
 
-export default function PreviewModal({ article, onClose, onEdit, getCategoryColor }: PreviewModalProps) {
+export default function PreviewModal({ article, onClose, onMinimize, onEdit, getCategoryColor }: PreviewModalProps) {
     const [windowState, setWindowState] = useState<WindowState>('normal');
     const [stats, setStats] = useState<ArticleStats>(emptyStats);
     const [statsLoaded, setStatsLoaded] = useState(false);
@@ -135,27 +136,6 @@ export default function PreviewModal({ article, onClose, onEdit, getCategoryColo
         });
     };
 
-    // ── MINIMIZED ─────────────────────────────────────────────────────
-    if (windowState === 'minimized') {
-        return (
-            <div className="fixed bottom-0 left-0 right-0 z-50 flex items-stretch bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 shadow-lg h-9">
-                <button
-                    onClick={() => setWindowState('normal')}
-                    className="flex items-center gap-2 px-4 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors border-r border-gray-200 dark:border-gray-700 max-w-xs"
-                >
-                    <FileText size={13} className="text-gray-400 shrink-0" />
-                    <span className="truncate">{article.title}</span>
-                </button>
-                <button
-                    onClick={onClose}
-                    className="ml-auto flex items-center px-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-                >
-                    <X size={14} />
-                </button>
-            </div>
-        );
-    }
-
     // Window controls — top-right
     const WindowControls = () => (
         <div className="flex items-center gap-1.5">
@@ -163,7 +143,7 @@ export default function PreviewModal({ article, onClose, onEdit, getCategoryColo
                 className="w-5 h-5 rounded-full bg-green-400 hover:bg-green-500 flex items-center justify-center transition-colors group">
                 <Maximize2 size={9} className="opacity-0 group-hover:opacity-100 text-green-900" />
             </button>
-            <button type="button" onClick={() => setWindowState('minimized')} title="Alta Al"
+            <button type="button" onClick={onMinimize} title="Alta Al"
                 className="w-5 h-5 rounded-full bg-yellow-400 hover:bg-yellow-500 flex items-center justify-center transition-colors group">
                 <Minimize2 size={9} className="opacity-0 group-hover:opacity-100 text-yellow-900" />
             </button>

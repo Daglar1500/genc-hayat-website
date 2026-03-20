@@ -44,8 +44,34 @@ export function useAdminData() {
     // Sidebar sort
     const [sidebarSort, setSidebarSort] = useState<'issue' | 'date-desc' | 'date-asc' | 'category' | 'author'>('issue');
 
-    // Quick preview popup
-    const [previewArticle, setPreviewArticle] = useState<Article | null>(null);
+    // Quick preview tabs
+    const [previewTabs, setPreviewTabs] = useState<Article[]>([]);
+    const [activePreviewId, setActivePreviewId] = useState<string | null>(null);
+    const [editingArticleId, setEditingArticleId] = useState<string | null>(null);
+
+    const openPreviewArticle = useCallback((article: Article) => {
+        setPreviewTabs(prev => {
+            if (prev.find(a => a.id === article.id)) return prev;
+            return [...prev, article];
+        });
+        setActivePreviewId(article.id);
+    }, []);
+
+    const closePreviewTab = useCallback((id: string) => {
+        setPreviewTabs(prev => {
+            const remaining = prev.filter(a => a.id !== id);
+            setActivePreviewId(curr => {
+                if (curr !== id) return curr;
+                return remaining.length > 0 ? remaining[remaining.length - 1].id : null;
+            });
+            return remaining;
+        });
+    }, []);
+
+    // Backwards-compatible alias: accepts Article | null, ignores null
+    const setPreviewArticle = useCallback((article: Article | null) => {
+        if (article) openPreviewArticle(article);
+    }, [openPreviewArticle]);
 
     // Bulk selection
     const [bulkSelected, setBulkSelected] = useState<string[]>([]);
@@ -266,6 +292,7 @@ export function useAdminData() {
     const startEditArticle = (article: Article) => {
         setSelectedArticle(article);
         setView('log');
+        setEditingArticleId(article.id);
     };
 
     const saveLayout = () => {
@@ -406,8 +433,10 @@ export function useAdminData() {
         showTemplates, setShowTemplates,
         // Sidebar sort
         sidebarSort, setSidebarSort,
-        // Preview
-        previewArticle, setPreviewArticle,
+        // Preview tabs
+        previewTabs, activePreviewId, setActivePreviewId,
+        openPreviewArticle, closePreviewTab, editingArticleId,
+        setPreviewArticle,
         // Bulk
         bulkSelected, setBulkSelected,
         bulkDropdownOpen, setBulkDropdownOpen,

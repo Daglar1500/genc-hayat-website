@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { FileText, X } from 'lucide-react';
 import { useAdminData } from './hooks/useAdminData';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
@@ -134,15 +135,59 @@ export default function App() {
                 />
             )}
 
-            {/* Article Quick Preview Modal */}
-            {data.previewArticle && (
-                <PreviewModal
-                    article={data.previewArticle}
-                    onClose={() => data.setPreviewArticle(null)}
-                    onEdit={data.startEditArticle}
-                    getCategoryColor={data.getCategoryColor}
-                />
+            {/* Bottom tab bar — all open preview tabs */}
+            {data.previewTabs.length > 0 && (
+                <div className="fixed bottom-0 left-0 right-0 z-40 flex items-stretch bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 shadow-lg h-9">
+                    {data.previewTabs.map(tab => {
+                        const isActive = tab.id === data.activePreviewId;
+                        return (
+                            <div
+                                key={tab.id}
+                                className={`flex items-stretch border-r border-gray-200 dark:border-gray-700 max-w-55 min-w-0 ${isActive ? 'bg-blue-50 dark:bg-blue-950 border-t-2 border-t-blue-400' : 'hover:bg-gray-50 dark:hover:bg-gray-800'}`}
+                            >
+                                <button
+                                    onClick={() => data.setActivePreviewId(tab.id)}
+                                    className="flex items-center gap-1.5 pl-3 pr-1 text-sm min-w-0 flex-1"
+                                >
+                                    <FileText size={12} className={`shrink-0 ${isActive ? 'text-blue-400' : 'text-gray-400'}`} />
+                                    <span className={`truncate text-xs ${isActive ? 'text-blue-700 dark:text-blue-300 font-medium' : 'text-gray-600 dark:text-gray-400'}`}>{tab.title}</span>
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        if (tab.id === data.editingArticleId) {
+                                            if (!confirm('Bu makale düzenleniyor. Sekmeyi kapatmak istediğinizden emin misiniz?')) return;
+                                        }
+                                        data.closePreviewTab(tab.id);
+                                    }}
+                                    className="flex items-center px-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 shrink-0"
+                                    title="Kapat"
+                                >
+                                    <X size={12} />
+                                </button>
+                            </div>
+                        );
+                    })}
+                </div>
             )}
+
+            {/* Active preview modal */}
+            {(() => {
+                const activeArticle = data.previewTabs.find(a => a.id === data.activePreviewId);
+                return activeArticle ? (
+                    <PreviewModal
+                        article={activeArticle}
+                        onClose={() => {
+                            if (activeArticle.id === data.editingArticleId) {
+                                if (!confirm('Bu makale düzenleniyor. Sekmeyi kapatmak istediğinizden emin misiniz?')) return;
+                            }
+                            data.closePreviewTab(activeArticle.id);
+                        }}
+                        onMinimize={() => data.setActivePreviewId(null)}
+                        onEdit={data.startEditArticle}
+                        getCategoryColor={data.getCategoryColor}
+                    />
+                ) : null;
+            })()}
 
             <SettingsPanel
                 settingsOpen={data.settingsOpen}
