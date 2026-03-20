@@ -36,6 +36,7 @@ export default function LogView({
 
     return (
         <LogArticle
+            key={selectedArticle?.id ?? 'new'}
             isEdit={!!selectedArticle}
             initialData={selectedArticle}
             onClose={() => { setView('dashboard'); setSelectedArticle(null); }}

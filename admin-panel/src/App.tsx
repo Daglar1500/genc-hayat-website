@@ -138,7 +138,7 @@ export default function App() {
                     setSelectedArticle={data.setSelectedArticle}
                     setPreviewArticle={data.setPreviewArticle}
                     onMinimize={() => setLogMinimized(true)}
-                    externalMinimized={logMinimized}
+                    externalMinimized={logMinimized || !!data.activePreviewId}
                     onDirtyChange={setLogDirty}
                 />
             )}
@@ -181,7 +181,7 @@ export default function App() {
                     {data.view === 'log' && logMinimized && (
                         <div className="flex items-stretch border-r border-gray-200 dark:border-gray-700 max-w-55 min-w-0 hover:bg-gray-50 dark:hover:bg-gray-800">
                             <button
-                                onClick={() => setLogMinimized(false)}
+                                onClick={() => { data.setActivePreviewId(null); setLogMinimized(false); }}
                                 className="flex items-center gap-1.5 pl-3 pr-1 min-w-0 flex-1"
                             >
                                 <Edit3 size={12} className="shrink-0 text-orange-400" />
