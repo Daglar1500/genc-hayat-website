@@ -23,6 +23,12 @@ export default function App() {
         if (data.view !== 'log') { setLogMinimized(false); setLogDirty(false); }
     }, [data.view]);
 
+    const handleStartEdit = (article: import('./types').Article) => {
+        setLogMinimized(false);
+        setLogDirty(false);
+        data.startEditArticle(article);
+    };
+
     return (
         <div className={`min-h-screen bg-gray-50 dark:bg-gray-950 font-sans text-gray-800 dark:text-gray-200 flex${darkMode ? ' dark' : ''}`}>
             <Sidebar
@@ -93,7 +99,7 @@ export default function App() {
                             handleDragStart={data.handleDragStart}
                             handleDrop={data.handleDrop}
                             deleteArticleFromSection={data.deleteArticleFromSection}
-                            startEditArticle={data.startEditArticle}
+                            startEditArticle={handleStartEdit}
                             setPreviewArticle={data.setPreviewArticle}
                             setSelectedArticle={data.setSelectedArticle}
                             setView={data.setView}
@@ -146,7 +152,7 @@ export default function App() {
 
             {/* Bottom tab bar — preview tabs + log article tab in one row */}
             {(data.previewTabs.length > 0 || (data.view === 'log' && logMinimized)) && (
-                <div className="fixed bottom-0 left-0 right-0 z-40 flex items-stretch bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 shadow-lg h-9">
+                <div className="fixed bottom-0 left-0 right-0 z-100 flex items-stretch bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 shadow-lg h-9">
                     {data.previewTabs.map(tab => {
                         const isActive = tab.id === data.activePreviewId;
                         return (
@@ -207,7 +213,7 @@ export default function App() {
                         article={activeArticle}
                         onClose={() => data.closePreviewTab(activeArticle.id)}
                         onMinimize={() => data.setActivePreviewId(null)}
-                        onEdit={(article) => { setLogMinimized(false); setLogDirty(false); data.startEditArticle(article); }}
+                        onEdit={handleStartEdit}
                         getCategoryColor={data.getCategoryColor}
                     />
                 ) : null;
