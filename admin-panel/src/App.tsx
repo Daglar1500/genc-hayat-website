@@ -20,8 +20,10 @@ export default function App() {
     const [logMinimized, setLogMinimized] = useState(false);
     const [logDirty, setLogDirty] = useState(false);
     const [logCloseConfirm, setLogCloseConfirm] = useState(false);
+    // Tracks the position of the edit tab among preview tabs (set when minimized)
+    const [logTabPosition, setLogTabPosition] = useState<number>(0);
     useEffect(() => {
-        if (data.view !== 'log') { setLogMinimized(false); setLogDirty(false); }
+        if (data.view !== 'log') { setLogMinimized(false); setLogDirty(false); setLogTabPosition(0); }
     }, [data.view]);
 
     const handleStartEdit = (article: import('./types').Article) => {
@@ -138,7 +140,7 @@ export default function App() {
                     setView={data.setView}
                     setSelectedArticle={data.setSelectedArticle}
                     setPreviewArticle={data.setPreviewArticle}
-                    onMinimize={() => setLogMinimized(true)}
+                    onMinimize={() => { setLogMinimized(true); setLogTabPosition(data.previewTabs.length); }}
                     externalMinimized={logMinimized || !!data.activePreviewId}
                     onDirtyChange={setLogDirty}
                 />
@@ -152,61 +154,70 @@ export default function App() {
             )}
 
             {/* Bottom tab bar — preview tabs + log article tab in one row */}
-            {(data.previewTabs.length > 0 || data.view === 'log') && (
-                <div className="fixed bottom-0 left-0 right-0 z-100 flex items-stretch bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 shadow-lg h-9">
-                    {data.previewTabs.map(tab => {
-                        const isActive = tab.id === data.activePreviewId;
-                        return (
-                            <div
-                                key={tab.id}
-                                className={`flex items-stretch border-r border-gray-200 dark:border-gray-700 max-w-55 min-w-0 ${isActive ? 'bg-blue-50 dark:bg-blue-950 border-t-2 border-t-blue-400' : 'hover:bg-gray-50 dark:hover:bg-gray-800'}`}
-                            >
-                                <button
-                                    onClick={() => data.setActivePreviewId(tab.id)}
-                                    className="flex items-center gap-1.5 pl-3 pr-1 min-w-0 flex-1"
-                                >
-                                    <FileText size={12} className={`shrink-0 ${isActive ? 'text-blue-400' : 'text-gray-400'}`} />
-                                    <span className={`truncate text-xs ${isActive ? 'text-blue-700 dark:text-blue-300 font-medium' : 'text-gray-600 dark:text-gray-400'}`}>{tab.title}</span>
-                                </button>
-                                <button
-                                    onClick={() => data.closePreviewTab(tab.id)}
-                                    className="flex items-center px-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 shrink-0"
-                                    title="Kapat"
-                                >
-                                    <X size={12} />
-                                </button>
-                            </div>
-                        );
-                    })}
-
-                    {data.view === 'log' && (() => {
-                        const isActive = !logMinimized && !data.activePreviewId;
-                        return (
-                        <div className={`flex items-stretch border-r border-gray-200 dark:border-gray-700 max-w-55 min-w-0 ${isActive ? 'bg-orange-50 dark:bg-orange-950 border-t-2 border-t-orange-400' : 'hover:bg-gray-50 dark:hover:bg-gray-800'}`}>
+            {(data.previewTabs.length > 0 || data.view === 'log') && (() => {
+                const renderPreviewTab = (tab: typeof data.previewTabs[0]) => {
+                    const isActive = tab.id === data.activePreviewId;
+                    return (
+                        <div
+                            key={tab.id}
+                            className={`flex items-stretch border-r border-gray-200 dark:border-gray-700 max-w-55 min-w-0 ${isActive ? 'bg-blue-50 dark:bg-blue-950 border-t-2 border-t-blue-400' : 'hover:bg-gray-50 dark:hover:bg-gray-800'}`}
+                        >
                             <button
-                                onClick={() => {
-                                    if (isActive) { setLogMinimized(true); }
-                                    else { data.setActivePreviewId(null); setLogMinimized(false); }
-                                }}
+                                onClick={() => data.setActivePreviewId(tab.id)}
                                 className="flex items-center gap-1.5 pl-3 pr-1 min-w-0 flex-1"
                             >
-                                <Edit3 size={12} className={`shrink-0 ${isActive ? 'text-orange-500' : 'text-orange-400'}`} />
-                                <span className={`truncate text-xs ${isActive ? 'text-orange-700 dark:text-orange-300 font-medium' : 'text-gray-600 dark:text-gray-400'}`}>
-                                    {data.selectedArticle?.title || 'Yeni Makale'}
-                                </span>
+                                <FileText size={12} className={`shrink-0 ${isActive ? 'text-blue-400' : 'text-gray-400'}`} />
+                                <span className={`truncate text-xs ${isActive ? 'text-blue-700 dark:text-blue-300 font-medium' : 'text-gray-600 dark:text-gray-400'}`}>{tab.title}</span>
                             </button>
                             <button
-                                onClick={() => setLogCloseConfirm(true)}
+                                onClick={() => data.closePreviewTab(tab.id)}
                                 className="flex items-center px-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 shrink-0"
                                 title="Kapat"
                             >
                                 <X size={12} />
                             </button>
                         </div>
-                        );
-                    })()}
-                </div>
-            )}
+                    );
+                };
+
+                const isLogActive = !logMinimized && !data.activePreviewId;
+                const editTab = data.view === 'log' ? (
+                    <div key="__log__" className={`flex items-stretch border-r border-gray-200 dark:border-gray-700 max-w-55 min-w-0 ${isLogActive ? 'bg-orange-50 dark:bg-orange-950 border-t-2 border-t-orange-400' : 'hover:bg-gray-50 dark:hover:bg-gray-800'}`}>
+                        <button
+                            onClick={() => {
+                                if (isLogActive) { setLogMinimized(true); setLogTabPosition(data.previewTabs.length); }
+                                else { data.setActivePreviewId(null); setLogMinimized(false); }
+                            }}
+                            className="flex items-center gap-1.5 pl-3 pr-1 min-w-0 flex-1"
+                        >
+                            <Edit3 size={12} className={`shrink-0 ${isLogActive ? 'text-orange-500' : 'text-orange-400'}`} />
+                            <span className={`truncate text-xs ${isLogActive ? 'text-orange-700 dark:text-orange-300 font-medium' : 'text-gray-600 dark:text-gray-400'}`}>
+                                {data.selectedArticle?.title || 'Yeni Makale'}
+                            </span>
+                        </button>
+                        <button
+                            onClick={() => setLogCloseConfirm(true)}
+                            className="flex items-center px-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 shrink-0"
+                            title="Kapat"
+                        >
+                            <X size={12} />
+                        </button>
+                    </div>
+                ) : null;
+
+                // Split preview tabs around the log tab's recorded position
+                const pos = Math.min(logTabPosition, data.previewTabs.length);
+                const before = data.previewTabs.slice(0, pos);
+                const after = data.previewTabs.slice(pos);
+
+                return (
+                    <div className="fixed bottom-0 left-0 right-0 z-100 flex items-stretch bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 shadow-lg h-9">
+                        {before.map(renderPreviewTab)}
+                        {editTab}
+                        {after.map(renderPreviewTab)}
+                    </div>
+                );
+            })()}
 
             {/* Active preview modal */}
             {(() => {
@@ -263,9 +274,18 @@ export default function App() {
                                     data.setView('dashboard');
                                     data.setSelectedArticle(null);
                                 }}
-                                className="px-4 py-2 text-sm font-bold text-white bg-red-500 rounded-lg hover:bg-red-600"
+                                className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
                             >
                                 Kaydetmeden Kapat
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setLogCloseConfirm(false);
+                                    (document.getElementById('log-article-form') as HTMLFormElement | null)?.requestSubmit();
+                                }}
+                                className="px-4 py-2 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+                            >
+                                Kaydet ve Kapat
                             </button>
                         </div>
                     </div>
