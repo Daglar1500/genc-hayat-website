@@ -60,7 +60,7 @@ export function useAdminData() {
             const remaining = prev.filter(a => a.id !== id);
             setActivePreviewId(curr => {
                 if (curr !== id) return curr;
-                return remaining.length > 0 ? remaining[remaining.length - 1].id : null;
+                return null;
             });
             return remaining;
         });
