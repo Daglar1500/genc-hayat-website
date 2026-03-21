@@ -183,22 +183,22 @@ export default function Header({
                     <Layers size={14} />Koleksiyonlar
                 </button>
 
-                {/* Makale Ekle */}
+                {/* Yazı Ekle */}
                 <button
                     onClick={() => { setSelectedArticle(null); setView('log'); }}
                     className="px-3 py-1.5 bg-orange-500 text-white rounded-lg text-sm font-medium hover:bg-orange-600 transition-colors flex items-center gap-1"
                 >
-                    <Plus size={14} /> Makale Ekle
+                    <Plus size={14} /> Yazı Ekle
                 </button>
                 <div className="w-px h-5 bg-gray-200 dark:bg-gray-700 mx-0.5" />
 
-                {/* Düzeni Kaydet */}
+                {/* Kaydet */}
                 <button
                     onClick={saveLayout}
                     disabled={isSaving}
-                    className={`px-5 py-1.5 rounded-lg text-sm font-semibold shadow-sm transition-all ${isSaving ? 'bg-gray-300 cursor-not-allowed text-gray-500' : 'bg-gray-900 hover:bg-gray-800 text-white'}`}
+                    className={`px-5 py-1.5 rounded-lg text-sm font-semibold shadow-sm transition-all ${isSaving ? 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed text-gray-500 dark:text-gray-400' : 'bg-gray-900 dark:bg-gray-100 hover:bg-gray-800 dark:hover:bg-white text-white dark:text-gray-900'}`}
                 >
-                    {isSaving ? 'Kaydediliyor...' : 'Düzeni Kaydet'}
+                    {isSaving ? 'Kaydediliyor...' : 'Kaydet'}
                 </button>
             </div>
         </div>
