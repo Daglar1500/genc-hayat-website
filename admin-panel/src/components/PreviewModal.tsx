@@ -291,19 +291,29 @@ export default function PreviewModal({ article, onClose, onMinimize, onEdit, get
     // Right panel: content + comments (always shown)
     const RightContent = () => (
         <div className="flex-1 overflow-y-auto p-6">
-            {/* Editor + char count badge — top-right of content area */}
-            {article.editorName && (
-                <div className="float-right ml-4 mb-3 flex items-center gap-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 shadow-sm">
-                    <div className="w-9 h-9 rounded-lg flex items-center justify-center text-white font-black text-sm shrink-0" style={{ backgroundColor: editorColor }}>
-                        {editorInitials}
+            {/* Editor + char count badges — top-right of content area */}
+            <div className="float-right ml-4 mb-3 flex flex-col gap-2">
+                {article.editorName && (
+                    <div className="flex items-center gap-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 shadow-sm">
+                        <div className="w-9 h-9 rounded-lg flex items-center justify-center text-white font-black text-sm shrink-0" style={{ backgroundColor: editorColor }}>
+                            {editorInitials}
+                        </div>
+                        <div>
+                            <div className="text-[9px] font-black uppercase tracking-widest text-purple-400 mb-0.5">Editör</div>
+                            <div className="text-sm font-semibold text-gray-800 dark:text-gray-200 whitespace-nowrap">{article.editorName}</div>
+                        </div>
+                    </div>
+                )}
+                <div className="flex items-center gap-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 shadow-sm">
+                    <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-slate-200 dark:bg-slate-700 shrink-0">
+                        <Type size={16} className="text-slate-500" />
                     </div>
                     <div>
-                        <div className="text-[9px] font-black uppercase tracking-widest text-purple-400 mb-0.5">Editör</div>
-                        <div className="text-sm font-semibold text-gray-800 dark:text-gray-200 whitespace-nowrap">{article.editorName}</div>
-                        <div className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">{charCount.toLocaleString('tr')} karakter</div>
+                        <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Karakter</div>
+                        <div className="text-sm font-semibold text-gray-800 dark:text-gray-200 whitespace-nowrap">{charCount.toLocaleString('tr')}</div>
                     </div>
                 </div>
-            )}
+            </div>
             <h2 className="text-2xl font-black text-gray-900 dark:text-gray-100 leading-tight mb-3">{article.title}</h2>
 
             {article.subheading && (
