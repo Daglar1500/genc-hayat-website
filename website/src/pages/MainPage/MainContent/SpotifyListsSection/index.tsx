@@ -56,6 +56,11 @@ export const SpotifySection = ({ playlists, profileUrl }: { playlists: PlaylistI
               <span className="text-[#1DB954] font-bold tracking-widest text-xs uppercase block">
                 Genç Hayat Spotify
               </span>
+              {playlists.length > 0 && (
+                <span className="text-[10px] md:text-xs bg-[#1DB954]/10 text-[#1DB954] border border-[#1DB954]/30 px-2 py-0.5 rounded-full font-mono font-bold">
+                  {playlists.length} çalma listesi
+                </span>
+              )}
             </div>
             <h2 className="text-3xl md:text-5xl font-labil font-bold text-white leading-tight">
               Çalma Listelerimiz
