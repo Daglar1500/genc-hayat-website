@@ -397,16 +397,63 @@ elseif ($method === 'DELETE' && preg_match('#^/api/issues/(.+)$#', $uri, $m)) {
     respond(['success' => true]);
 }
 
-// DELETE /api/articles/:id
+// DELETE /api/articles/:id  →  soft delete (çöp kutusuna taşı)
 elseif ($method === 'DELETE' && preg_match('#^/api/articles/(.+)$#', $uri, $m)) {
     $id = $m[1];
     $articles = readJson('articles.json') ?? [];
-    $articles = array_values(array_filter($articles, fn($a) => $a['id'] !== $id));
+    $found = null;
+    $articles = array_values(array_filter($articles, function($a) use ($id, &$found) {
+        if ($a['id'] === $id) { $found = $a; return false; }
+        return true;
+    }));
+    if (!$found) respond(['error' => 'Article not found'], 404);
+    $found['deletedAt'] = round(microtime(true) * 1000);
+    $trash = readJson('trash.json') ?? [];
+    array_unshift($trash, $found);
+    writeJson('trash.json', $trash);
     writeJson('articles.json', $articles);
-    // Also clean up section_articles
+    // section_articles'tan da temizle
     $sa = readJson('section_articles.json') ?? [];
     $sa = array_values(array_filter($sa, fn($rel) => $rel['articleId'] !== $id));
     writeJson('section_articles.json', $sa);
+    respond(['success' => true]);
+}
+
+// GET /api/trash
+elseif ($method === 'GET' && $uri === '/api/trash') {
+    respond(readJson('trash.json') ?? []);
+}
+
+// POST /api/trash/:id/restore
+elseif ($method === 'POST' && preg_match('#^/api/trash/([^/]+)/restore$#', $uri, $m)) {
+    $id = $m[1];
+    $trash = readJson('trash.json') ?? [];
+    $found = null;
+    $trash = array_values(array_filter($trash, function($a) use ($id, &$found) {
+        if ($a['id'] === $id) { $found = $a; return false; }
+        return true;
+    }));
+    if (!$found) respond(['error' => 'Not found in trash'], 404);
+    unset($found['deletedAt']);
+    $articles = readJson('articles.json') ?? [];
+    array_unshift($articles, $found);
+    writeJson('articles.json', $articles);
+    writeJson('trash.json', $trash);
+    respond($found);
+}
+
+// DELETE /api/trash/:id  →  kalıcı sil
+elseif ($method === 'DELETE' && preg_match('#^/api/trash/(.+)$#', $uri, $m)) {
+    $id = $m[1];
+    $trash = readJson('trash.json') ?? [];
+    $trash = array_values(array_filter($trash, fn($a) => $a['id'] !== $id));
+    writeJson('trash.json', $trash);
+    respond(['success' => true]);
+}
+
+// DELETE /api/trash  →  tümünü kalıcı sil
+elseif ($method === 'DELETE' && $uri === '/api/trash') {
+    writeJson('trash.json', []);
     respond(['success' => true]);
 }
 

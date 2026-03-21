@@ -59,6 +59,12 @@ export default function App() {
                 setSections={data.setSections}
                 showToast={data.showToast}
                 setPreviewArticle={data.setPreviewArticle}
+                trashedArticles={data.trashedArticles}
+                trashOpen={data.trashOpen}
+                setTrashOpen={data.setTrashOpen}
+                restoreArticle={data.restoreArticle}
+                permanentDeleteArticle={data.permanentDeleteArticle}
+                emptyTrash={data.emptyTrash}
             />
 
             <div className={`flex-1 transition-all duration-300 p-8 ${data.menuOpen ? 'ml-80' : ''}`}>
