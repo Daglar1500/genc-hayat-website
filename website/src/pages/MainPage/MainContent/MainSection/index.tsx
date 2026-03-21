@@ -15,7 +15,6 @@ import { Labelo } from '../../ArticleCard';
 
 const ArticleCarousel = ({ issueNumber, isLatest }: { issueNumber: number; isLatest: boolean }) => {
   const [startIndex, setStartIndex] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
   const [recommendedArticles, setRecommendedArticles] = useState<ArticleCard[]>([]);
   const VISIBLE_COUNT = 4;
 
@@ -66,14 +65,6 @@ const ArticleCarousel = ({ issueNumber, isLatest }: { issueNumber: number; isLat
     setStartIndex(0);
   }, [issueNumber]);
 
-  useEffect(() => {
-    if (isPaused) return;
-    const timer = setTimeout(() => {
-      if (canNext) next(); else resetToStart();
-    }, 3000);
-    return () => clearTimeout(timer);
-  }, [startIndex, isPaused, canNext, next]);
-
   const visibleArticles = recommendedArticles.slice(startIndex, startIndex + VISIBLE_COUNT);
 
   if (recommendedArticles.length === 0) {
@@ -81,7 +72,7 @@ const ArticleCarousel = ({ issueNumber, isLatest }: { issueNumber: number; isLat
   }
 
   return (
-    <div className="relative" onMouseEnter={() => setIsPaused(true)} onMouseLeave={() => setIsPaused(false)}>
+    <div className="relative">
       <div className="flex items-center justify-between mb-6">
         <div>
           <span className="text-xs font-bold text-zinc-400 uppercase tracking-widest">{heading}</span>
