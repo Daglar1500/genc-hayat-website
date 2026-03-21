@@ -282,7 +282,7 @@ function FormBody({
         <div>
             <label className={layout === 'wide' ? 'block text-sm font-bold text-gray-700 mb-1' : 'block text-xs font-bold text-gray-500 uppercase mb-1'}>Kapak Görseli</label>
             {formData.imageUrl && (
-                <img src={formData.imageUrl} alt="Kapak" className="w-full max-h-48 object-cover rounded-lg mb-2 border" />
+                <img src={formData.imageUrl} alt="Kapak" className="w-full rounded-lg mb-2 border" />
             )}
             <input
                 value={formData.imageUrl || ''}
