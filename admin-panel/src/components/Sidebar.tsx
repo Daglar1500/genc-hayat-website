@@ -82,7 +82,7 @@ export default function Sidebar({
     );
 
     const renderDivider = (label: string, count: number) => (
-        <div className="flex items-center gap-2 mb-1 py-1 sticky top-0 z-10 bg-gray-50 dark:bg-slate-900 -mx-4 px-4">
+        <div className="flex items-center gap-2 mb-1 py-1 sticky top-0 z-20 bg-gray-50 dark:bg-slate-900 -mx-4 px-4">
             <span className="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest">{label}</span>
             <div className="flex-1 h-px bg-gray-200 dark:bg-slate-700" />
             <span className="text-[10px] text-gray-300 dark:text-slate-600">{count}</span>
@@ -140,7 +140,7 @@ export default function Sidebar({
             const sortedGroups = Object.entries(groups).sort(([a], [b]) => a.localeCompare(b, 'tr'));
             return sortedGroups.map(([cat, arts]) => (
                 <div key={cat} className="mb-1">
-                    <div className="flex items-center gap-2 mb-1 py-1 sticky top-0 z-10 bg-gray-50 dark:bg-slate-900 -mx-4 px-4">
+                    <div className="flex items-center gap-2 mb-1 py-1 sticky top-0 z-20 bg-gray-50 dark:bg-slate-900 -mx-4 px-4">
                         <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: getCategoryColor(cat) }} />
                         <span className="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest truncate">{cat}</span>
                         <div className="flex-1 h-px bg-gray-200 dark:bg-slate-700" />
