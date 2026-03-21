@@ -33,6 +33,7 @@ export default function App() {
         setLogTabPosition(previewIndex >= 0 ? previewIndex : data.previewTabs.length);
         setLogMinimized(false);
         setLogDirty(false);
+        data.setActivePreviewId(null);
         data.startEditArticle(article);
     };
 
