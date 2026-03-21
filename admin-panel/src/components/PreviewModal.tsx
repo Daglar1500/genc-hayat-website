@@ -283,16 +283,6 @@ export default function PreviewModal({ article, onClose, onMinimize, onEdit, get
                     </div>
                 )}
 
-                {/* Karakter — slate */}
-                <div className="px-4 py-3.5 border-b border-gray-100 dark:border-gray-800 flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
-                        <Type size={16} className="text-slate-500" />
-                    </div>
-                    <div>
-                        <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Karakter</div>
-                        <div className="text-sm font-semibold text-gray-800 dark:text-gray-200">{charCount.toLocaleString('tr')}</div>
-                    </div>
-                </div>
 
             </div>
         </div>
@@ -301,7 +291,7 @@ export default function PreviewModal({ article, onClose, onMinimize, onEdit, get
     // Right panel: content + comments (always shown)
     const RightContent = () => (
         <div className="flex-1 overflow-y-auto p-6">
-            {/* Editor badge — top-right of content area */}
+            {/* Editor + char count badge — top-right of content area */}
             {article.editorName && (
                 <div className="float-right ml-4 mb-3 flex items-center gap-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 shadow-sm">
                     <div className="w-9 h-9 rounded-lg flex items-center justify-center text-white font-black text-sm shrink-0" style={{ backgroundColor: editorColor }}>
@@ -310,20 +300,21 @@ export default function PreviewModal({ article, onClose, onMinimize, onEdit, get
                     <div>
                         <div className="text-[9px] font-black uppercase tracking-widest text-purple-400 mb-0.5">Editör</div>
                         <div className="text-sm font-semibold text-gray-800 dark:text-gray-200 whitespace-nowrap">{article.editorName}</div>
+                        <div className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">{charCount.toLocaleString('tr')} karakter</div>
                     </div>
                 </div>
             )}
-            <h2 className="text-xl font-black text-gray-900 dark:text-gray-100 leading-tight mb-2">{article.title}</h2>
+            <h2 className="text-2xl font-black text-gray-900 dark:text-gray-100 leading-tight mb-3">{article.title}</h2>
 
             {article.subheading && (
-                <p className="text-sm italic text-gray-600 dark:text-gray-400 mb-4 border-l-2 border-gray-200 dark:border-gray-700 pl-3">{article.subheading}</p>
+                <p className="text-base italic text-gray-600 dark:text-gray-400 mb-5 border-l-2 border-gray-200 dark:border-gray-700 pl-3 leading-relaxed">{article.subheading}</p>
             )}
 
             {/* Full article content — images use natural aspect ratio via CSS */}
             <div
-                className="prose prose-sm max-w-none text-gray-800 dark:text-gray-300 leading-relaxed
+                className="prose prose-sm max-w-none text-gray-800 dark:text-gray-300 leading-relaxed text-sm
                     [&_h2]:text-base [&_h2]:font-bold [&_h2]:mt-4 [&_h2]:mb-2
-                    [&_p]:mb-2 [&_ul]:pl-5 [&_ul]:list-disc [&_li]:mb-1
+                    [&_p]:mb-3 [&_ul]:pl-5 [&_ul]:list-disc [&_li]:mb-1
                     [&_img]:max-w-full [&_img]:h-auto [&_img]:rounded-lg [&_img]:my-2 [&_img]:block"
                 dangerouslySetInnerHTML={{ __html: htmlContent }}
             />
