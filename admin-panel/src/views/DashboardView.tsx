@@ -56,7 +56,7 @@ function sectionTypeColor(type: string): string {
         case 'article-feed': return 'bg-blue-500';
         case 'video-row': return 'bg-red-500';
         case 'spotify-row': return 'bg-green-500';
-        case 'letterboxd-row': return 'bg-emerald-600';
+        case 'letterboxd-row': return 'bg-blue-600';
         case 'archive-row': return 'bg-slate-400';
         default: return 'bg-gray-400';
     }
@@ -810,7 +810,7 @@ export default function DashboardView({
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <div className="text-xs font-semibold text-gray-400 uppercase">Filmler / Listeler</div>
+                                    <div className="text-xs font-semibold text-gray-400 uppercase">Film Listeleri</div>
                                     {(section.config?.films || []).map((f: any, i: number) => (
                                         <div
                                             key={f.id}
@@ -829,7 +829,7 @@ export default function DashboardView({
                                             }}
                                             className="flex gap-2 items-center p-2 border border-gray-100 dark:border-gray-800 rounded-xl bg-gray-50/50 dark:bg-gray-800/40 cursor-default"
                                         >
-                                            <GripVertical size={14} className="text-gray-300 dark:text-gray-600 cursor-grab shrink-0" />
+                                            <span className="text-xs font-bold text-gray-400 dark:text-gray-500 w-4 shrink-0 text-center">{i + 1}</span>
                                             <div className="flex flex-col gap-1 flex-1 min-w-0">
                                                 <input className="w-full p-1.5 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-400" placeholder="Liste adı" value={f.title || ''} onChange={e => updateConfigItem(section.id, 'films', i, { title: e.target.value })} />
                                                 <div className="flex gap-1">
@@ -854,9 +854,9 @@ export default function DashboardView({
                                     ))}
                                     <button
                                         onClick={() => addConfigItem(section.id, 'films', { id: `f-${Date.now()}`, url: '', title: '', filmCount: '' })}
-                                        className="text-sm text-gray-500 font-medium hover:text-emerald-700 flex items-center gap-1 transition-colors"
+                                        className="text-sm text-gray-500 font-medium hover:text-blue-600 flex items-center gap-1 transition-colors"
                                     >
-                                        <Plus size={14} /> Film / Liste Ekle
+                                        <Plus size={14} /> Film Listesi Ekle
                                     </button>
                                 </div>
                             </div>
