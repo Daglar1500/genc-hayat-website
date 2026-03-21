@@ -181,11 +181,9 @@ const LogArticle = ({
 
     // Normal: compact card
     return (
-        <div
-            className="fixed inset-0 bottom-9 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
-        >
+        <div className="fixed inset-0 bottom-9 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
             <div
-                className="bg-white w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+                className="bg-white w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] relative"
                 onClick={e => e.stopPropagation()}
             >
                 {/* Header */}
@@ -221,8 +219,8 @@ const LogArticle = ({
                     </div>
                 </div>
 
-                {/* Scrollable form */}
-                <div className="overflow-y-auto flex-1 p-5">
+                {/* Scrollable form — extra bottom padding so content isn't hidden under floating buttons */}
+                <div className="overflow-y-auto flex-1 p-5 pb-16">
                     <FormBody
                         isEdit={isEdit} formData={formData} setFormData={setFormDataDirty}
                         editorHtml={editorHtml} setEditorHtml={setEditorHtmlDirty}
@@ -233,13 +231,13 @@ const LogArticle = ({
                     />
                 </div>
 
-                {/* Bottom actions — no background */}
-                <div className="px-5 py-3 flex gap-2 justify-end shrink-0">
+                {/* Floating action buttons — no background bar */}
+                <div className="absolute bottom-3 right-5 flex gap-2 z-10">
                     <button
                         type="submit"
                         form="log-article-form"
                         onClick={() => { submitAction.current = 'close'; }}
-                        className="px-4 py-2 text-sm font-medium text-gray-600 bg-white border rounded-lg hover:bg-gray-50"
+                        className="px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50"
                     >
                         Kaydet ve Kapat
                     </button>
@@ -247,7 +245,7 @@ const LogArticle = ({
                         type="submit"
                         form="log-article-form"
                         onClick={() => { submitAction.current = 'view'; }}
-                        className="px-4 py-2 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 flex items-center gap-1"
+                        className="px-4 py-2 text-sm font-bold text-white bg-blue-600 rounded-lg shadow-sm hover:bg-blue-700 flex items-center gap-1"
                     >
                         Kaydet ve Görüntüle
                     </button>
@@ -279,9 +277,44 @@ function FormBody({
     allArticles?: Article[];
     currentId?: string;
 }) {
+    // Shared image section rendered in the content column
+    const ImageSection = (
+        <div>
+            <label className={layout === 'wide' ? 'block text-sm font-bold text-gray-700 mb-1' : 'block text-xs font-bold text-gray-500 uppercase mb-1'}>Kapak Görseli</label>
+            {formData.imageUrl && (
+                <img src={formData.imageUrl} alt="Kapak" className="w-full max-h-48 object-cover rounded-lg mb-2 border" />
+            )}
+            <input
+                value={formData.imageUrl || ''}
+                onChange={e => setFormData({ ...formData, imageUrl: e.target.value })}
+                className={`w-full border rounded ${layout === 'wide' ? 'px-4 py-2' : 'p-2 text-sm'} text-sm font-mono text-gray-600`}
+                placeholder="https://..."
+            />
+            <label className="mt-1 flex items-center gap-1 text-xs text-blue-600 cursor-pointer hover:underline">
+                <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+                <ImageIcon size={11} /> Dosya yükle
+            </label>
+        </div>
+    );
+
     if (layout === 'wide') {
         return (
             <form id="log-article-form" onSubmit={handleSubmit} className="grid grid-cols-12 gap-8">
+                {/* Left column: Yayın Bilgileri */}
+                <div className="col-span-4 space-y-6">
+                    <SidePanel formData={formData} setFormData={setFormData} editors={editors} categories={categories} labels={labels} toggleLabel={toggleLabel} charCount={editorHtml.replace(/<[^>]+>/g, '').trim().length} allArticles={allArticles} currentId={currentId} />
+                    <div className="flex flex-col gap-3 pt-4">
+                        <button type="submit" onClick={() => { submitAction.current = 'view'; }}
+                            className="w-full py-3 bg-blue-600 text-white font-bold rounded-xl shadow-lg hover:bg-blue-700 transition">
+                            Kaydet ve Görüntüle
+                        </button>
+                        <button type="submit" onClick={() => { submitAction.current = 'close'; }}
+                            className="w-full py-3 bg-gray-800 text-white font-bold rounded-xl shadow hover:bg-gray-900 transition">
+                            Kaydet ve Kapat
+                        </button>
+                    </div>
+                </div>
+                {/* Right column: content */}
                 <div className="col-span-8 space-y-6">
                     <div>
                         <label className="block text-sm font-bold text-gray-700 mb-1">Başlık *</label>
@@ -312,22 +345,10 @@ function FormBody({
                         <label className="block text-sm font-bold text-gray-700 mb-1">Alt Başlık / Sunum</label>
                         <textarea value={formData.subheading || ''} onChange={e => setFormData({ ...formData, subheading: e.target.value })} rows={2} className="w-full px-4 py-2 border rounded-lg resize-none focus:ring-blue-500 outline-none" placeholder="Özet..." />
                     </div>
+                    {ImageSection}
                     <div className="space-y-2">
                         <label className="block text-sm font-bold text-gray-700">Makale İçeriği</label>
                         <RichTextEditor value={editorHtml} onChange={setEditorHtml} />
-                    </div>
-                </div>
-                <div className="col-span-4 space-y-6">
-                    <SidePanel formData={formData} setFormData={setFormData} editors={editors} categories={categories} labels={labels} toggleLabel={toggleLabel} handleImageUpload={handleImageUpload} charCount={editorHtml.replace(/<[^>]+>/g, '').trim().length} allArticles={allArticles} currentId={currentId} />
-                    <div className="flex flex-col gap-3 pt-4">
-                        <button type="submit" onClick={() => { submitAction.current = 'view'; }}
-                            className="w-full py-3 bg-blue-600 text-white font-bold rounded-xl shadow-lg hover:bg-blue-700 transition">
-                            Kaydet ve Görüntüle
-                        </button>
-                        <button type="submit" onClick={() => { submitAction.current = 'close'; }}
-                            className="w-full py-3 bg-gray-800 text-white font-bold rounded-xl shadow hover:bg-gray-900 transition">
-                            Kaydet ve Kapat
-                        </button>
                     </div>
                 </div>
             </form>
@@ -340,7 +361,7 @@ function FormBody({
             {/* Left column: Yayın Bilgileri */}
             <div className="space-y-3">
                 <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wide">Yayın Bilgileri</h3>
-                <SidePanel formData={formData} setFormData={setFormData} editors={editors} categories={categories} labels={labels} toggleLabel={toggleLabel} handleImageUpload={handleImageUpload} compact charCount={editorHtml.replace(/<[^>]+>/g, '').trim().length} allArticles={allArticles} currentId={currentId} />
+                <SidePanel formData={formData} setFormData={setFormData} editors={editors} categories={categories} labels={labels} toggleLabel={toggleLabel} compact charCount={editorHtml.replace(/<[^>]+>/g, '').trim().length} allArticles={allArticles} currentId={currentId} />
             </div>
             {/* Right column: content fields */}
             <div className="space-y-4">
@@ -373,6 +394,7 @@ function FormBody({
                     <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Alt Başlık</label>
                     <textarea value={formData.subheading || ''} onChange={e => setFormData({ ...formData, subheading: e.target.value })} rows={2} className="w-full px-3 py-2 border rounded-lg resize-none outline-none text-sm" placeholder="Özet..." />
                 </div>
+                {ImageSection}
                 <div>
                     <label className="block text-xs font-bold text-gray-500 uppercase mb-1">İçerik</label>
                     <RichTextEditor value={editorHtml} onChange={setEditorHtml} />
@@ -382,14 +404,13 @@ function FormBody({
     );
 }
 
-function SidePanel({ formData, setFormData, editors, categories, labels, toggleLabel, handleImageUpload, compact, charCount, allArticles, currentId }: {
+function SidePanel({ formData, setFormData, editors, categories, labels, toggleLabel, compact, charCount, allArticles, currentId }: {
     formData: Partial<Article>;
     setFormData: React.Dispatch<React.SetStateAction<Partial<Article>>>;
     editors: string[];
     categories: Category[];
     labels: string[];
     toggleLabel: (lbl: string) => void;
-    handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
     compact?: boolean;
     charCount?: number;
     allArticles?: Article[];
@@ -461,14 +482,6 @@ function SidePanel({ formData, setFormData, editors, categories, labels, toggleL
                 )}
             </div>
             <div className={groupClass}><label className={labelClass}>Okul / Mahalle</label><input value={formData.school || ''} onChange={e => setFormData({ ...formData, school: e.target.value })} className={fieldClass} /></div>
-            <div className={groupClass}>
-                <label className={labelClass}>Kapak Görseli</label>
-                <input value={formData.imageUrl || ''} onChange={e => setFormData({ ...formData, imageUrl: e.target.value })} className={`${fieldClass} text-sm`} placeholder="https://..." />
-                <label className="mt-1 flex items-center gap-1 text-xs text-blue-600 cursor-pointer hover:underline">
-                    <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
-                    <ImageIcon size={11} /> Dosya yükle
-                </label>
-            </div>
             <div className={groupClass}>
                 <label className={labelClass}>Kategori</label>
                 <select value={formData.category} onChange={e => setFormData({ ...formData, category: e.target.value })} className={`${fieldClass} bg-white`}>
