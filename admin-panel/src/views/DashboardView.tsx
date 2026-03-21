@@ -348,11 +348,11 @@ export default function DashboardView({
             {/* Statistics Cards */}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-10">
                 {[
-                    { value: loggedArticles.length, label: 'Toplam Makale', icon: <FileText size={17} />, bg: 'bg-blue-50', text: 'text-blue-600' },
-                    { value: loggedArticles.filter(a => a.status === 'edited').length, label: 'Düzenlendi', icon: <CheckCircle size={17} />, bg: 'bg-emerald-50', text: 'text-emerald-600' },
-                    { value: loggedArticles.filter(a => a.status !== 'edited').length, label: 'Düzenlenmedi', icon: <XCircle size={17} />, bg: 'bg-rose-50', text: 'text-rose-500' },
-                    { value: sections.length, label: 'Section', icon: <Layers size={17} />, bg: 'bg-violet-50', text: 'text-violet-600' },
-                    { value: issues.length, label: 'Sayı', icon: <BookMarked size={17} />, bg: 'bg-amber-50', text: 'text-amber-600' },
+                    { value: loggedArticles.length, label: 'Toplam Makale', icon: <FileText size={17} />, bg: 'bg-blue-50 dark:bg-blue-900/20', text: 'text-blue-600 dark:text-blue-400' },
+                    { value: loggedArticles.filter(a => a.status === 'edited').length, label: 'Düzenlendi', icon: <CheckCircle size={17} />, bg: 'bg-emerald-50 dark:bg-emerald-900/20', text: 'text-emerald-600 dark:text-emerald-400' },
+                    { value: loggedArticles.filter(a => a.status !== 'edited').length, label: 'Düzenlenmedi', icon: <XCircle size={17} />, bg: 'bg-rose-50 dark:bg-rose-900/20', text: 'text-rose-500 dark:text-rose-400' },
+                    { value: sections.length, label: 'Section', icon: <Layers size={17} />, bg: 'bg-violet-50 dark:bg-violet-900/20', text: 'text-violet-600 dark:text-violet-400' },
+                    { value: issues.length, label: 'Sayı', icon: <BookMarked size={17} />, bg: 'bg-amber-50 dark:bg-amber-900/20', text: 'text-amber-600 dark:text-amber-400' },
                 ].map(({ value, label, icon, bg, text }) => (
                     <div key={label} className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl px-4 py-4 shadow-sm hover:shadow-md transition-shadow flex items-center gap-3">
                         <div className={`p-2.5 ${bg} rounded-xl shrink-0`}>
