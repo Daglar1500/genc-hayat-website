@@ -253,6 +253,11 @@ export default function App() {
                         onPreview={(a) => data.openPreviewArticle(a)}
                         onStatusChange={(updated) => {
                             data.setLoggedArticles(prev => prev.map(a => a.id === updated.id ? updated : a));
+                            data.setSections(prev => prev.map(s => ({
+                                ...s,
+                                articles: s.articles.map(a => a.id === updated.id ? { ...a, status: updated.status } : a),
+                                ...(s.routeArticle?.id === updated.id ? { routeArticle: { ...s.routeArticle, status: updated.status } } : {}),
+                            })));
                             data.openPreviewArticle(updated);
                         }}
                     />
