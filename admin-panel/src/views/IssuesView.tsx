@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import { Plus, X, Edit3, Trash2, BookOpen, Star, ArrowRight, ChevronDown, ChevronUp, AlertCircle, Download } from 'lucide-react';
+import { Plus, X, Edit3, Trash2, BookOpen, Star, ArrowRight, ChevronDown, ChevronUp, AlertCircle, Download, ExternalLink } from 'lucide-react';
 import type { Article, Issue } from '../types';
 import IssueForm from '../components/IssueForm';
-import { API_URL } from '../config';
+import { API_URL, WEBSITE_URL } from '../config';
 
 interface IssuesViewProps {
     issues: Issue[];
@@ -13,6 +13,7 @@ interface IssuesViewProps {
     setIssueFormOpen: (open: boolean) => void;
     loggedArticles: Article[];
     setLoggedArticles: React.Dispatch<React.SetStateAction<Article[]>>;
+    onPreviewArticle?: (article: Article) => void;
 }
 
 export default function IssuesView({
@@ -20,6 +21,7 @@ export default function IssuesView({
     selectedIssue, setSelectedIssue,
     issueFormOpen, setIssueFormOpen,
     loggedArticles, setLoggedArticles,
+    onPreviewArticle,
 }: IssuesViewProps) {
     const [expandedIssue, setExpandedIssue] = useState<string | null>(null);
     const [syncing, setSyncing] = useState(false);
@@ -388,16 +390,16 @@ export default function IssuesView({
                             {isExpanded && (
                                 <div className="border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/40 px-4 py-3 space-y-3">
                                     {sunuArt && (
-                                        <ArticleRow article={sunuArt} tag="Sunu" tagColor="blue" />
+                                        <ArticleRow article={sunuArt} tag="Sunu" tagColor="blue" onPreview={onPreviewArticle} />
                                     )}
                                     {rotaArt && (
-                                        <ArticleRow article={rotaArt} tag="Rota" tagColor="green" />
+                                        <ArticleRow article={rotaArt} tag="Rota" tagColor="green" onPreview={onPreviewArticle} />
                                     )}
                                     {recArts.length > 0 && (
                                         <div>
                                             <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Önerilen Makaleler ({recArts.length})</div>
                                             <div className="space-y-1">
-                                                {recArts.map(a => <ArticleRow key={a.id} article={a} />)}
+                                                {recArts.map(a => <ArticleRow key={a.id} article={a} onPreview={onPreviewArticle} />)}
                                             </div>
                                         </div>
                                     )}
@@ -405,7 +407,7 @@ export default function IssuesView({
                                         <div>
                                             <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Diğer Makaleler ({otherArts.length})</div>
                                             <div className="space-y-1">
-                                                {otherArts.map(a => <ArticleRow key={a.id} article={a} />)}
+                                                {otherArts.map(a => <ArticleRow key={a.id} article={a} onPreview={onPreviewArticle} />)}
                                             </div>
                                         </div>
                                     )}
@@ -430,13 +432,16 @@ export default function IssuesView({
     );
 }
 
-function ArticleRow({ article, tag, tagColor }: { article: Article; tag?: string; tagColor?: 'blue' | 'green' }) {
+function ArticleRow({ article, tag, tagColor, onPreview }: { article: Article; tag?: string; tagColor?: 'blue' | 'green'; onPreview?: (a: Article) => void }) {
     const colors = {
         blue: 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400',
         green: 'bg-green-50 text-green-700 dark:bg-green-950/40 dark:text-green-400',
     };
     return (
-        <div className="flex items-center gap-2.5 py-1.5 px-2 bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-800">
+        <div
+            className={`flex items-center gap-2.5 py-1.5 px-2 bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-800 transition-colors ${onPreview ? 'cursor-pointer hover:border-blue-300 dark:hover:border-blue-700 hover:bg-blue-50/30 dark:hover:bg-blue-950/20' : ''}`}
+            onClick={() => onPreview?.(article)}
+        >
             <img src={article.imageUrl} alt="" className="w-8 h-8 rounded-md object-cover shrink-0 bg-gray-100" />
             <div className="flex-1 min-w-0">
                 <div className="text-sm font-medium text-gray-800 dark:text-gray-200 truncate">{article.title}</div>
@@ -448,6 +453,14 @@ function ArticleRow({ article, tag, tagColor }: { article: Article; tag?: string
             <span className={`text-[10px] px-1.5 py-0.5 rounded-md shrink-0 ${article.status === 'edited' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400' : 'bg-rose-50 text-rose-500 dark:bg-rose-950/40 dark:text-rose-400'}`}>
                 {article.status === 'edited' ? 'Düzenlendi' : 'Taslak'}
             </span>
+            {article.slug && (
+                <a href={`${WEBSITE_URL}/articles/${article.slug}`} target="_blank" rel="noopener noreferrer"
+                    onClick={e => e.stopPropagation()}
+                    className="text-blue-400 hover:text-blue-600 transition-colors shrink-0"
+                    title="Websitede Aç">
+                    <ExternalLink size={12} />
+                </a>
+            )}
         </div>
     );
 }

@@ -1,7 +1,7 @@
-import { useEffect, useState, useCallback } from 'react';
-import { X, Edit3, Eye, MessageSquare, Check, FileText, CheckSquare, Square, Maximize2, Minimize2, MapPin, RefreshCw, User, Tag, GraduationCap, Hash, Type } from 'lucide-react';
-import type { Article } from '../types';
-import { API_URL } from '../config';
+import { useEffect, useState } from 'react';
+import { X, Edit3, Eye, MessageSquare, Check, FileText, CheckSquare, Square, Maximize2, Minimize2, MapPin, RefreshCw, User, Tag, GraduationCap, Hash, Type, ExternalLink } from 'lucide-react';
+import type { Article, ArticleStat } from '../types';
+import { WEBSITE_URL } from '../config';
 
 interface PreviewModalProps {
     article: Article;
@@ -12,21 +12,11 @@ interface PreviewModalProps {
     allArticles?: Article[];
     onPreview?: (article: Article) => void;
     onStatusChange?: (article: Article) => void;
-}
-
-interface Comment {
-    id: string;
-    articleId: string;
-    text: string;
-    createdAt: number;
-    isRead: boolean;
-}
-
-interface ArticleStats {
-    views: number;
-    commentCount: number;
-    unreadCount: number;
-    comments: Comment[];
+    articleStat?: ArticleStat | null;
+    onMarkRead?: (commentId: string) => void;
+    onRefreshStats?: (quiet?: boolean) => void;
+    statsRefreshing?: boolean;
+    statsLoaded?: boolean;
 }
 
 type WindowState = 'normal' | 'maximized';
@@ -101,29 +91,12 @@ function exportCommentsAsDoc(article: Article, comments: Comment[]) {
     link.click();
 }
 
-const emptyStats: ArticleStats = { views: 0, commentCount: 0, unreadCount: 0, comments: [] };
-
-export default function PreviewModal({ article, onClose, onMinimize, onEdit, getCategoryColor, allArticles, onPreview, onStatusChange }: PreviewModalProps) {
+export default function PreviewModal({ article, onClose, onMinimize, onEdit, getCategoryColor, allArticles, onPreview, onStatusChange, articleStat, onMarkRead, onRefreshStats, statsRefreshing: statsRefreshingProp, statsLoaded: statsLoadedProp }: PreviewModalProps) {
     const [windowState, setWindowState] = useState<WindowState>('normal');
-    const [stats, setStats] = useState<ArticleStats>(emptyStats);
-    const [statsLoaded, setStatsLoaded] = useState(false);
-    const [statsRefreshing, setStatsRefreshing] = useState(false);
 
-    const loadStats = useCallback((quiet = false) => {
-        if (!quiet) setStatsLoaded(false);
-        setStatsRefreshing(true);
-        fetch(`${API_URL}/stats`)
-            .then(r => r.json())
-            .then((data: any[]) => {
-                const found = data.find((s: any) => s.id === article.id);
-                setStats(found || emptyStats);
-                setStatsLoaded(true);
-                setStatsRefreshing(false);
-            })
-            .catch(() => { setStatsLoaded(true); setStatsRefreshing(false); });
-    }, [article.id]);
-
-    useEffect(() => { loadStats(); }, [loadStats]);
+    const stats = articleStat ?? { views: 0, commentCount: 0, unreadCount: 0, comments: [] };
+    const statsLoaded = statsLoadedProp ?? true;
+    const statsRefreshing = statsRefreshingProp ?? false;
 
     const charCount = countChars(article);
     const htmlContent = article.text || (article.content ? renderContent(article.content as any[]) : '');
@@ -135,20 +108,27 @@ export default function PreviewModal({ article, onClose, onMinimize, onEdit, get
         setLocalStatus(newStatus);
         const updated = { ...article, status: newStatus };
         fetch(`${API_URL}/articles/${article.id}`, {
-            method: 'PATCH',
+            method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ status: newStatus }),
         }).then(() => onStatusChange?.(updated)).catch(() => setLocalStatus(article.status));
     };
 
+    const editorColors = ['#3b82f6','#8b5cf6','#10b981','#f59e0b','#ef4444','#ec4899','#14b8a6','#6366f1'];
+    const editorColor = (() => {
+        if (!article.editorName) return '#94a3b8';
+        let h = 0;
+        for (let i = 0; i < article.editorName.length; i++) h = article.editorName.charCodeAt(i) + ((h << 5) - h);
+        return editorColors[Math.abs(h) % editorColors.length];
+    })();
+    const editorInitials = (() => {
+        const parts = (article.editorName || '').trim().split(/\s+/).filter(Boolean);
+        if (!parts.length) return '';
+        return parts.length === 1 ? parts[0][0].toUpperCase() : (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    })();
+
     const markRead = (id: string) => {
-        fetch(`${API_URL}/comments/${id}/read`, { method: 'PATCH' }).then(() => {
-            setStats(prev => ({
-                ...prev,
-                comments: prev.comments.map(c => c.id === id ? { ...c, isRead: true } : c),
-                unreadCount: Math.max(0, prev.unreadCount - 1),
-            }));
-        });
+        onMarkRead?.(id);
     };
 
     // Window controls — top-right
@@ -184,13 +164,6 @@ export default function PreviewModal({ article, onClose, onMinimize, onEdit, get
                         </div>
                     )
                 }
-                {stats.unreadCount > 0 && (
-                    <div className="absolute bottom-2 left-2 right-2 flex items-center gap-1.5 flex-wrap">
-                        <span className="flex items-center gap-1 text-[10px] text-white bg-amber-500/90 px-1.5 py-0.5 rounded-full font-medium backdrop-blur-sm">
-                            <MessageSquare size={9} /> {stats.unreadCount} yeni yorum
-                        </span>
-                    </div>
-                )}
             </div>
 
             {/* Meta — tüm fieldlar aynı formatta */}
@@ -207,18 +180,6 @@ export default function PreviewModal({ article, onClose, onMinimize, onEdit, get
                     </div>
                 </div>
 
-                {/* Editör — mor */}
-                {article.editorName && (
-                    <div className="px-4 py-3.5 border-b border-gray-100 dark:border-gray-800 flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center shrink-0">
-                            <Edit3 size={16} className="text-purple-500" />
-                        </div>
-                        <div>
-                            <div className="text-[9px] font-black uppercase tracking-widest text-purple-400 mb-0.5">Editör</div>
-                            <div className="text-sm font-semibold text-gray-800 dark:text-gray-200">{article.editorName}</div>
-                        </div>
-                    </div>
-                )}
 
                 {/* Kategori — indigo */}
                 {article.category && (
@@ -282,16 +243,6 @@ export default function PreviewModal({ article, onClose, onMinimize, onEdit, get
                     </div>
                 )}
 
-                {/* Karakter — slate */}
-                <div className="px-4 py-3.5 border-b border-gray-100 dark:border-gray-800 flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
-                        <Type size={16} className="text-slate-500" />
-                    </div>
-                    <div>
-                        <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Karakter</div>
-                        <div className="text-sm font-semibold text-gray-800 dark:text-gray-200">{charCount.toLocaleString('tr')}</div>
-                    </div>
-                </div>
 
             </div>
         </div>
@@ -300,17 +251,47 @@ export default function PreviewModal({ article, onClose, onMinimize, onEdit, get
     // Right panel: content + comments (always shown)
     const RightContent = () => (
         <div className="flex-1 overflow-y-auto p-6">
-            <h2 className="text-xl font-black text-gray-900 dark:text-gray-100 leading-tight mb-2">{article.title}</h2>
+            {/* Editor + char count badges — top-right of content area */}
+            <div className="float-right ml-4 mb-3 flex flex-col gap-2">
+                {article.editorName && (
+                    <div className="flex items-center gap-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 shadow-sm">
+                        <div className="w-9 h-9 rounded-lg flex items-center justify-center text-white font-black text-sm shrink-0" style={{ backgroundColor: editorColor }}>
+                            {editorInitials}
+                        </div>
+                        <div>
+                            <div className="text-[9px] font-black uppercase tracking-widest text-purple-400 mb-0.5">Editör</div>
+                            <div className="text-sm font-semibold text-gray-800 dark:text-gray-200 whitespace-nowrap">{article.editorName}</div>
+                        </div>
+                    </div>
+                )}
+                <div className="flex items-center gap-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 shadow-sm">
+                    <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-slate-200 dark:bg-slate-700 shrink-0">
+                        <Type size={16} className="text-slate-500" />
+                    </div>
+                    <div>
+                        <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Karakter</div>
+                        <div className="text-sm font-semibold text-gray-800 dark:text-gray-200 whitespace-nowrap">{charCount.toLocaleString('tr')}</div>
+                    </div>
+                </div>
+            </div>
+            <div className="flex items-start gap-2 mb-3">
+                <h2 className="text-2xl font-black text-gray-900 dark:text-gray-100 leading-tight flex-1">{article.title}</h2>
+                <a href={`${WEBSITE_URL}/articles/${article.slug || article.id}`} target="_blank" rel="noopener noreferrer"
+                    className="shrink-0 mt-1 p-1.5 rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950 text-blue-500 hover:bg-blue-100 dark:hover:bg-blue-900 hover:text-blue-700 transition-colors"
+                    title="Websitede Aç">
+                    <ExternalLink size={13} />
+                </a>
+            </div>
 
             {article.subheading && (
-                <p className="text-sm italic text-gray-600 dark:text-gray-400 mb-4 border-l-2 border-gray-200 dark:border-gray-700 pl-3">{article.subheading}</p>
+                <p className="text-base italic text-gray-600 dark:text-gray-400 mb-5 border-l-2 border-gray-200 dark:border-gray-700 pl-3 leading-relaxed">{article.subheading}</p>
             )}
 
             {/* Full article content — images use natural aspect ratio via CSS */}
             <div
-                className="prose prose-sm max-w-none text-gray-800 dark:text-gray-300 leading-relaxed
+                className="prose prose-sm max-w-none text-gray-800 dark:text-gray-300 leading-relaxed text-sm
                     [&_h2]:text-base [&_h2]:font-bold [&_h2]:mt-4 [&_h2]:mb-2
-                    [&_p]:mb-2 [&_ul]:pl-5 [&_ul]:list-disc [&_li]:mb-1
+                    [&_p]:mb-3 [&_ul]:pl-5 [&_ul]:list-disc [&_li]:mb-1
                     [&_img]:max-w-full [&_img]:h-auto [&_img]:rounded-lg [&_img]:my-2 [&_img]:block"
                 dangerouslySetInnerHTML={{ __html: htmlContent }}
             />
@@ -364,7 +345,7 @@ export default function PreviewModal({ article, onClose, onMinimize, onEdit, get
                             </button>
                         )}
                         <button
-                            onClick={() => loadStats(true)}
+                            onClick={() => onRefreshStats?.(true)}
                             title="Yorumları yenile"
                             className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors"
                         >
@@ -404,7 +385,14 @@ export default function PreviewModal({ article, onClose, onMinimize, onEdit, get
         return (
             <div className="fixed inset-0 z-50 bg-white dark:bg-gray-900 flex flex-col">
                 <div className="flex items-center justify-between px-5 py-2.5 border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 shrink-0">
-                    <span className="text-sm font-semibold text-gray-600 dark:text-gray-400 truncate pr-4">{article.title}</span>
+                    <div className="flex items-center gap-2 min-w-0 flex-1 pr-4">
+                        <span className="text-sm font-semibold text-gray-600 dark:text-gray-400 truncate">{article.title}</span>
+                        <a href={`${WEBSITE_URL}/articles/${article.slug || article.id}`} target="_blank" rel="noopener noreferrer"
+                            className="shrink-0 p-1 rounded-md border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950 text-blue-500 hover:bg-blue-100 dark:hover:bg-blue-900 hover:text-blue-700 transition-colors"
+                            title="Websitede Aç">
+                            <ExternalLink size={11} />
+                        </a>
+                    </div>
                     <div className="flex items-center gap-3 shrink-0">
                         {stats.views > 0 && (
                             <span className="flex items-center gap-1 text-xs text-gray-400"><Eye size={12} /> {stats.views}</span>

@@ -125,7 +125,13 @@ export default function App() {
                             updateConfigItem={data.updateConfigItem}
                         />
                     ) : data.view === 'stats' ? (
-                        <StatsView />
+                        <StatsView
+                            stats={data.allStats}
+                            isLoading={!data.statsLoaded}
+                            isRefreshing={data.statsRefreshing}
+                            onRefresh={data.loadAllStats}
+                            onMarkRead={data.markCommentRead}
+                        />
                     ) : data.view === 'collections' ? (
                         <CollectionsView
                             loggedArticles={data.loggedArticles}
@@ -142,6 +148,7 @@ export default function App() {
                             setIssueFormOpen={data.setIssueFormOpen}
                             loggedArticles={data.loggedArticles}
                             setLoggedArticles={data.setLoggedArticles}
+                            onPreviewArticle={data.openPreviewArticle}
                         />
                     ) : null}
                 </div>
@@ -159,6 +166,7 @@ export default function App() {
                     setView={data.setView}
                     setSelectedArticle={data.setSelectedArticle}
                     setPreviewArticle={data.setPreviewArticle}
+                    syncPreviewTab={data.syncPreviewTab}
                     onMinimize={() => { setLogMinimized(true); setLogTabPosition(data.previewTabs.length); }}
                     externalMinimized={logMinimized || !!data.activePreviewId}
                     onDirtyChange={setLogDirty}
@@ -251,8 +259,18 @@ export default function App() {
                         getCategoryColor={data.getCategoryColor}
                         allArticles={data.loggedArticles}
                         onPreview={(a) => data.openPreviewArticle(a)}
+                        articleStat={data.allStats.find(s => s.id === activeArticle.id) ?? null}
+                        onMarkRead={(cid) => data.markCommentRead(cid, activeArticle.id)}
+                        onRefreshStats={data.loadAllStats}
+                        statsRefreshing={data.statsRefreshing}
+                        statsLoaded={data.statsLoaded}
                         onStatusChange={(updated) => {
                             data.setLoggedArticles(prev => prev.map(a => a.id === updated.id ? updated : a));
+                            data.setSections(prev => prev.map(s => ({
+                                ...s,
+                                articles: s.articles.map(a => a.id === updated.id ? { ...a, status: updated.status } : a),
+                                ...(s.routeArticle?.id === updated.id ? { routeArticle: { ...s.routeArticle, status: updated.status } } : {}),
+                            })));
                             data.openPreviewArticle(updated);
                         }}
                     />

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { API_URL } from '../config';
-import type { Article, Category, Section, Issue } from '../types';
+import type { Article, ArticleStat, Category, Section, Issue } from '../types';
 
 export function useAdminData() {
     const [view, setView] = useState<'dashboard' | 'log' | 'read' | 'issues' | 'stats' | 'collections'>('dashboard');
@@ -44,6 +44,31 @@ export function useAdminData() {
     // Sidebar sort
     const [sidebarSort, setSidebarSort] = useState<'issue' | 'date-desc' | 'date-asc' | 'category' | 'author'>('issue');
 
+    // Shared stats (comments + views)
+    const [allStats, setAllStats] = useState<ArticleStat[]>([]);
+    const [statsLoaded, setStatsLoaded] = useState(false);
+    const [statsRefreshing, setStatsRefreshing] = useState(false);
+
+    const loadAllStats = useCallback((quiet = false) => {
+        if (!quiet) setStatsLoaded(false);
+        setStatsRefreshing(true);
+        fetch(`${API_URL}/stats`)
+            .then(r => r.json())
+            .then(data => { setAllStats(data); setStatsLoaded(true); setStatsRefreshing(false); })
+            .catch(() => { setStatsLoaded(true); setStatsRefreshing(false); });
+    }, []);
+
+    useEffect(() => { loadAllStats(); }, [loadAllStats]);
+
+    const markCommentRead = useCallback((commentId: string, articleId: string) => {
+        setAllStats(prev => prev.map(a => a.id !== articleId ? a : {
+            ...a,
+            comments: a.comments.map(c => c.id === commentId ? { ...c, isRead: true } : c),
+            unreadCount: Math.max(0, a.unreadCount - 1),
+        }));
+        fetch(`${API_URL}/comments/${commentId}/read`, { method: 'PATCH' });
+    }, []);
+
     // Quick preview tabs
     const [previewTabs, setPreviewTabs] = useState<Article[]>([]);
     const [activePreviewId, setActivePreviewId] = useState<string | null>(null);
@@ -59,6 +84,14 @@ export function useAdminData() {
     const closePreviewTab = useCallback((id: string) => {
         setPreviewTabs(prev => prev.filter(a => a.id !== id));
         setActivePreviewId(curr => curr === id ? null : curr);
+    }, []);
+
+    // Silently update an article in previewTabs without changing activePreviewId
+    const syncPreviewTab = useCallback((article: Article) => {
+        setPreviewTabs(prev => {
+            if (!prev.some(a => a.id === article.id)) return prev;
+            return prev.map(a => a.id === article.id ? article : a);
+        });
     }, []);
 
     // Backwards-compatible alias: accepts Article | null, ignores null
@@ -478,9 +511,11 @@ export function useAdminData() {
         showTemplates, setShowTemplates,
         // Sidebar sort
         sidebarSort, setSidebarSort,
+        // Stats
+        allStats, statsLoaded, statsRefreshing, loadAllStats, markCommentRead,
         // Preview tabs
         previewTabs, activePreviewId, setActivePreviewId,
-        openPreviewArticle, closePreviewTab,
+        openPreviewArticle, closePreviewTab, syncPreviewTab,
         setPreviewArticle,
         // Bulk
         bulkSelected, setBulkSelected,

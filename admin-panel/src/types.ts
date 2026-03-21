@@ -73,3 +73,24 @@ export interface Issue {
     recomendedCards?: Article[];
     otherArticles?: Article[];
 }
+
+export interface Comment {
+    id: string;
+    articleId: string;
+    text: string;
+    createdAt: number;
+    isRead: boolean;
+}
+
+export interface ArticleStat {
+    id: string;
+    title: string;
+    author: string;
+    category: string;
+    issueNumber: string;
+    imageUrl: string;
+    views: number;
+    commentCount: number;
+    unreadCount: number;
+    comments: Comment[];
+}

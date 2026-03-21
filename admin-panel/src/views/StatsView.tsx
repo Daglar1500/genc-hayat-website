@@ -1,54 +1,20 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Eye, MessageSquare, Check, RefreshCw, ChevronDown, ChevronUp } from 'lucide-react';
-import { API_URL } from '../config';
+import { useState } from 'react';
+import { Eye, MessageSquare, Check, RefreshCw, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
+import { WEBSITE_URL } from '../config';
+import type { ArticleStat } from '../types';
 
-interface Comment {
-    id: string;
-    articleId: string;
-    text: string;
-    createdAt: number;
-    isRead: boolean;
+interface StatsViewProps {
+    stats: ArticleStat[];
+    isLoading: boolean;
+    isRefreshing: boolean;
+    onRefresh: () => void;
+    onMarkRead: (commentId: string, articleId: string) => void;
 }
 
-interface ArticleStat {
-    id: string;
-    title: string;
-    author: string;
-    category: string;
-    issueNumber: string;
-    imageUrl: string;
-    views: number;
-    commentCount: number;
-    unreadCount: number;
-    comments: Comment[];
-}
-
-export default function StatsView() {
-    const [stats, setStats] = useState<ArticleStat[]>([]);
-    const [loading, setLoading] = useState(true);
+export default function StatsView({ stats, isLoading, isRefreshing, onRefresh, onMarkRead }: StatsViewProps) {
     const [expanded, setExpanded] = useState<string | null>(null);
     const [issueFilter, setIssueFilter] = useState<string>('all');
     const [sortBy, setSortBy] = useState<'views' | 'comments' | 'unread'>('views');
-
-    const load = useCallback(() => {
-        setLoading(true);
-        fetch(`${API_URL}/stats`)
-            .then(r => r.json())
-            .then(data => { setStats(data); setLoading(false); })
-            .catch(() => setLoading(false));
-    }, []);
-
-    useEffect(() => { load(); }, [load]);
-
-    const markRead = (commentId: string, articleId: string) => {
-        fetch(`${API_URL}/comments/${commentId}/read`, { method: 'PATCH' }).then(() => {
-            setStats(prev => prev.map(a => a.id !== articleId ? a : {
-                ...a,
-                comments: a.comments.map(c => c.id === commentId ? { ...c, isRead: true } : c),
-                unreadCount: Math.max(0, a.unreadCount - 1),
-            }));
-        });
-    };
 
     const issues = Array.from(new Set(stats.map(a => String(a.issueNumber))))
         .sort((a, b) => Number(b) - Number(a));
@@ -108,16 +74,16 @@ export default function StatsView() {
                     ))}
                 </div>
                 <button
-                    onClick={load}
+                    onClick={onRefresh}
                     className="ml-auto p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
                     title="Yenile"
                 >
-                    <RefreshCw size={14} />
+                    <RefreshCw size={14} className={isRefreshing ? 'animate-spin' : ''} />
                 </button>
             </div>
 
             {/* Article list */}
-            {loading ? (
+            {isLoading ? (
                 <div className="py-20 text-center text-gray-400 dark:text-gray-600">Yükleniyor...</div>
             ) : filtered.length === 0 ? (
                 <div className="py-20 text-center text-gray-400 dark:text-gray-600">Veri bulunamadı.</div>
@@ -133,7 +99,15 @@ export default function StatsView() {
                                 <div className="w-7 text-center text-sm font-black text-gray-300 dark:text-gray-700 shrink-0">{idx + 1}</div>
                                 <img src={stat.imageUrl} alt="" className="w-10 h-10 rounded-lg object-cover shrink-0 bg-gray-100 dark:bg-gray-800" />
                                 <div className="flex-1 min-w-0">
-                                    <div className="text-sm font-semibold text-gray-800 dark:text-gray-200 line-clamp-1">{stat.title}</div>
+                                    <div className="flex items-center gap-1.5">
+                                        <div className="text-sm font-semibold text-gray-800 dark:text-gray-200 line-clamp-1 flex-1">{stat.title}</div>
+                                        <a href={`${WEBSITE_URL}/articles/${stat.id}`} target="_blank" rel="noopener noreferrer"
+                                            onClick={e => e.stopPropagation()}
+                                            className="shrink-0 text-blue-400 hover:text-blue-600 transition-colors"
+                                            title="Websitede Aç">
+                                            <ExternalLink size={11} />
+                                        </a>
+                                    </div>
                                     <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 flex items-center gap-2">
                                         <span>{stat.author}</span>
                                         <span>·</span>
@@ -197,7 +171,7 @@ export default function StatsView() {
                                                     </div>
                                                     {!c.isRead && (
                                                         <button
-                                                            onClick={() => markRead(c.id, stat.id)}
+                                                            onClick={() => onMarkRead(c.id, stat.id)}
                                                             className="p-1.5 rounded-lg bg-amber-100 dark:bg-amber-900/40 text-amber-600 hover:bg-amber-200 dark:hover:bg-amber-800 transition-colors shrink-0"
                                                             title="Okundu işaretle"
                                                         >
