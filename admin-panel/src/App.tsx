@@ -66,6 +66,7 @@ export default function App() {
                 restoreArticle={data.restoreArticle}
                 permanentDeleteArticle={data.permanentDeleteArticle}
                 emptyTrash={data.emptyTrash}
+                hasTabBar={data.previewTabs.length > 0 || data.view === 'log'}
             />
 
             <div className={`flex-1 transition-all duration-300 p-8 ${data.menuOpen ? 'ml-80' : ''}`}>

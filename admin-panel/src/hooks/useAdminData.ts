@@ -334,8 +334,8 @@ export function useAdminData() {
             .catch(() => { showToast('Kaydetme başarısız!', 'error'); setIsSaving(false); });
     };
 
-    const handleDragStart = (e: React.DragEvent, type: string, id: string, fromSec?: string) => {
-        dragItem.current = { type, id, fromSec };
+    const handleDragStart = (e: React.DragEvent, type: string, id: string, fromSec?: string, bulkIds?: string[]) => {
+        dragItem.current = { type, id, fromSec, bulkIds };
         e.dataTransfer.setData('text/plain', id);
         e.dataTransfer.effectAllowed = 'copyMove';
     };
@@ -355,6 +355,28 @@ export function useAdminData() {
 
         const newSections = [...sections];
         const targetSection = newSections[targetSecIdx];
+
+        // Bulk drag from sidebar — add all selected articles at once
+        if (dragged.type === 'sidebar' && dragged.bulkIds && dragged.bulkIds.length > 1) {
+            const selectedArts = loggedArticles.filter(a => dragged.bulkIds.includes(a.id));
+            const existingIds = new Set(targetSection.articles.map((a: Article) => a.id));
+            const maxArticles = targetSection.type === 'category-row' ? 3 : targetSection.type === 'ordinary-row' ? 4 : null;
+            let toAdd = selectedArts.filter(a => !existingIds.has(a.id));
+            if (maxArticles !== null) {
+                const remaining = maxArticles - targetSection.articles.length;
+                if (remaining <= 0) {
+                    showToast(`Bu bölüm dolu (maksimum ${maxArticles} makale)`, 'error');
+                    dragItem.current = null;
+                    return;
+                }
+                toAdd = toAdd.slice(0, remaining);
+            }
+            targetSection.articles.push(...toAdd.map((a: Article) => ({ ...a })));
+            setSections(newSections);
+            if (toAdd.length > 0) showToast(`${toAdd.length} makale eklendi`);
+            dragItem.current = null;
+            return;
+        }
 
         let art: Article | undefined;
         let sourceIdx = -1;

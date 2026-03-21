@@ -198,6 +198,16 @@ export default function DashboardView({
     const leaveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const dragConfigRef = useRef<{ sectionId: string; field: string; index: number } | null>(null);
 
+    // Auto-initialize category-row sections that have no title set
+    useEffect(() => {
+        if (categories.length === 0) return;
+        const needsInit = sections.some(s => s.type === 'category-row' && !s.title);
+        if (!needsInit) return;
+        setSections(prev => prev.map(s =>
+            s.type === 'category-row' && !s.title ? { ...s, title: categories[0].name } : s
+        ));
+    }, [sections, categories]);
+
     const getSectionSummary = (sec: Section): string => {
         switch (sec.type) {
             case 'spot-row': return sec.articles[0]?.title || 'Yazı yok';

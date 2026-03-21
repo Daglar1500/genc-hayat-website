@@ -16,7 +16,8 @@ interface SidebarProps {
     setBulkSelected: React.Dispatch<React.SetStateAction<string[]>>;
     bulkDropdownOpen: boolean;
     setBulkDropdownOpen: React.Dispatch<React.SetStateAction<boolean>>;
-    handleDragStart: (e: React.DragEvent, type: string, id: string, fromSec?: string) => void;
+    handleDragStart: (e: React.DragEvent, type: string, id: string, fromSec?: string, bulkIds?: string[]) => void;
+    hasTabBar?: boolean;
     deleteArticle: (id: string) => void;
     getCategoryColor: (name: string) => string;
     formatLogDate: (timestamp: number) => string;
@@ -45,12 +46,19 @@ export default function Sidebar({
     setPreviewArticle,
     trashedArticles, trashOpen, setTrashOpen,
     restoreArticle, permanentDeleteArticle, emptyTrash,
+    hasTabBar,
 }: SidebarProps) {
     const renderSidebarCard = (a: Article) => (
         <div
             key={a.id}
             draggable
-            onDragStart={e => handleDragStart(e, 'sidebar', a.id)}
+            onDragStart={e => {
+                if (bulkSelected.includes(a.id) && bulkSelected.length > 1) {
+                    handleDragStart(e, 'sidebar', a.id, undefined, bulkSelected);
+                } else {
+                    handleDragStart(e, 'sidebar', a.id);
+                }
+            }}
             onClick={() => setPreviewArticle(a)}
             className={`relative p-2.5 border rounded-xl cursor-pointer flex gap-2.5 group transition-all overflow-hidden ${bulkSelected.includes(a.id) ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-300 dark:border-blue-700' : 'bg-white dark:bg-slate-800/60 border-gray-200 dark:border-slate-800 hover:bg-gray-50 dark:hover:bg-slate-800 hover:border-gray-300 dark:hover:border-slate-600'}`}
         >
@@ -212,7 +220,7 @@ export default function Sidebar({
     );
 
     return (
-        <div className={`fixed inset-y-0 left-0 z-40 w-80 bg-gray-50 dark:bg-slate-900 border-r border-gray-200 dark:border-slate-800 transform transition-transform duration-300 ${menuOpen ? 'translate-x-0' : '-translate-x-full'} shadow-2xl flex flex-col`}>
+        <div className={`fixed top-0 left-0 z-40 w-80 bg-gray-50 dark:bg-slate-900 border-r border-gray-200 dark:border-slate-800 transform transition-transform duration-300 ${menuOpen ? 'translate-x-0' : '-translate-x-full'} shadow-2xl flex flex-col ${hasTabBar ? 'bottom-9' : 'bottom-0'}`}>
             <div className="px-4 py-3.5 flex justify-between items-center border-b border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900">
                 <div className="flex items-center gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-blue-500 inline-block" />
@@ -277,7 +285,7 @@ export default function Sidebar({
                                 <span className="text-xs font-bold text-gray-800 dark:text-slate-200">{bulkSelected.length} makale seçildi</span>
                                 <button
                                     onClick={() => setBulkSelected([])}
-                                    className="text-xs text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 underline"
+                                    className="text-xs px-2 py-1 bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 text-gray-600 dark:text-slate-300 rounded font-medium hover:bg-gray-50 dark:hover:bg-slate-600 transition-colors"
                                 >
                                     Hepsini Kaldır
                                 </button>
@@ -289,7 +297,7 @@ export default function Sidebar({
                                         Section'a Ekle <ChevronDown size={12} />
                                     </button>
                                     {bulkDropdownOpen && (
-                                        <div className="absolute bottom-full right-0 mb-1 w-52 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl z-50 py-1 max-h-48 overflow-y-auto">
+                                        <div className="absolute bottom-full right-0 mb-1 w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl z-50 py-1 max-h-48 overflow-y-auto">
                                             {sections.map(sec => (
                                                 <button
                                                     key={sec.id}
@@ -306,9 +314,11 @@ export default function Sidebar({
                                                         setBulkSelected([]);
                                                         setBulkDropdownOpen(false);
                                                     }}
-                                                    className="w-full text-left px-3 py-2 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 truncate"
+                                                    className="w-full text-left px-3 py-2 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                                                 >
-                                                    {getSectionLabel(sec.type)}{sec.title ? ` — ${sec.title}` : ''}
+                                                    {sec.type === 'category-row'
+                                                        ? `Kategori: ${sec.title || '(seçilmedi)'}`
+                                                        : `${getSectionLabel(sec.type)}${sec.title ? ` — ${sec.title}` : ''}`}
                                                 </button>
                                             ))}
                                         </div>
