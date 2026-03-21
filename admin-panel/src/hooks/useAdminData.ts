@@ -304,7 +304,7 @@ export function useAdminData() {
         e.dataTransfer.effectAllowed = 'copyMove';
     };
 
-    const handleDrop = (e: React.DragEvent, targetSecId: string, targetIndex?: number, mode?: 'replace') => {
+    const handleDrop = (e: React.DragEvent, targetSecId: string, targetIndex?: number, mode?: 'replace' | 'articles') => {
         e.preventDefault();
         e.stopPropagation();
         const dragged = dragItem.current;
@@ -336,7 +336,7 @@ export function useAdminData() {
 
         if (!art) return;
 
-        if (targetSection.type === 'main-row') {
+        if (targetSection.type === 'main-row' && mode !== 'articles' && mode !== 'replace') {
             targetSection.routeArticle = art;
             setSections(newSections);
             dragItem.current = null;
