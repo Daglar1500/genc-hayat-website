@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import logo from '../public/logo.png';
 import logo_white from '../public/logo_white.png';
+import letterboxdBw from '../public/letterbox-black-and-white.png';
 import { NAV_DATA } from './Footer';
 
 // --- Sub-Components ---
@@ -97,9 +98,7 @@ export const SocialIcons = ({ isWhite = false }: { isWhite?: boolean }) => {
         {
             href: "https://letterboxd.com/genc_hayat/",
             icon: (
-                <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-                    <path d="M0 12C0 5.373 5.373 0 12 0s12 5.373 12 12-5.373 12-12 12S0 18.627 0 12zm7.2-3.6h9.6v7.2H7.2V8.4zM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-4.8-3a4.8 4.8 0 1 1 9.6 0 4.8 4.8 0 0 1-9.6 0z" />
-                </svg>
+                <img src={letterboxdBw} alt="Letterboxd" className={`w-5 h-5 ${isWhite ? 'brightness-0 invert' : 'brightness-0'}`} />
             )
         }
     ];

@@ -11,6 +11,7 @@ import LogView from './views/LogView';
 import ReadView from './views/ReadView';
 import IssuesView from './views/IssuesView';
 import StatsView from './views/StatsView';
+import CollectionsView from './views/CollectionsView';
 
 export default function App() {
     const data = useAdminData();
@@ -28,6 +29,8 @@ export default function App() {
     }, [data.view]);
 
     const handleStartEdit = (article: import('./types').Article) => {
+        const previewIndex = data.previewTabs.findIndex(t => t.id === article.id);
+        setLogTabPosition(previewIndex >= 0 ? previewIndex : data.previewTabs.length);
         setLogMinimized(false);
         setLogDirty(false);
         data.startEditArticle(article);
@@ -115,6 +118,12 @@ export default function App() {
                         />
                     ) : data.view === 'stats' ? (
                         <StatsView />
+                    ) : data.view === 'collections' ? (
+                        <CollectionsView
+                            loggedArticles={data.loggedArticles}
+                            setLoggedArticles={data.setLoggedArticles}
+                            setPreviewArticle={data.setPreviewArticle}
+                        />
                     ) : data.view === 'issues' ? (
                         <IssuesView
                             issues={data.issues}
@@ -137,6 +146,7 @@ export default function App() {
                     categories={data.categories}
                     labels={data.labels}
                     editors={data.editors}
+                    loggedArticles={data.loggedArticles}
                     setLoggedArticles={data.setLoggedArticles}
                     setView={data.setView}
                     setSelectedArticle={data.setSelectedArticle}
@@ -165,7 +175,7 @@ export default function App() {
                             className={`flex items-stretch border-r border-gray-200 dark:border-gray-700 max-w-55 min-w-0 ${isActive ? 'bg-blue-50 dark:bg-blue-950 border-t-2 border-t-blue-400' : 'hover:bg-gray-50 dark:hover:bg-gray-800'}`}
                         >
                             <button
-                                onClick={() => data.setActivePreviewId(tab.id)}
+                                onClick={() => data.setActivePreviewId(isActive ? null : tab.id)}
                                 className="flex items-center gap-1.5 pl-3 pr-1 min-w-0 flex-1"
                             >
                                 <FileText size={12} className={`shrink-0 ${isActive ? 'text-blue-400' : 'text-gray-400'}`} />
@@ -231,6 +241,8 @@ export default function App() {
                         onMinimize={() => data.setActivePreviewId(null)}
                         onEdit={handleStartEdit}
                         getCategoryColor={data.getCategoryColor}
+                        allArticles={data.loggedArticles}
+                        onPreview={(a) => data.openPreviewArticle(a)}
                     />
                 ) : null;
             })()}

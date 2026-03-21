@@ -181,8 +181,14 @@ export const FeaturedArticleDetail = () => {
 
             setRandomArticle(mappedOthers[Math.floor(Math.random() * mappedOthers.length)]);
 
-            const related = mappedOthers.filter((item) => item.category?.name === mappedArticle.category?.name).slice(0, 3);
-            setRelatedArticles(related);
+            const recIds: string[] = articleData.recommendedArticleIds ?? [];
+            if (recIds.length > 0) {
+                const recArts = recIds.map(id => mappedOthers.find(a => a.href === `/articles/${id}`)).filter(Boolean) as typeof mappedOthers;
+                setRelatedArticles(recArts.slice(0, 3));
+            } else {
+                const related = mappedOthers.filter((item) => item.category?.name === mappedArticle.category?.name).slice(0, 3);
+                setRelatedArticles(related);
+            }
           }
         }
 
@@ -604,7 +610,7 @@ export const FeaturedArticleDetail = () => {
           <section className="w-full mt-8 border-t border-black/10 pt-10">
             <div className="w-full text-center lg:text-left">
               <h3 className="text-2xl lg:text-3xl font-bold mb-4 px-4 sm:px-8 md:px-16 lg:px-24 xl:px-[140px] font-sans tracking-tight">
-                Son Sayının Önerilen Yazıları
+                Önerilen Yazılar
               </h3>
             </div>
             <ArticleLine articles={relatedArticles} centered={true} />

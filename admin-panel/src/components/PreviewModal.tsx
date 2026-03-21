@@ -9,6 +9,8 @@ interface PreviewModalProps {
     onMinimize: () => void;
     onEdit: (article: Article) => void;
     getCategoryColor: (name: string) => string;
+    allArticles?: Article[];
+    onPreview?: (article: Article) => void;
 }
 
 interface Comment {
@@ -100,7 +102,7 @@ function exportCommentsAsDoc(article: Article, comments: Comment[]) {
 
 const emptyStats: ArticleStats = { views: 0, commentCount: 0, unreadCount: 0, comments: [] };
 
-export default function PreviewModal({ article, onClose, onMinimize, onEdit, getCategoryColor }: PreviewModalProps) {
+export default function PreviewModal({ article, onClose, onMinimize, onEdit, getCategoryColor, allArticles, onPreview }: PreviewModalProps) {
     const [windowState, setWindowState] = useState<WindowState>('normal');
     const [stats, setStats] = useState<ArticleStats>(emptyStats);
     const [statsLoaded, setStatsLoaded] = useState(false);
@@ -169,18 +171,13 @@ export default function PreviewModal({ article, onClose, onMinimize, onEdit, get
                         </div>
                     )
                 }
-                <div className="absolute bottom-2 left-2 right-2 flex items-center gap-1.5 flex-wrap">
-                    {stats.views > 0 && (
-                        <span className="flex items-center gap-1 text-[10px] text-white bg-black/60 px-1.5 py-0.5 rounded-full backdrop-blur-sm">
-                            <Eye size={9} /> {stats.views} görüntülenme
-                        </span>
-                    )}
-                    {stats.unreadCount > 0 && (
+                {stats.unreadCount > 0 && (
+                    <div className="absolute bottom-2 left-2 right-2 flex items-center gap-1.5 flex-wrap">
                         <span className="flex items-center gap-1 text-[10px] text-white bg-amber-500/90 px-1.5 py-0.5 rounded-full font-medium backdrop-blur-sm">
                             <MessageSquare size={9} /> {stats.unreadCount} yeni yorum
                         </span>
-                    )}
-                </div>
+                    </div>
+                )}
             </div>
 
             {/* Meta — tüm fieldlar aynı formatta */}
@@ -205,34 +202,32 @@ export default function PreviewModal({ article, onClose, onMinimize, onEdit, get
                         </div>
                         <div>
                             <div className="text-[9px] font-black uppercase tracking-widest text-indigo-400 mb-0.5">Kategori</div>
-                            <span className="text-xs font-black px-2.5 py-0.5 rounded-full text-white" style={{ backgroundColor: getCategoryColor(article.category) }}>
-                                {article.category}
-                            </span>
+                            <div className="text-sm font-semibold text-gray-800 dark:text-gray-200">{article.category}</div>
                         </div>
                     </div>
                 )}
 
-                {/* Okul / Kurum — cyan */}
+                {/* Okul / Mahalle — cyan */}
                 {article.school && (
                     <div className="px-4 py-3.5 border-b border-gray-100 dark:border-gray-800 flex items-center gap-3">
                         <div className="w-9 h-9 rounded-xl bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center shrink-0">
                             <GraduationCap size={16} className="text-cyan-500" />
                         </div>
                         <div>
-                            <div className="text-[9px] font-black uppercase tracking-widest text-cyan-400 mb-0.5">Okul / Kurum</div>
+                            <div className="text-[9px] font-black uppercase tracking-widest text-cyan-400 mb-0.5">Okul / Mahalle</div>
                             <div className="text-sm font-semibold text-gray-800 dark:text-gray-200">{article.school}</div>
                         </div>
                     </div>
                 )}
 
-                {/* Şehir / Mahalle — turuncu */}
+                {/* Şehir — turuncu */}
                 {article.place && (
                     <div className="px-4 py-3.5 border-b border-gray-100 dark:border-gray-800 flex items-center gap-3">
                         <div className="w-9 h-9 rounded-xl bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center shrink-0">
                             <MapPin size={16} className="text-orange-500" />
                         </div>
                         <div>
-                            <div className="text-[9px] font-black uppercase tracking-widest text-orange-400 mb-0.5">Şehir / Mahalle</div>
+                            <div className="text-[9px] font-black uppercase tracking-widest text-orange-400 mb-0.5">Şehir</div>
                             <div className="text-sm font-semibold text-gray-800 dark:text-gray-200">{article.place}</div>
                         </div>
                     </div>
@@ -249,6 +244,18 @@ export default function PreviewModal({ article, onClose, onMinimize, onEdit, get
                     </div>
                 </div>
 
+                {/* Etiketler */}
+                {article.labels && article.labels.length > 0 && (
+                    <div className="px-4 py-3.5 border-b border-gray-100 dark:border-gray-800">
+                        <div className="text-[9px] font-black uppercase tracking-widest text-gray-400 mb-2">Etiketler</div>
+                        <div className="flex flex-wrap gap-1.5">
+                            {article.labels.map(l => (
+                                <span key={l} className="text-[10px] px-2.5 py-0.5 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-full font-semibold">{l}</span>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
                 {/* Karakter — slate */}
                 <div className="px-4 py-3.5 border-b border-gray-100 dark:border-gray-800 flex items-center gap-3">
                     <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
@@ -261,7 +268,7 @@ export default function PreviewModal({ article, onClose, onMinimize, onEdit, get
                 </div>
 
                 {/* Durum — yeşil / kırmızı */}
-                <div className="px-4 py-3.5 border-b border-gray-100 dark:border-gray-800 flex items-center gap-3">
+                <div className="px-4 py-3.5 flex items-center gap-3">
                     <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${isEdited ? 'bg-emerald-100 dark:bg-emerald-900/30' : 'bg-red-100 dark:bg-red-900/30'}`}>
                         {isEdited ? <CheckSquare size={16} className="text-emerald-500" /> : <Square size={16} className="text-red-500" />}
                     </div>
@@ -270,18 +277,6 @@ export default function PreviewModal({ article, onClose, onMinimize, onEdit, get
                         <div className="text-sm font-semibold text-gray-800 dark:text-gray-200">{isEdited ? 'Düzenlendi' : 'Henüz Düzenlenmedi'}</div>
                     </div>
                 </div>
-
-                {/* Etiketler */}
-                {article.labels && article.labels.length > 0 && (
-                    <div className="px-4 py-3.5">
-                        <div className="text-[9px] font-black uppercase tracking-widest text-gray-400 mb-2">Etiketler</div>
-                        <div className="flex flex-wrap gap-1.5">
-                            {article.labels.map(l => (
-                                <span key={l} className="text-[10px] px-2.5 py-0.5 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-full font-semibold">{l}</span>
-                            ))}
-                        </div>
-                    </div>
-                )}
             </div>
         </div>
     );
@@ -303,6 +298,35 @@ export default function PreviewModal({ article, onClose, onMinimize, onEdit, get
                     [&_img]:max-w-full [&_img]:h-auto [&_img]:rounded-lg [&_img]:my-2 [&_img]:block"
                 dangerouslySetInnerHTML={{ __html: htmlContent }}
             />
+
+            {/* Önerilen Yazılar */}
+            {(() => {
+                const recIds = article.recommendedArticleIds ?? [];
+                const recArts = recIds.map(id => allArticles?.find(a => a.id === id)).filter(Boolean) as Article[];
+                if (recArts.length === 0) return null;
+                return (
+                    <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+                        <h3 className="font-bold text-gray-700 dark:text-gray-300 text-sm mb-2">Önerilen Yazılar</h3>
+                        <div className="flex gap-2 overflow-x-auto pb-1">
+                            {recArts.map(a => (
+                                <button key={a.id} onClick={() => onPreview?.(a)}
+                                    className="flex items-center gap-2 shrink-0 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-2.5 py-1.5 hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-colors text-left max-w-52">
+                                    {a.imageUrl && <img src={a.imageUrl} alt="" className="w-8 h-8 rounded object-cover shrink-0" />}
+                                    <span className="text-xs font-medium text-gray-700 dark:text-gray-300 line-clamp-2 leading-tight">{a.title}</span>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                );
+            })()}
+
+            {/* Görüntülenme */}
+            {stats.views > 0 && (
+                <div className="mt-4 flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400">
+                    <Eye size={14} className="text-gray-400" />
+                    <span>{stats.views.toLocaleString('tr')} görüntülenme</span>
+                </div>
+            )}
 
             {/* Comments — always rendered */}
             <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
@@ -390,7 +414,7 @@ export default function PreviewModal({ article, onClose, onMinimize, onEdit, get
     // ── NORMAL ────────────────────────────────────────────────────────
     return (
         <div
-            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+            className="fixed inset-0 bottom-9 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
             onClick={onClose}
         >
             <div
@@ -412,19 +436,11 @@ export default function PreviewModal({ article, onClose, onMinimize, onEdit, get
                 </div>
 
                 {/* Two-column body */}
-                <div className="flex flex-1 overflow-hidden">
+                <div className="flex flex-1 overflow-hidden relative">
                     <LeftPanel />
                     <RightContent />
-                </div>
-
-                {/* Bottom bar */}
-                <div className="px-5 py-3 border-t border-gray-100 dark:border-gray-800 flex gap-2 justify-end shrink-0 bg-gray-50 dark:bg-gray-800/50">
-                    <button onClick={onClose}
-                        className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
-                        Kapat
-                    </button>
                     <button onClick={() => { onEdit(article); onClose(); }}
-                        className="px-4 py-2 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 flex items-center gap-1">
+                        className="absolute bottom-4 right-4 px-4 py-2 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 flex items-center gap-1 shadow-lg">
                         <Edit3 size={14} /> Düzenle
                     </button>
                 </div>

@@ -13,12 +13,26 @@ const generateSlug = (title: string) =>
 
 type WindowState = 'normal' | 'maximized';
 
+const TR_CITIES = [
+    'Adana', 'Adıyaman', 'Afyonkarahisar', 'Ağrı', 'Aksaray', 'Amasya', 'Ankara', 'Antalya',
+    'Ardahan', 'Artvin', 'Aydın', 'Balıkesir', 'Bartın', 'Batman', 'Bayburt', 'Bilecik',
+    'Bingöl', 'Bitlis', 'Bolu', 'Burdur', 'Bursa', 'Çanakkale', 'Çankırı', 'Çorum',
+    'Denizli', 'Diyarbakır', 'Düzce', 'Edirne', 'Elazığ', 'Erzincan', 'Erzurum', 'Eskişehir',
+    'Gaziantep', 'Giresun', 'Gümüşhane', 'Hakkari', 'Hatay', 'Iğdır', 'Isparta', 'İstanbul',
+    'İçel (Mersin)', 'İzmir', 'Kahramanmaraş', 'Karabük', 'Karaman', 'Kars', 'Kastamonu',
+    'Kayseri', 'Kilis', 'Kırıkkale', 'Kırklareli', 'Kırşehir', 'Kocaeli', 'Konya', 'Kütahya',
+    'Malatya', 'Manisa', 'Mardin', 'Muğla', 'Muş', 'Nevşehir', 'Niğde', 'Ordu', 'Osmaniye',
+    'Rize', 'Sakarya', 'Samsun', 'Siirt', 'Sinop', 'Sivas', 'Şanlıurfa', 'Şırnak',
+    'Tekirdağ', 'Tokat', 'Trabzon', 'Tunceli', 'Uşak', 'Van', 'Yalova', 'Yozgat', 'Zonguldak',
+];
+
 const LogArticle = ({
     isEdit,
     initialData,
     categories,
     labels,
     editors,
+    allArticles,
     onClose,
     onSuccess,
     onSaveAndView,
@@ -32,6 +46,7 @@ const LogArticle = ({
     categories: Category[];
     labels: string[];
     editors: string[];
+    allArticles?: Article[];
     onClose: () => void;
     onSuccess: (article: Article) => void;
     onSaveAndView?: (article: Article) => void;
@@ -49,7 +64,8 @@ const LogArticle = ({
     const [formData, setFormData] = useState<Partial<Article>>(initialData ? { ...initialData } : {
         labels: [],
         status: 'not-edited',
-        editorName: editors[0] || 'Admin'
+        editorName: editors[0] || 'Admin',
+        issueNumber: allArticles?.length ? allArticles[0].issueNumber : undefined,
     });
 
     const [editorHtml, setEditorHtml] = useState<string>(() => {
@@ -155,7 +171,7 @@ const LogArticle = ({
                         editorHtml={editorHtml} setEditorHtml={setEditorHtmlDirty}
                         slugTouched={slugTouched} toggleLabel={toggleLabel}
                         handleImageUpload={handleImageUpload} handleSubmit={handleSubmit}
-                        submitAction={submitAction} categories={categories} labels={labels} editors={editors}
+                        submitAction={submitAction} categories={categories} labels={labels} editors={editors} allArticles={allArticles} currentId={initialData?.id}
                         layout="wide"
                     />
                 </div>
@@ -163,16 +179,16 @@ const LogArticle = ({
         );
     }
 
-    // Normal: compact card matching ReadArticle style
+    // Normal: compact card
     return (
         <div
-            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+            className="fixed inset-0 bottom-9 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
         >
             <div
-                className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+                className="bg-white w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
                 onClick={e => e.stopPropagation()}
             >
-                {/* Header with cover image area and window controls */}
+                {/* Header */}
                 <div className="relative h-20 shrink-0 bg-linear-to-r from-blue-50 to-indigo-50 border-b">
                     <div className="flex items-center h-full px-5 gap-3">
                         <div className="w-8 h-8 rounded-full bg-white border flex items-center justify-center shrink-0">
@@ -212,13 +228,13 @@ const LogArticle = ({
                         editorHtml={editorHtml} setEditorHtml={setEditorHtmlDirty}
                         slugTouched={slugTouched} toggleLabel={toggleLabel}
                         handleImageUpload={handleImageUpload} handleSubmit={handleSubmit}
-                        submitAction={submitAction} categories={categories} labels={labels} editors={editors}
+                        submitAction={submitAction} categories={categories} labels={labels} editors={editors} allArticles={allArticles} currentId={initialData?.id}
                         layout="compact"
                     />
                 </div>
 
-                {/* Bottom actions */}
-                <div className="px-5 py-3 border-t flex gap-2 justify-end shrink-0 bg-gray-50">
+                {/* Bottom actions — no background */}
+                <div className="px-5 py-3 flex gap-2 justify-end shrink-0">
                     <button
                         type="submit"
                         form="log-article-form"
@@ -242,9 +258,9 @@ const LogArticle = ({
 };
 
 function FormBody({
-    isEdit, formData, setFormData, editorHtml, setEditorHtml,
+    isEdit: _isEdit, formData, setFormData, editorHtml, setEditorHtml,
     slugTouched, toggleLabel, handleImageUpload, handleSubmit,
-    submitAction, categories, labels, editors, layout
+    submitAction, categories, labels, editors, layout, allArticles, currentId
 }: {
     isEdit: boolean;
     formData: Partial<Article>;
@@ -260,6 +276,8 @@ function FormBody({
     labels: string[];
     editors: string[];
     layout: 'compact' | 'wide';
+    allArticles?: Article[];
+    currentId?: string;
 }) {
     if (layout === 'wide') {
         return (
@@ -300,7 +318,7 @@ function FormBody({
                     </div>
                 </div>
                 <div className="col-span-4 space-y-6">
-                    <SidePanel formData={formData} setFormData={setFormData} editors={editors} categories={categories} labels={labels} toggleLabel={toggleLabel} handleImageUpload={handleImageUpload} />
+                    <SidePanel formData={formData} setFormData={setFormData} editors={editors} categories={categories} labels={labels} toggleLabel={toggleLabel} handleImageUpload={handleImageUpload} charCount={editorHtml.replace(/<[^>]+>/g, '').trim().length} allArticles={allArticles} currentId={currentId} />
                     <div className="flex flex-col gap-3 pt-4">
                         <button type="submit" onClick={() => { submitAction.current = 'view'; }}
                             className="w-full py-3 bg-blue-600 text-white font-bold rounded-xl shadow-lg hover:bg-blue-700 transition">
@@ -316,48 +334,55 @@ function FormBody({
         );
     }
 
-    // Compact layout
+    // Compact layout — two columns
     return (
-        <form id="log-article-form" onSubmit={handleSubmit} className="space-y-4">
-            <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Başlık *</label>
-                <input
-                    value={formData.title || ''}
-                    onChange={e => {
-                        const title = e.target.value;
-                        setFormData(prev => ({
-                            ...prev,
-                            title,
-                            slug: slugTouched.current ? prev.slug : generateSlug(title)
-                        }));
-                    }}
-                    className="w-full text-lg font-bold px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                    placeholder="Makale Başlığı"
-                />
+        <form id="log-article-form" onSubmit={handleSubmit} className="grid grid-cols-[260px_1fr] gap-5">
+            {/* Left column: Yayın Bilgileri */}
+            <div className="space-y-3">
+                <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wide">Yayın Bilgileri</h3>
+                <SidePanel formData={formData} setFormData={setFormData} editors={editors} categories={categories} labels={labels} toggleLabel={toggleLabel} handleImageUpload={handleImageUpload} compact charCount={editorHtml.replace(/<[^>]+>/g, '').trim().length} allArticles={allArticles} currentId={currentId} />
             </div>
-            <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Slug</label>
-                <input
-                    value={formData.slug || ''}
-                    onChange={e => { slugTouched.current = true; setFormData(prev => ({ ...prev, slug: e.target.value })); }}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none font-mono text-sm text-gray-600"
-                    placeholder="otomatik-slug-uretilir"
-                />
+            {/* Right column: content fields */}
+            <div className="space-y-4">
+                <div>
+                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Başlık *</label>
+                    <input
+                        value={formData.title || ''}
+                        onChange={e => {
+                            const title = e.target.value;
+                            setFormData(prev => ({
+                                ...prev,
+                                title,
+                                slug: slugTouched.current ? prev.slug : generateSlug(title)
+                            }));
+                        }}
+                        className="w-full text-lg font-bold px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                        placeholder="Makale Başlığı"
+                    />
+                </div>
+                <div>
+                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Slug</label>
+                    <input
+                        value={formData.slug || ''}
+                        onChange={e => { slugTouched.current = true; setFormData(prev => ({ ...prev, slug: e.target.value })); }}
+                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none font-mono text-sm text-gray-600"
+                        placeholder="otomatik-slug-uretilir"
+                    />
+                </div>
+                <div>
+                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Alt Başlık</label>
+                    <textarea value={formData.subheading || ''} onChange={e => setFormData({ ...formData, subheading: e.target.value })} rows={2} className="w-full px-3 py-2 border rounded-lg resize-none outline-none text-sm" placeholder="Özet..." />
+                </div>
+                <div>
+                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">İçerik</label>
+                    <RichTextEditor value={editorHtml} onChange={setEditorHtml} />
+                </div>
             </div>
-            <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Alt Başlık</label>
-                <textarea value={formData.subheading || ''} onChange={e => setFormData({ ...formData, subheading: e.target.value })} rows={2} className="w-full px-3 py-2 border rounded-lg resize-none outline-none text-sm" placeholder="Özet..." />
-            </div>
-            <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">İçerik</label>
-                <RichTextEditor value={editorHtml} onChange={setEditorHtml} />
-            </div>
-            <SidePanel formData={formData} setFormData={setFormData} editors={editors} categories={categories} labels={labels} toggleLabel={toggleLabel} handleImageUpload={handleImageUpload} compact />
         </form>
     );
 }
 
-function SidePanel({ formData, setFormData, editors, categories, labels, toggleLabel, handleImageUpload, compact }: {
+function SidePanel({ formData, setFormData, editors, categories, labels, toggleLabel, handleImageUpload, compact, charCount, allArticles, currentId }: {
     formData: Partial<Article>;
     setFormData: React.Dispatch<React.SetStateAction<Partial<Article>>>;
     editors: string[];
@@ -366,10 +391,22 @@ function SidePanel({ formData, setFormData, editors, categories, labels, toggleL
     toggleLabel: (lbl: string) => void;
     handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
     compact?: boolean;
+    charCount?: number;
+    allArticles?: Article[];
+    currentId?: string;
 }) {
+    const [recSearch, setRecSearch] = useState('');
+    const isCustomCity = !!(formData.place && !TR_CITIES.includes(formData.place));
+    const [showCustomCity, setShowCustomCity] = useState(isCustomCity);
+
     const fieldClass = `w-full p-2 border rounded ${compact ? 'text-sm' : ''}`;
     const labelClass = `block text-xs font-bold text-gray-500 uppercase mb-1`;
     const groupClass = compact ? '' : 'space-y-1';
+    const recIds: string[] = formData.recommendedArticleIds ?? [];
+    const recArticles = recIds.map(id => allArticles?.find(a => a.id === id)).filter(Boolean) as Article[];
+    const recSearchResults = recSearch.length > 0
+        ? (allArticles ?? []).filter(a => a.id !== currentId && !recIds.includes(a.id) && (a.title?.toLowerCase().includes(recSearch.toLowerCase()) || a.author?.toLowerCase().includes(recSearch.toLowerCase()))).slice(0, 6)
+        : [];
 
     return (
         <div className={compact ? 'space-y-3' : 'bg-gray-50 p-4 rounded-xl space-y-4'}>
@@ -385,8 +422,44 @@ function SidePanel({ formData, setFormData, editors, categories, labels, toggleL
                     <input value={formData.editorName || ''} onChange={e => setFormData({ ...formData, editorName: e.target.value })} className={fieldClass} />
                 )}
             </div>
-            <div className={groupClass}><label className={labelClass}>Sayı</label><input value={formData.issueNumber || ''} onChange={e => setFormData({ ...formData, issueNumber: e.target.value })} className={fieldClass} /></div>
-            <div className={groupClass}><label className={labelClass}>Yer / Konum</label><input value={formData.place || ''} onChange={e => setFormData({ ...formData, place: e.target.value })} className={fieldClass} /></div>
+            <div className={groupClass}>
+                <label className={labelClass}>Sayı</label>
+                <input
+                    value={formData.issueNumber || ''}
+                    onChange={e => setFormData({ ...formData, issueNumber: e.target.value.replace(/\D/g, '') })}
+                    inputMode="numeric"
+                    className={fieldClass}
+                    placeholder="0"
+                />
+            </div>
+            <div className={groupClass}>
+                <label className={labelClass}>Şehir</label>
+                <select
+                    value={showCustomCity ? '__other__' : (formData.place || '')}
+                    onChange={e => {
+                        if (e.target.value === '__other__') {
+                            setShowCustomCity(true);
+                            setFormData({ ...formData, place: '' });
+                        } else {
+                            setShowCustomCity(false);
+                            setFormData({ ...formData, place: e.target.value });
+                        }
+                    }}
+                    className={`${fieldClass} bg-white`}
+                >
+                    <option value="">— Seçin —</option>
+                    {TR_CITIES.map(city => <option key={city} value={city}>{city}</option>)}
+                    <option value="__other__">Diğer...</option>
+                </select>
+                {showCustomCity && (
+                    <input
+                        value={formData.place || ''}
+                        onChange={e => setFormData({ ...formData, place: e.target.value })}
+                        className={`${fieldClass} mt-1`}
+                        placeholder="Şehir adı girin"
+                    />
+                )}
+            </div>
             <div className={groupClass}><label className={labelClass}>Okul / Mahalle</label><input value={formData.school || ''} onChange={e => setFormData({ ...formData, school: e.target.value })} className={fieldClass} /></div>
             <div className={groupClass}>
                 <label className={labelClass}>Kapak Görseli</label>
@@ -404,7 +477,7 @@ function SidePanel({ formData, setFormData, editors, categories, labels, toggleL
             </div>
             <div className={groupClass}>
                 <label className={labelClass}>Etiketler</label>
-                <div className="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto content-start p-2 border rounded bg-white">
+                <div className="flex flex-wrap gap-1.5 content-start p-2 border rounded bg-white">
                     {labels.map(lbl => (
                         <button key={lbl} type="button" onClick={() => toggleLabel(lbl)}
                             className={`text-xs px-2 py-0.5 rounded-full border ${formData.labels?.includes(lbl) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-600'}`}>
@@ -412,6 +485,46 @@ function SidePanel({ formData, setFormData, editors, categories, labels, toggleL
                         </button>
                     ))}
                 </div>
+            </div>
+            {allArticles && (
+                <div className={groupClass}>
+                    <label className={labelClass}>Önerilen Yazılar <span className="text-gray-300 font-normal normal-case">({recIds.length}/3)</span></label>
+                    <div className="space-y-1 mb-1">
+                        {recArticles.map(a => (
+                            <div key={a.id} className="flex items-center gap-1.5 bg-blue-50 border border-blue-100 rounded px-2 py-1">
+                                <span className="flex-1 text-xs text-gray-700 truncate">{a.title}{a.author ? <span className="text-gray-400"> · {a.author}</span> : null}</span>
+                                <button type="button" onClick={() => setFormData(p => ({ ...p, recommendedArticleIds: recIds.filter(id => id !== a.id) }))}
+                                    className="text-gray-400 hover:text-red-500 shrink-0"><X size={11} /></button>
+                            </div>
+                        ))}
+                    </div>
+                    {recIds.length < 3 && (
+                        <div className="relative">
+                            <input
+                                type="text"
+                                value={recSearch}
+                                onChange={e => setRecSearch(e.target.value)}
+                                placeholder="Yazı ara ve ekle..."
+                                className={`${fieldClass} text-xs`}
+                            />
+                            {recSearchResults.length > 0 && (
+                                <div className="absolute z-20 top-full left-0 right-0 bg-white border border-gray-200 rounded shadow-lg max-h-40 overflow-y-auto">
+                                    {recSearchResults.map(a => (
+                                        <button key={a.id} type="button"
+                                            onClick={() => { setFormData(p => ({ ...p, recommendedArticleIds: [...(p.recommendedArticleIds ?? []), a.id] })); setRecSearch(''); }}
+                                            className="w-full text-left px-3 py-1.5 text-xs hover:bg-blue-50 truncate border-b last:border-0">
+                                            <span className="font-medium">{a.title}</span>
+                                            <span className="text-gray-400 ml-1">· {a.author}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+            )}
+            <div className={`${groupClass} text-xs text-gray-400`}>
+                {charCount?.toLocaleString('tr')} karakter
             </div>
             <div className="flex items-center gap-2 pt-1">
                 <label className="text-xs font-bold text-gray-500 uppercase">Durum:</label>

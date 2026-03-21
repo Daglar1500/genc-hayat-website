@@ -4,7 +4,7 @@ import ReadArticle from '../components/ReadArticle';
 
 interface ReadViewProps {
     selectedArticle: Article;
-    setView: (v: 'dashboard' | 'log' | 'read' | 'issues' | 'stats') => void;
+    setView: (v: 'dashboard' | 'log' | 'read' | 'issues' | 'stats' | 'collections') => void;
     setSelectedArticle: (article: Article | null) => void;
 }
 

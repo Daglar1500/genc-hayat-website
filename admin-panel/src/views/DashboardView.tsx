@@ -369,7 +369,7 @@ export default function DashboardView({
             <div className="flex gap-2 mb-8 flex-wrap">
                 {Object.entries(
                     loggedArticles.reduce((acc, a) => { if (a.category) acc[a.category] = (acc[a.category] || 0) + 1; return acc; }, {} as Record<string, number>)
-                ).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([cat, count]) => (
+                ).sort((a, b) => b[1] - a[1]).slice(0, 7).map(([cat, count]) => (
                     <div key={cat} className="flex items-center gap-1.5 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-full px-3 py-1.5 shadow-sm">
                         <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: getCategoryColor(cat) }} />
                         <span className="text-xs font-medium text-gray-600 dark:text-gray-400">{cat}</span>
@@ -664,7 +664,7 @@ export default function DashboardView({
                                                     </div>
                                                 </div>
                                             </div>
-                                            <h2 className="text-4xl font-serif font-bold mb-2 leading-tight">{section.articles[0].title}</h2>
+                                            <h2 onClick={() => setPreviewArticle(section.articles[0])} className="text-4xl font-serif font-bold mb-2 leading-tight cursor-pointer hover:text-yellow-300 transition-colors">{section.articles[0].title}</h2>
                                             {section.articles[0].school && <p className="text-sm text-blue-400 font-medium mb-2">{section.articles[0].school}</p>}
                                             <div className="flex items-center gap-4 text-sm text-gray-400 mt-4 border-t border-gray-700 pt-4">
                                                 <span className="font-semibold text-white">{section.articles[0].author}</span>

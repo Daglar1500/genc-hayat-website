@@ -3,7 +3,7 @@ import { API_URL } from '../config';
 import type { Article, Category, Section, Issue } from '../types';
 
 export function useAdminData() {
-    const [view, setView] = useState<'dashboard' | 'log' | 'read' | 'issues' | 'stats'>('dashboard');
+    const [view, setView] = useState<'dashboard' | 'log' | 'read' | 'issues' | 'stats' | 'collections'>('dashboard');
     const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
     const [settingsOpen, setSettingsOpen] = useState(false);
 
