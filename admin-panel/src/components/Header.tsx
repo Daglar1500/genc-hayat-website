@@ -186,7 +186,7 @@ export default function Header({
                 {/* Yazı Ekle */}
                 <button
                     onClick={() => { setSelectedArticle(null); setView('log'); }}
-                    className="px-3 py-1.5 bg-orange-500 dark:bg-orange-600 text-white rounded-lg text-sm font-medium hover:bg-orange-600 dark:hover:bg-orange-500 transition-colors flex items-center gap-1"
+                    className="px-3 py-1.5 bg-orange-500 dark:bg-orange-500/20 text-white dark:text-orange-400 rounded-lg text-sm font-medium hover:bg-orange-600 dark:hover:bg-orange-500/30 transition-colors flex items-center gap-1"
                 >
                     <Plus size={14} /> Yazı Ekle
                 </button>
