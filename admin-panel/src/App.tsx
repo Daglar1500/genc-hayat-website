@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { FileText, X, Edit3 } from 'lucide-react';
 import { useAdminData } from './hooks/useAdminData';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
@@ -10,11 +11,30 @@ import LogView from './views/LogView';
 import ReadView from './views/ReadView';
 import IssuesView from './views/IssuesView';
 import StatsView from './views/StatsView';
+import CollectionsView from './views/CollectionsView';
 
 export default function App() {
     const data = useAdminData();
     const [darkMode, setDarkMode] = useState(() => localStorage.getItem('admin-dark') === 'true');
     useEffect(() => { localStorage.setItem('admin-dark', String(darkMode)); }, [darkMode]);
+
+    const [logMinimized, setLogMinimized] = useState(false);
+    const [logDirty, setLogDirty] = useState(false);
+    const [logCloseConfirm, setLogCloseConfirm] = useState(false);
+    const [logSaveTrigger, setLogSaveTrigger] = useState(0);
+    // Tracks the position of the edit tab among preview tabs (set when minimized)
+    const [logTabPosition, setLogTabPosition] = useState<number>(0);
+    useEffect(() => {
+        if (data.view !== 'log') { setLogMinimized(false); setLogDirty(false); setLogTabPosition(0); }
+    }, [data.view]);
+
+    const handleStartEdit = (article: import('./types').Article) => {
+        const previewIndex = data.previewTabs.findIndex(t => t.id === article.id);
+        setLogTabPosition(previewIndex >= 0 ? previewIndex : data.previewTabs.length);
+        setLogMinimized(false);
+        setLogDirty(false);
+        data.startEditArticle(article);
+    };
 
     return (
         <div className={`min-h-screen bg-gray-50 dark:bg-gray-950 font-sans text-gray-800 dark:text-gray-200 flex${darkMode ? ' dark' : ''}`}>
@@ -86,7 +106,7 @@ export default function App() {
                             handleDragStart={data.handleDragStart}
                             handleDrop={data.handleDrop}
                             deleteArticleFromSection={data.deleteArticleFromSection}
-                            startEditArticle={data.startEditArticle}
+                            startEditArticle={handleStartEdit}
                             setPreviewArticle={data.setPreviewArticle}
                             setSelectedArticle={data.setSelectedArticle}
                             setView={data.setView}
@@ -98,6 +118,12 @@ export default function App() {
                         />
                     ) : data.view === 'stats' ? (
                         <StatsView />
+                    ) : data.view === 'collections' ? (
+                        <CollectionsView
+                            loggedArticles={data.loggedArticles}
+                            setLoggedArticles={data.setLoggedArticles}
+                            setPreviewArticle={data.setPreviewArticle}
+                        />
                     ) : data.view === 'issues' ? (
                         <IssuesView
                             issues={data.issues}
@@ -120,10 +146,15 @@ export default function App() {
                     categories={data.categories}
                     labels={data.labels}
                     editors={data.editors}
+                    loggedArticles={data.loggedArticles}
                     setLoggedArticles={data.setLoggedArticles}
                     setView={data.setView}
                     setSelectedArticle={data.setSelectedArticle}
                     setPreviewArticle={data.setPreviewArticle}
+                    onMinimize={() => { setLogMinimized(true); setLogTabPosition(data.previewTabs.length); }}
+                    externalMinimized={logMinimized || !!data.activePreviewId}
+                    onDirtyChange={setLogDirty}
+                    saveTrigger={logSaveTrigger}
                 />
             )}
             {data.view === 'read' && data.selectedArticle && (
@@ -134,15 +165,87 @@ export default function App() {
                 />
             )}
 
-            {/* Article Quick Preview Modal */}
-            {data.previewArticle && (
-                <PreviewModal
-                    article={data.previewArticle}
-                    onClose={() => data.setPreviewArticle(null)}
-                    onEdit={data.startEditArticle}
-                    getCategoryColor={data.getCategoryColor}
-                />
-            )}
+            {/* Bottom tab bar — preview tabs + log article tab in one row */}
+            {(data.previewTabs.length > 0 || data.view === 'log') && (() => {
+                const renderPreviewTab = (tab: typeof data.previewTabs[0]) => {
+                    const isActive = tab.id === data.activePreviewId;
+                    return (
+                        <div
+                            key={tab.id}
+                            className={`flex items-stretch border-r border-gray-200 dark:border-gray-700 max-w-55 min-w-0 ${isActive ? 'bg-blue-50 dark:bg-blue-950 border-t-2 border-t-blue-400' : 'hover:bg-gray-50 dark:hover:bg-gray-800'}`}
+                        >
+                            <button
+                                onClick={() => data.setActivePreviewId(isActive ? null : tab.id)}
+                                className="flex items-center gap-1.5 pl-3 pr-1 min-w-0 flex-1"
+                            >
+                                <FileText size={12} className={`shrink-0 ${isActive ? 'text-blue-400' : 'text-gray-400'}`} />
+                                <span className={`truncate text-xs ${isActive ? 'text-blue-700 dark:text-blue-300 font-medium' : 'text-gray-600 dark:text-gray-400'}`}>{tab.title}</span>
+                            </button>
+                            <button
+                                onClick={() => data.closePreviewTab(tab.id)}
+                                className="flex items-center px-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 shrink-0"
+                                title="Kapat"
+                            >
+                                <X size={12} />
+                            </button>
+                        </div>
+                    );
+                };
+
+                const isLogActive = !logMinimized && !data.activePreviewId;
+                const editTab = data.view === 'log' ? (
+                    <div key="__log__" className={`flex items-stretch border-r border-gray-200 dark:border-gray-700 max-w-55 min-w-0 ${isLogActive ? 'bg-orange-50 dark:bg-orange-950 border-t-2 border-t-orange-400' : 'hover:bg-gray-50 dark:hover:bg-gray-800'}`}>
+                        <button
+                            onClick={() => {
+                                if (isLogActive) { setLogMinimized(true); setLogTabPosition(data.previewTabs.length); }
+                                else { data.setActivePreviewId(null); setLogMinimized(false); }
+                            }}
+                            className="flex items-center gap-1.5 pl-3 pr-1 min-w-0 flex-1"
+                        >
+                            <Edit3 size={12} className={`shrink-0 ${isLogActive ? 'text-orange-500' : 'text-orange-400'}`} />
+                            <span className={`truncate text-xs ${isLogActive ? 'text-orange-700 dark:text-orange-300 font-medium' : 'text-gray-600 dark:text-gray-400'}`}>
+                                {data.selectedArticle?.title || 'Yeni Makale'}
+                            </span>
+                        </button>
+                        <button
+                            onClick={() => setLogCloseConfirm(true)}
+                            className="flex items-center px-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 shrink-0"
+                            title="Kapat"
+                        >
+                            <X size={12} />
+                        </button>
+                    </div>
+                ) : null;
+
+                // Split preview tabs around the log tab's recorded position
+                const pos = Math.min(logTabPosition, data.previewTabs.length);
+                const before = data.previewTabs.slice(0, pos);
+                const after = data.previewTabs.slice(pos);
+
+                return (
+                    <div className="fixed bottom-0 left-0 right-0 z-100 flex items-stretch bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 shadow-lg h-9">
+                        {before.map(renderPreviewTab)}
+                        {editTab}
+                        {after.map(renderPreviewTab)}
+                    </div>
+                );
+            })()}
+
+            {/* Active preview modal */}
+            {(() => {
+                const activeArticle = data.previewTabs.find(a => a.id === data.activePreviewId);
+                return activeArticle ? (
+                    <PreviewModal
+                        article={activeArticle}
+                        onClose={() => data.closePreviewTab(activeArticle.id)}
+                        onMinimize={() => data.setActivePreviewId(null)}
+                        onEdit={handleStartEdit}
+                        getCategoryColor={data.getCategoryColor}
+                        allArticles={data.loggedArticles}
+                        onPreview={(a) => data.openPreviewArticle(a)}
+                    />
+                ) : null;
+            })()}
 
             <SettingsPanel
                 settingsOpen={data.settingsOpen}
@@ -159,6 +262,49 @@ export default function App() {
             />
 
             <Toast toasts={data.toasts} />
+
+            {/* Close confirmation modal for dirty edit form */}
+            {logCloseConfirm && (
+                <div className="fixed inset-0 z-200 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+                    <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-sm mx-4 p-6">
+                        <h3 className="text-base font-bold text-gray-900 dark:text-gray-100 mb-1">
+                            {logDirty ? 'Kaydedilmemiş değişiklikler var' : 'Formu kapat'}
+                        </h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">
+                            {logDirty
+                                ? 'Düzenleme formunu kapatmak istediğinizden emin misiniz? Kaydedilmemiş değişiklikler kaybolacak.'
+                                : 'Düzenleme formunu kapatmak istediğinizden emin misiniz?'}
+                        </p>
+                        <div className="flex gap-2 justify-end">
+                            <button
+                                onClick={() => setLogCloseConfirm(false)}
+                                className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
+                            >
+                                İptal
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setLogCloseConfirm(false);
+                                    data.setView('dashboard');
+                                    data.setSelectedArticle(null);
+                                }}
+                                className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
+                            >
+                                Kaydetmeden Kapat
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setLogCloseConfirm(false);
+                                    setLogSaveTrigger(t => t + 1);
+                                }}
+                                className="px-4 py-2 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+                            >
+                                Kaydet ve Kapat
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

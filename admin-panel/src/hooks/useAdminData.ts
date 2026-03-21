@@ -3,7 +3,7 @@ import { API_URL } from '../config';
 import type { Article, Category, Section, Issue } from '../types';
 
 export function useAdminData() {
-    const [view, setView] = useState<'dashboard' | 'log' | 'read' | 'issues' | 'stats'>('dashboard');
+    const [view, setView] = useState<'dashboard' | 'log' | 'read' | 'issues' | 'stats' | 'collections'>('dashboard');
     const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
     const [settingsOpen, setSettingsOpen] = useState(false);
 
@@ -44,8 +44,27 @@ export function useAdminData() {
     // Sidebar sort
     const [sidebarSort, setSidebarSort] = useState<'issue' | 'date-desc' | 'date-asc' | 'category' | 'author'>('issue');
 
-    // Quick preview popup
-    const [previewArticle, setPreviewArticle] = useState<Article | null>(null);
+    // Quick preview tabs
+    const [previewTabs, setPreviewTabs] = useState<Article[]>([]);
+    const [activePreviewId, setActivePreviewId] = useState<string | null>(null);
+    const openPreviewArticle = useCallback((article: Article) => {
+        setPreviewTabs(prev => {
+            const exists = prev.find(a => a.id === article.id);
+            if (exists) return prev.map(a => a.id === article.id ? article : a);
+            return [...prev, article];
+        });
+        setActivePreviewId(article.id);
+    }, []);
+
+    const closePreviewTab = useCallback((id: string) => {
+        setPreviewTabs(prev => prev.filter(a => a.id !== id));
+        setActivePreviewId(curr => curr === id ? null : curr);
+    }, []);
+
+    // Backwards-compatible alias: accepts Article | null, ignores null
+    const setPreviewArticle = useCallback((article: Article | null) => {
+        if (article) openPreviewArticle(article);
+    }, [openPreviewArticle]);
 
     // Bulk selection
     const [bulkSelected, setBulkSelected] = useState<string[]>([]);
@@ -285,7 +304,7 @@ export function useAdminData() {
         e.dataTransfer.effectAllowed = 'copyMove';
     };
 
-    const handleDrop = (e: React.DragEvent, targetSecId: string, targetIndex?: number, mode?: 'replace') => {
+    const handleDrop = (e: React.DragEvent, targetSecId: string, targetIndex?: number, mode?: 'replace' | 'articles') => {
         e.preventDefault();
         e.stopPropagation();
         const dragged = dragItem.current;
@@ -317,7 +336,7 @@ export function useAdminData() {
 
         if (!art) return;
 
-        if (targetSection.type === 'main-row') {
+        if (targetSection.type === 'main-row' && mode !== 'articles' && mode !== 'replace') {
             targetSection.routeArticle = art;
             setSections(newSections);
             dragItem.current = null;
@@ -325,6 +344,7 @@ export function useAdminData() {
         }
 
         // Replace mode: replace from sidebar, swap when from a section
+        const replaceMax = targetSection.type === 'category-row' ? 3 : targetSection.type === 'ordinary-row' ? 4 : null;
         if (mode === 'replace' && targetIndex !== undefined) {
             if (targetIndex < targetSection.articles.length) {
                 const displaced = targetSection.articles[targetIndex];
@@ -332,8 +352,12 @@ export function useAdminData() {
                 if (dragged.type !== 'sidebar' && sourceSecIdx !== -1 && sourceIdx !== -1) {
                     newSections[sourceSecIdx].articles.splice(sourceIdx, 0, displaced);
                 }
-            } else {
+            } else if (replaceMax === null || targetSection.articles.length < replaceMax) {
                 targetSection.articles.push(art);
+            } else {
+                showToast(`Bu bölüme maksimum ${replaceMax} makale eklenebilir`, 'error');
+                dragItem.current = null;
+                return;
             }
             setSections(newSections);
             dragItem.current = null;
@@ -401,8 +425,10 @@ export function useAdminData() {
         showTemplates, setShowTemplates,
         // Sidebar sort
         sidebarSort, setSidebarSort,
-        // Preview
-        previewArticle, setPreviewArticle,
+        // Preview tabs
+        previewTabs, activePreviewId, setActivePreviewId,
+        openPreviewArticle, closePreviewTab,
+        setPreviewArticle,
         // Bulk
         bulkSelected, setBulkSelected,
         bulkDropdownOpen, setBulkDropdownOpen,

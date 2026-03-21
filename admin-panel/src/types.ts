@@ -32,6 +32,7 @@ export interface Article {
     status: 'edited' | 'not-edited';
     slug?: string;
     type?: 'featured' | 'normal' | 'sunu' | 'rota';
+    recommendedArticleIds?: string[];
 }
 
 export type SectionType = 'main-row' | 'category-row' | 'ordinary-row' | 'spot-row' | 'article-feed' | 'video-row' | 'spotify-row' | 'letterboxd-row' | 'archive-row';

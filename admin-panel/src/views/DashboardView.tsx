@@ -3,7 +3,7 @@ import {
     FileText, CheckCircle, XCircle, Layers, BookMarked,
     Pin, Eye, EyeOff, ChevronUp, ChevronDown, Trash2, Edit3,
     AlignLeft, MapPin, Plus, X, GripVertical, Upload,
-    Eraser, ChevronRight, Film,
+    Eraser, ChevronRight,
 } from 'lucide-react';
 import type { Article, Section, Category } from '../types';
 import { getSectionLabel } from '../utils/sectionHelpers';
@@ -154,6 +154,7 @@ function ArticleCard({
     );
 }
 
+
 interface DashboardViewProps {
     sections: Section[];
     setSections: React.Dispatch<React.SetStateAction<Section[]>>;
@@ -164,7 +165,7 @@ interface DashboardViewProps {
     setPagination: React.Dispatch<React.SetStateAction<Record<string, { page: number, expanded: boolean }>>>;
     getCategoryColor: (name: string) => string;
     handleDragStart: (e: React.DragEvent, type: string, id: string, fromSec?: string) => void;
-    handleDrop: (e: React.DragEvent, targetSecId: string, targetIndex?: number, mode?: 'replace') => void;
+    handleDrop: (e: React.DragEvent, targetSecId: string, targetIndex?: number, mode?: 'replace' | 'articles') => void;
     deleteArticleFromSection: (sectionId: string, articleId: string) => void;
     startEditArticle: (article: Article) => void;
     setPreviewArticle: (article: Article | null) => void;
@@ -369,7 +370,7 @@ export default function DashboardView({
             <div className="flex gap-2 mb-8 flex-wrap">
                 {Object.entries(
                     loggedArticles.reduce((acc, a) => { if (a.category) acc[a.category] = (acc[a.category] || 0) + 1; return acc; }, {} as Record<string, number>)
-                ).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([cat, count]) => (
+                ).sort((a, b) => b[1] - a[1]).slice(0, 7).map(([cat, count]) => (
                     <div key={cat} className="flex items-center gap-1.5 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-full px-3 py-1.5 shadow-sm">
                         <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: getCategoryColor(cat) }} />
                         <span className="text-xs font-medium text-gray-600 dark:text-gray-400">{cat}</span>
@@ -398,6 +399,12 @@ export default function DashboardView({
                             <span className={`w-2 h-2 rounded-full shrink-0 ${sectionTypeColor(section.type)}`} />
                             {section.isPinned && <Pin size={11} fill="currentColor" className="text-blue-500" />}
                             <span className="text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">{getSectionLabel(section.type)}</span>
+                            {section.type === 'category-row' && (
+                                <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${section.articles.length >= 3 ? 'bg-red-50 text-red-500 border border-red-200' : 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500'}`}>{section.articles.length}/3</span>
+                            )}
+                            {section.type === 'ordinary-row' && (
+                                <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${section.articles.length >= 4 ? 'bg-red-50 text-red-500 border border-red-200' : 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500'}`}>{section.articles.length}/4</span>
+                            )}
                             {!(section.isVisible ?? true) && (
                                 <span className="text-[10px] text-amber-600 font-medium bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded-full">Gizli</span>
                             )}
@@ -658,7 +665,7 @@ export default function DashboardView({
                                                     </div>
                                                 </div>
                                             </div>
-                                            <h2 className="text-4xl font-serif font-bold mb-2 leading-tight">{section.articles[0].title}</h2>
+                                            <h2 onClick={() => setPreviewArticle(section.articles[0])} className="text-4xl font-serif font-bold mb-2 leading-tight cursor-pointer hover:text-yellow-300 transition-colors">{section.articles[0].title}</h2>
                                             {section.articles[0].school && <p className="text-sm text-blue-400 font-medium mb-2">{section.articles[0].school}</p>}
                                             <div className="flex items-center gap-4 text-sm text-gray-400 mt-4 border-t border-gray-700 pt-4">
                                                 <span className="font-semibold text-white">{section.articles[0].author}</span>
@@ -823,42 +830,30 @@ export default function DashboardView({
                                             className="flex gap-2 items-center p-2 border border-gray-100 dark:border-gray-800 rounded-xl bg-gray-50/50 dark:bg-gray-800/40 cursor-default"
                                         >
                                             <GripVertical size={14} className="text-gray-300 dark:text-gray-600 cursor-grab shrink-0" />
-                                            {/* Poster thumbnail */}
-                                            <div className="w-8 h-12 rounded overflow-hidden bg-zinc-800 shrink-0 border border-zinc-700">
-                                                {f.posterUrl
-                                                    ? <img src={f.posterUrl} alt="" className="w-full h-full object-cover" />
-                                                    : <div className="w-full h-full flex items-center justify-center text-zinc-500"><Film size={12} /></div>
-                                                }
-                                            </div>
                                             <div className="flex flex-col gap-1 flex-1 min-w-0">
-                                                <input className="w-full p-1.5 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-emerald-400" placeholder="Başlık (otomatik doldurulur)" value={f.title || ''} onChange={e => updateConfigItem(section.id, 'films', i, { title: e.target.value })} />
+                                                <input className="w-full p-1.5 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-400" placeholder="Liste adı" value={f.title || ''} onChange={e => updateConfigItem(section.id, 'films', i, { title: e.target.value })} />
                                                 <div className="flex gap-1">
                                                     <input
-                                                        className="flex-1 p-1.5 border border-gray-200 dark:border-gray-700 rounded-lg text-xs bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-emerald-400"
+                                                        className="flex-1 p-1.5 border border-gray-200 dark:border-gray-700 rounded-lg text-xs bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-400"
                                                         placeholder="Letterboxd URL"
                                                         value={f.url}
                                                         onChange={e => updateConfigItem(section.id, 'films', i, { url: e.target.value })}
-                                                        onBlur={async e => {
-                                                            const url = e.target.value;
-                                                            if (!url) return;
-                                                            try {
-                                                                const res = await fetch(`https://noembed.com/embed?url=${encodeURIComponent(url)}`);
-                                                                const data = await res.json();
-                                                                const patch: Record<string, string> = {};
-                                                                if (!f.title && data.title) patch.title = data.title;
-                                                                if (!f.posterUrl && data.thumbnail_url) patch.posterUrl = data.thumbnail_url;
-                                                                if (Object.keys(patch).length > 0) updateConfigItem(section.id, 'films', i, patch);
-                                                            } catch { /* silent */ }
-                                                        }}
                                                     />
-                                                    <input className="w-14 p-1.5 border border-gray-200 dark:border-gray-700 rounded-lg text-xs bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-emerald-400" placeholder="Yıl" value={f.year || ''} onChange={e => updateConfigItem(section.id, 'films', i, { year: e.target.value })} />
+                                                    <input
+                                                        type="number"
+                                                        min="0"
+                                                        className="w-20 p-1.5 border border-gray-200 dark:border-gray-700 rounded-lg text-xs bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                                                        placeholder="Film sayısı"
+                                                        value={f.filmCount ?? ''}
+                                                        onChange={e => updateConfigItem(section.id, 'films', i, { filmCount: e.target.value === '' ? '' : Number(e.target.value) })}
+                                                    />
                                                 </div>
                                             </div>
                                             <button onClick={() => removeConfigItem(section.id, 'films', i)} className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors shrink-0"><Trash2 size={14} /></button>
                                         </div>
                                     ))}
                                     <button
-                                        onClick={() => addConfigItem(section.id, 'films', { id: `f-${Date.now()}`, url: '', title: '', year: '', director: '', rating: 0, posterUrl: '' })}
+                                        onClick={() => addConfigItem(section.id, 'films', { id: `f-${Date.now()}`, url: '', title: '', filmCount: '' })}
                                         className="text-sm text-gray-500 font-medium hover:text-emerald-700 flex items-center gap-1 transition-colors"
                                     >
                                         <Plus size={14} /> Film / Liste Ekle
@@ -880,7 +875,7 @@ export default function DashboardView({
                                 {/* Title + Issue Number */}
                                 <div className="grid grid-cols-3 gap-3">
                                     <div className="col-span-2">
-                                        <label className="block text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase mb-1">Manşet Başlığı</label>
+                                        <label className="block text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase mb-1">Bölüm Başlığı</label>
                                         <input
                                             value={section.title ?? ''}
                                             onFocus={() => recordHistory(sections)}
@@ -981,6 +976,43 @@ export default function DashboardView({
                                         )}
                                     </div>
                                 </div>
+                                {/* Önerilen yazılar — aynı ordinary-row grid düzeni */}
+                                {(() => {
+                                    const arts = section.articles;
+                                    const prevIdx = (insertPreview?.sectionId === section.id) ? insertPreview.index : -1;
+                                    const items = buildDisplayItems(arts, prevIdx);
+                                    return (
+                                        <div className="mt-4 space-y-2">
+                                            <label className="block text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase">Önerilen Yazılar <span className="font-normal normal-case text-gray-300 dark:text-gray-600">({arts.length})</span></label>
+                                            <div
+                                                className="grid grid-cols-4 gap-5 min-h-40"
+                                                onDragOver={e => e.preventDefault()}
+                                                onDrop={e => handleDrop(e, section.id, undefined, 'articles')}
+                                            >
+                                                {arts.length === 0 && prevIdx === -1 && (
+                                                    <div className="col-span-4 h-20 border-2 border-dashed border-gray-100 dark:border-gray-800 rounded-xl flex items-center justify-center text-sm text-gray-300 dark:text-gray-600">Yazı Kütüphanesinden Buraya Sürükle</div>
+                                                )}
+                                                {items.map(item =>
+                                                    item.type === 'preview'
+                                                        ? <InsertPreviewSlot key="preview" />
+                                                        : <div key={item.art.id} className="h-60">
+                                                            <ArticleCard
+                                                                article={item.art}
+                                                                sectionId={section.id}
+                                                                index={item.realIdx}
+                                                                isReplaceTarget={replaceTarget?.sectionId === section.id && replaceTarget?.index === item.realIdx}
+                                                                onDragStart={(e) => { handleDragStart(e, 'grid', item.art.id, section.id); }}
+                                                                onDragOverCard={makeCardDragOver(section.id, item.realIdx)}
+                                                                onDragLeaveCard={scheduleHoverClear}
+                                                                onCardDrop={makeCardDrop(section.id, item.realIdx)}
+                                                                {...sharedCardProps}
+                                                            />
+                                                        </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    );
+                                })()}
                             </div>
                         )}
                     </div>}
@@ -992,7 +1024,7 @@ export default function DashboardView({
                 <span className="text-xs font-semibold text-gray-300 dark:text-gray-600 uppercase tracking-wider">Bölüm Ekle</span>
                 <div className="w-px h-4 bg-gray-200 dark:bg-gray-700" />
                 {[
-                    { type: 'main-row', label: 'Ana Manşet' },
+                    { type: 'main-row', label: 'Ana Bölüm' },
                     { type: 'ordinary-row', label: 'Sıradan Satır' },
                     { type: 'category-row', label: 'Kategori Bölümü' },
                     { type: 'spot-row', label: 'Spot Satırı' },

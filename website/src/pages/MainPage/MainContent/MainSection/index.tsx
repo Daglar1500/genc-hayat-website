@@ -21,11 +21,15 @@ const ArticleCarousel = ({ issueNumber, isLatest }: { issueNumber: number; isLat
 
   useEffect(() => {
     const apiUrl = (import.meta as any).env?.VITE_API_URL ?? 'http://localhost:3001/api';
-    fetch(`${apiUrl}/articles`)
+    fetch(`${apiUrl}/init`)
       .then(res => res.json())
       .then(data => {
-        // En son eklenen 8 makaleyi al
-        const articles = data.slice(0, 8).map((a: any) => ({
+        // Ana Bölüm (main-row) section'ındaki önerilen yazıları al; yoksa en son 8 makaleyi kullan
+        const mainSection = data.sections?.find((s: any) => s.type === 'main-row');
+        const rawArticles: any[] = (mainSection?.articles?.length > 0)
+          ? mainSection.articles
+          : (data.articles ?? []).slice(0, 8);
+        const articles = rawArticles.map((a: any) => ({
           href: `/articles/${a.id}`,
           title: a.title,
           type: a.type || 'normal',

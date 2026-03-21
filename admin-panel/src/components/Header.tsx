@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
     Menu, X, Plus, Settings,
-    Layout, BookOpen, BarChart2,
+    Layout, BookOpen, BarChart2, Layers,
     RotateCcw, RotateCw, Moon, Sun
 } from 'lucide-react';
 import type { Section } from '../types';
@@ -13,8 +13,8 @@ interface Template {
 }
 
 interface HeaderProps {
-    view: 'dashboard' | 'log' | 'read' | 'issues' | 'stats';
-    setView: (v: 'dashboard' | 'log' | 'read' | 'issues' | 'stats') => void;
+    view: 'dashboard' | 'log' | 'read' | 'issues' | 'stats' | 'collections';
+    setView: (v: 'dashboard' | 'log' | 'read' | 'issues' | 'stats' | 'collections') => void;
     menuOpen: boolean;
     setMenuOpen: (open: boolean) => void;
     historySize: number;
@@ -173,6 +173,14 @@ export default function Header({
                     className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5 ${view === 'issues' ? 'bg-violet-600 text-white hover:bg-violet-700' : 'bg-violet-50 text-violet-700 hover:bg-violet-100 dark:bg-violet-900/20 dark:text-violet-400 dark:hover:bg-violet-900/40'}`}
                 >
                     <BookOpen size={14} />Sayılar
+                </button>
+
+                {/* Koleksiyonlar toggle */}
+                <button
+                    onClick={() => setView(view === 'collections' ? 'dashboard' : 'collections')}
+                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5 ${view === 'collections' ? 'bg-teal-600 text-white hover:bg-teal-700' : 'bg-teal-50 text-teal-700 hover:bg-teal-100 dark:bg-teal-900/20 dark:text-teal-400 dark:hover:bg-teal-900/40'}`}
+                >
+                    <Layers size={14} />Koleksiyonlar
                 </button>
 
                 {/* Makale Ekle */}
