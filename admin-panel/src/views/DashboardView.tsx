@@ -258,6 +258,16 @@ export default function DashboardView({
         return () => clearTimeout(t);
     }, [pendingDeleteId]);
 
+    useEffect(() => {
+        if (!pendingClearId) return;
+        const t = setTimeout(() => setPendingClearId(null), 2000);
+        const resetOnOutsideClick = (e: MouseEvent) => {
+            if (!(e.target as HTMLElement).closest('[data-clear-btn]')) setPendingClearId(null);
+        };
+        const tid = setTimeout(() => document.addEventListener('mousedown', resetOnOutsideClick), 0);
+        return () => { clearTimeout(t); clearTimeout(tid); document.removeEventListener('mousedown', resetOnOutsideClick); };
+    }, [pendingClearId]);
+
     const sharedCardProps = {
         getCategoryColor, deleteArticleFromSection, startEditArticle, setPreviewArticle,
     };
@@ -482,6 +492,7 @@ export default function DashboardView({
                             </button>
                             {/* Clear */}
                             <button
+                                data-clear-btn=""
                                 onClick={() => {
                                     if (pendingClearId === section.id) {
                                         clearSection(section);

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
-    Menu, X, Plus, Settings,
+    Menu, X, Plus, Settings, Check,
     Layout, BookOpen, BarChart2, Layers,
     RotateCcw, RotateCw, Moon, Sun
 } from 'lucide-react';
@@ -30,7 +30,7 @@ interface HeaderProps {
     templates: Template[];
     loadTemplate: (template: Template) => void;
     deleteTemplate: (idx: number) => void;
-    saveTemplate: () => void;
+    saveTemplate: (name: string) => void;
     darkMode: boolean;
     toggleDarkMode: () => void;
 }
@@ -48,6 +48,27 @@ export default function Header({
     darkMode, toggleDarkMode,
 }: HeaderProps) {
     const [unreadComments, setUnreadComments] = useState(0);
+    const [templateNameModal, setTemplateNameModal] = useState(false);
+    const [templateNameInput, setTemplateNameInput] = useState('');
+    const [pendingDeleteIdx, setPendingDeleteIdx] = useState<number | null>(null);
+    const templatesRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (!showTemplates) return;
+        const handler = (e: MouseEvent) => {
+            if (templatesRef.current && !templatesRef.current.contains(e.target as Node)) {
+                setShowTemplates(false);
+            }
+        };
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, [showTemplates, setShowTemplates]);
+
+    useEffect(() => {
+        if (pendingDeleteIdx === null) return;
+        const t = setTimeout(() => setPendingDeleteIdx(null), 2000);
+        return () => clearTimeout(t);
+    }, [pendingDeleteIdx]);
 
     useEffect(() => {
         const load = () => {
@@ -120,7 +141,7 @@ export default function Header({
                 <div className="w-px h-5 bg-gray-200 dark:bg-gray-700 mx-0.5" />
 
                 {/* Templates */}
-                <div className="relative">
+                <div className="relative" ref={templatesRef}>
                     <button
                         onClick={() => setShowTemplates(!showTemplates)}
                         className="px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 flex items-center gap-1.5 transition-colors"
@@ -138,12 +159,21 @@ export default function Header({
                                 <div key={i} className="flex items-center gap-2 px-2 py-1.5 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg">
                                     <span className="flex-1 text-sm text-gray-700 dark:text-gray-300 truncate">{t.name}</span>
                                     <button onClick={() => loadTemplate(t)} className="text-xs text-blue-600 font-medium hover:underline shrink-0">Yükle</button>
-                                    <button onClick={() => deleteTemplate(i)} className="text-gray-300 hover:text-red-500 transition-colors shrink-0"><X size={12} /></button>
+                                    <button
+                                        onClick={() => {
+                                            if (pendingDeleteIdx === i) { deleteTemplate(i); setPendingDeleteIdx(null); }
+                                            else setPendingDeleteIdx(i);
+                                        }}
+                                        className={`transition-colors shrink-0 ${pendingDeleteIdx === i ? 'text-red-500' : 'text-gray-300 hover:text-red-500'}`}
+                                        title={pendingDeleteIdx === i ? 'Silmek için tekrar tıkla' : 'Şablonu Sil'}
+                                    >
+                                        {pendingDeleteIdx === i ? <Check size={12} /> : <X size={12} />}
+                                    </button>
                                 </div>
                             ))}
                             <div className="border-t border-gray-100 dark:border-gray-800 pt-2 mt-2">
                                 <button
-                                    onClick={saveTemplate}
+                                    onClick={() => { setTemplateNameInput(''); setTemplateNameModal(true); setShowTemplates(false); }}
                                     className="w-full text-sm text-emerald-600 font-medium hover:text-emerald-700 flex items-center gap-1 justify-center py-1"
                                 >
                                     <Plus size={13} /> Mevcut Düzeni Kaydet
@@ -201,6 +231,30 @@ export default function Header({
                     {isSaving ? 'Kaydediliyor...' : 'Kaydet'}
                 </button>
             </div>
+            {/* Template name modal */}
+            {templateNameModal && (
+                <div className="fixed inset-0 z-200 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+                    <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-sm mx-4 p-6" onClick={e => e.stopPropagation()}>
+                        <h3 className="text-base font-bold text-gray-900 dark:text-gray-100 mb-1">Şablon Kaydet</h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Bu düzene bir isim verin.</p>
+                        <input
+                            autoFocus
+                            value={templateNameInput}
+                            onChange={e => setTemplateNameInput(e.target.value)}
+                            onKeyDown={e => {
+                                if (e.key === 'Enter' && templateNameInput.trim()) { saveTemplate(templateNameInput.trim()); setTemplateNameModal(false); }
+                                if (e.key === 'Escape') setTemplateNameModal(false);
+                            }}
+                            placeholder="Şablon adı..."
+                            className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none mb-4"
+                        />
+                        <div className="flex gap-2 justify-end">
+                            <button onClick={() => setTemplateNameModal(false)} className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">İptal</button>
+                            <button onClick={() => { if (templateNameInput.trim()) { saveTemplate(templateNameInput.trim()); setTemplateNameModal(false); } }} disabled={!templateNameInput.trim()} className="px-4 py-2 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">Kaydet</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

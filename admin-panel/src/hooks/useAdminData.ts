@@ -114,13 +114,8 @@ export function useAdminData() {
 
     // --- Template Functions ---
     // Saves all section content except article-feed articles
-    const saveTemplate = () => {
-        const name = prompt('Şablon adı:');
-        if (!name) return;
-        const templateSections = sections.map(s => ({
-            ...s,
-            articles: s.type === 'article-feed' ? [] : s.articles,
-        }));
+    const saveTemplate = (name: string) => {
+        const templateSections = sections.map(s => ({ ...s }));
         const newTemplates = [...templates, { name, sections: templateSections }];
         setTemplates(newTemplates);
         localStorage.setItem('cms-templates', JSON.stringify(newTemplates));

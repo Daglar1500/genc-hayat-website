@@ -48,6 +48,18 @@ export default function Sidebar({
     restoreArticle, permanentDeleteArticle, emptyTrash,
     hasTabBar,
 }: SidebarProps) {
+    const bulkDropdownRef = React.useRef<HTMLDivElement>(null);
+    React.useEffect(() => {
+        if (!bulkDropdownOpen) return;
+        const handler = (e: MouseEvent) => {
+            if (bulkDropdownRef.current && !bulkDropdownRef.current.contains(e.target as Node)) {
+                setBulkDropdownOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, [bulkDropdownOpen, setBulkDropdownOpen]);
+
     const EDITOR_BG_COLORS = ['#3b82f6','#8b5cf6','#10b981','#f59e0b','#ef4444','#ec4899','#14b8a6','#6366f1','#f97316','#06b6d4'];
     const getEditorColor = (name: string) => {
         if (!name) return '#94a3b8';
@@ -313,7 +325,13 @@ export default function Sidebar({
                                 >
                                     Kaldır
                                 </button>
-                                <div className="relative ml-auto shrink-0">
+                                <button
+                                    onClick={() => { bulkSelected.forEach(id => deleteArticle(id)); setBulkSelected([]); }}
+                                    className="text-[11px] px-1.5 py-1 bg-red-500 text-white rounded font-medium hover:bg-red-600 transition-colors shrink-0"
+                                >
+                                    Sil
+                                </button>
+                                <div className="relative ml-auto shrink-0" ref={bulkDropdownRef}>
                                     <button
                                         onClick={() => setBulkDropdownOpen(prev => !prev)}
                                         className="text-[11px] px-1.5 py-1 bg-blue-600 text-white rounded font-medium hover:bg-blue-700 flex items-center gap-1 whitespace-nowrap"

@@ -251,6 +251,10 @@ export default function App() {
                         getCategoryColor={data.getCategoryColor}
                         allArticles={data.loggedArticles}
                         onPreview={(a) => data.openPreviewArticle(a)}
+                        onStatusChange={(updated) => {
+                            data.setLoggedArticles(prev => prev.map(a => a.id === updated.id ? updated : a));
+                            data.openPreviewArticle(updated);
+                        }}
                     />
                 ) : null;
             })()}

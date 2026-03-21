@@ -11,6 +11,7 @@ interface PreviewModalProps {
     getCategoryColor: (name: string) => string;
     allArticles?: Article[];
     onPreview?: (article: Article) => void;
+    onStatusChange?: (article: Article) => void;
 }
 
 interface Comment {
@@ -102,7 +103,7 @@ function exportCommentsAsDoc(article: Article, comments: Comment[]) {
 
 const emptyStats: ArticleStats = { views: 0, commentCount: 0, unreadCount: 0, comments: [] };
 
-export default function PreviewModal({ article, onClose, onMinimize, onEdit, getCategoryColor, allArticles, onPreview }: PreviewModalProps) {
+export default function PreviewModal({ article, onClose, onMinimize, onEdit, getCategoryColor, allArticles, onPreview, onStatusChange }: PreviewModalProps) {
     const [windowState, setWindowState] = useState<WindowState>('normal');
     const [stats, setStats] = useState<ArticleStats>(emptyStats);
     const [statsLoaded, setStatsLoaded] = useState(false);
@@ -126,7 +127,19 @@ export default function PreviewModal({ article, onClose, onMinimize, onEdit, get
 
     const charCount = countChars(article);
     const htmlContent = article.text || (article.content ? renderContent(article.content as any[]) : '');
-    const isEdited = article.status === 'edited';
+    const [localStatus, setLocalStatus] = useState<'edited' | 'not-edited'>(article.status);
+    useEffect(() => { setLocalStatus(article.status); }, [article.status, article.id]);
+    const isEdited = localStatus === 'edited';
+    const toggleStatus = () => {
+        const newStatus: 'edited' | 'not-edited' = localStatus === 'edited' ? 'not-edited' : 'edited';
+        setLocalStatus(newStatus);
+        const updated = { ...article, status: newStatus };
+        fetch(`${API_URL}/articles/${article.id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: newStatus }),
+        }).then(() => onStatusChange?.(updated)).catch(() => setLocalStatus(article.status));
+    };
 
     const markRead = (id: string) => {
         fetch(`${API_URL}/comments/${id}/read`, { method: 'PATCH' }).then(() => {
@@ -193,6 +206,19 @@ export default function PreviewModal({ article, onClose, onMinimize, onEdit, get
                         <div className="text-sm font-semibold text-gray-800 dark:text-gray-200">{article.author}</div>
                     </div>
                 </div>
+
+                {/* Editör — mor */}
+                {article.editorName && (
+                    <div className="px-4 py-3.5 border-b border-gray-100 dark:border-gray-800 flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center shrink-0">
+                            <Edit3 size={16} className="text-purple-500" />
+                        </div>
+                        <div>
+                            <div className="text-[9px] font-black uppercase tracking-widest text-purple-400 mb-0.5">Editör</div>
+                            <div className="text-sm font-semibold text-gray-800 dark:text-gray-200">{article.editorName}</div>
+                        </div>
+                    </div>
+                )}
 
                 {/* Kategori — indigo */}
                 {article.category && (
@@ -267,16 +293,6 @@ export default function PreviewModal({ article, onClose, onMinimize, onEdit, get
                     </div>
                 </div>
 
-                {/* Durum — yeşil / kırmızı */}
-                <div className="px-4 py-3.5 flex items-center gap-3">
-                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${isEdited ? 'bg-emerald-100 dark:bg-emerald-900/30' : 'bg-red-100 dark:bg-red-900/30'}`}>
-                        {isEdited ? <CheckSquare size={16} className="text-emerald-500" /> : <Square size={16} className="text-red-500" />}
-                    </div>
-                    <div>
-                        <div className={`text-[9px] font-black uppercase tracking-widest mb-0.5 ${isEdited ? 'text-emerald-400' : 'text-red-400'}`}>Durum</div>
-                        <div className="text-sm font-semibold text-gray-800 dark:text-gray-200">{isEdited ? 'Düzenlendi' : 'Henüz Düzenlenmedi'}</div>
-                    </div>
-                </div>
             </div>
         </div>
     );
@@ -396,6 +412,13 @@ export default function PreviewModal({ article, onClose, onMinimize, onEdit, get
                         {stats.unreadCount > 0 && (
                             <span className="flex items-center gap-1 text-xs font-medium text-amber-600"><MessageSquare size={12} /> {stats.unreadCount} yeni</span>
                         )}
+                        <button
+                            onClick={toggleStatus}
+                            className={`px-2.5 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1 transition-colors ${isEdited ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-200' : 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-400 hover:bg-red-200'}`}
+                        >
+                            {isEdited ? <CheckSquare size={12} /> : <Square size={12} />}
+                            {isEdited ? 'Düzenlendi' : 'Düzenlenmedi'}
+                        </button>
                         <button onClick={() => { onEdit(article); onClose(); }}
                             className="px-3 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-lg hover:bg-blue-700 flex items-center gap-1">
                             <Edit3 size={12} /> Düzenle
@@ -439,10 +462,19 @@ export default function PreviewModal({ article, onClose, onMinimize, onEdit, get
                 <div className="flex flex-1 overflow-hidden relative">
                     <LeftPanel />
                     <RightContent />
-                    <button onClick={() => { onEdit(article); onClose(); }}
-                        className="absolute bottom-4 right-4 px-4 py-2 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 flex items-center gap-1 shadow-lg">
-                        <Edit3 size={14} /> Düzenle
-                    </button>
+                    <div className="absolute bottom-4 right-4 flex items-center gap-2">
+                        <button
+                            onClick={toggleStatus}
+                            className={`px-3 py-2 text-sm font-bold rounded-lg flex items-center gap-1.5 shadow-lg transition-colors ${isEdited ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-200 dark:hover:bg-emerald-900/60' : 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/60'}`}
+                        >
+                            {isEdited ? <CheckSquare size={14} /> : <Square size={14} />}
+                            {isEdited ? 'Düzenlendi' : 'Düzenlenmedi'}
+                        </button>
+                        <button onClick={() => { onEdit(article); onClose(); }}
+                            className="px-4 py-2 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 flex items-center gap-1 shadow-lg">
+                            <Edit3 size={14} /> Düzenle
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
