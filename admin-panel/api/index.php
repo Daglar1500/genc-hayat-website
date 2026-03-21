@@ -268,8 +268,8 @@ elseif ($method === 'POST' && $uri === '/api/articles') {
     respond($newArticle);
 }
 
-// PUT /api/articles/:id
-elseif ($method === 'PUT' && preg_match('#^/api/articles/(.+)$#', $uri, $m)) {
+// PUT / PATCH /api/articles/:id
+elseif (($method === 'PUT' || $method === 'PATCH') && preg_match('#^/api/articles/(.+)$#', $uri, $m)) {
     $id          = $m[1];
     $updatedData = json_decode(file_get_contents('php://input'), true);
     $articles    = readJson('articles.json') ?? [];
