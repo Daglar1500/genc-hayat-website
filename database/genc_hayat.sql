@@ -17,6 +17,8 @@ SET time_zone = "+03:00";
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8mb4 */;
 
+SET FOREIGN_KEY_CHECKS = 0;
+
 --
 -- Veritabanı: `genc_hayat`
 --
@@ -452,6 +454,8 @@ ALTER TABLE `yorumlar`
   ADD CONSTRAINT `fk_yorum_yazi`
     FOREIGN KEY (`yazi_id`) REFERENCES `yazilar` (`yazi_id`)
     ON DELETE CASCADE ON UPDATE CASCADE;
+
+SET FOREIGN_KEY_CHECKS = 1;
 
 COMMIT;
 
