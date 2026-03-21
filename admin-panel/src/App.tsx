@@ -33,6 +33,7 @@ export default function App() {
         setLogTabPosition(previewIndex >= 0 ? previewIndex : data.previewTabs.length);
         setLogMinimized(false);
         setLogDirty(false);
+        data.setActivePreviewId(null);
         data.startEditArticle(article);
     };
 
@@ -65,6 +66,7 @@ export default function App() {
                 restoreArticle={data.restoreArticle}
                 permanentDeleteArticle={data.permanentDeleteArticle}
                 emptyTrash={data.emptyTrash}
+                hasTabBar={data.previewTabs.length > 0 || data.view === 'log'}
             />
 
             <div className={`flex-1 transition-all duration-300 p-8 ${data.menuOpen ? 'ml-80' : ''}`}>
@@ -249,6 +251,10 @@ export default function App() {
                         getCategoryColor={data.getCategoryColor}
                         allArticles={data.loggedArticles}
                         onPreview={(a) => data.openPreviewArticle(a)}
+                        onStatusChange={(updated) => {
+                            data.setLoggedArticles(prev => prev.map(a => a.id === updated.id ? updated : a));
+                            data.openPreviewArticle(updated);
+                        }}
                     />
                 ) : null;
             })()}

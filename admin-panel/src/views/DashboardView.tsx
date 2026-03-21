@@ -198,6 +198,16 @@ export default function DashboardView({
     const leaveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const dragConfigRef = useRef<{ sectionId: string; field: string; index: number } | null>(null);
 
+    // Auto-initialize category-row sections that have no title set
+    useEffect(() => {
+        if (categories.length === 0) return;
+        const needsInit = sections.some(s => s.type === 'category-row' && !s.title);
+        if (!needsInit) return;
+        setSections(prev => prev.map(s =>
+            s.type === 'category-row' && !s.title ? { ...s, title: categories[0].name } : s
+        ));
+    }, [sections, categories]);
+
     const getSectionSummary = (sec: Section): string => {
         switch (sec.type) {
             case 'spot-row': return sec.articles[0]?.title || 'Yazı yok';
@@ -247,6 +257,16 @@ export default function DashboardView({
         const t = setTimeout(() => setPendingDeleteId(null), 2000);
         return () => clearTimeout(t);
     }, [pendingDeleteId]);
+
+    useEffect(() => {
+        if (!pendingClearId) return;
+        const t = setTimeout(() => setPendingClearId(null), 2000);
+        const resetOnOutsideClick = (e: MouseEvent) => {
+            if (!(e.target as HTMLElement).closest('[data-clear-btn]')) setPendingClearId(null);
+        };
+        const tid = setTimeout(() => document.addEventListener('mousedown', resetOnOutsideClick), 0);
+        return () => { clearTimeout(t); clearTimeout(tid); document.removeEventListener('mousedown', resetOnOutsideClick); };
+    }, [pendingClearId]);
 
     const sharedCardProps = {
         getCategoryColor, deleteArticleFromSection, startEditArticle, setPreviewArticle,
@@ -472,6 +492,7 @@ export default function DashboardView({
                             </button>
                             {/* Clear */}
                             <button
+                                data-clear-btn=""
                                 onClick={() => {
                                     if (pendingClearId === section.id) {
                                         clearSection(section);
