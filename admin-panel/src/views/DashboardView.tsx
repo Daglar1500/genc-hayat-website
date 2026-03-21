@@ -829,26 +829,23 @@ export default function DashboardView({
                                             }}
                                             className="flex gap-2 items-center p-2 border border-gray-100 dark:border-gray-800 rounded-xl bg-gray-50/50 dark:bg-gray-800/40 cursor-default"
                                         >
-                                            <span className="text-xs font-bold text-gray-400 dark:text-gray-500 w-4 shrink-0 text-center">{i + 1}</span>
-                                            <div className="flex flex-col gap-1 flex-1 min-w-0">
-                                                <input className="w-full p-1.5 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-400" placeholder="Liste adı" value={f.title || ''} onChange={e => updateConfigItem(section.id, 'films', i, { title: e.target.value })} />
-                                                <div className="flex gap-1">
-                                                    <input
-                                                        className="flex-1 p-1.5 border border-gray-200 dark:border-gray-700 rounded-lg text-xs bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-400"
-                                                        placeholder="Letterboxd URL"
-                                                        value={f.url}
-                                                        onChange={e => updateConfigItem(section.id, 'films', i, { url: e.target.value })}
-                                                    />
-                                                    <input
-                                                        type="number"
-                                                        min="0"
-                                                        className="w-20 p-1.5 border border-gray-200 dark:border-gray-700 rounded-lg text-xs bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-400"
-                                                        placeholder="Film sayısı"
-                                                        value={f.filmCount ?? ''}
-                                                        onChange={e => updateConfigItem(section.id, 'films', i, { filmCount: e.target.value === '' ? '' : Number(e.target.value) })}
-                                                    />
-                                                </div>
-                                            </div>
+                                            <GripVertical size={14} className="text-gray-300 dark:text-gray-600 cursor-grab shrink-0" />
+                                            <div className="w-6 h-6 bg-blue-600 text-white text-xs font-bold rounded-lg flex items-center justify-center shrink-0">{i + 1}</div>
+                                            <input className="flex-1 p-1.5 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-400" placeholder="Liste Adı" value={f.title || ''} onChange={e => updateConfigItem(section.id, 'films', i, { title: e.target.value })} />
+                                            <input
+                                                className="w-52 p-1.5 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                                                placeholder="Letterboxd URL"
+                                                value={f.url}
+                                                onChange={e => updateConfigItem(section.id, 'films', i, { url: e.target.value })}
+                                            />
+                                            <input
+                                                type="number"
+                                                min="0"
+                                                className="w-20 p-1.5 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                                                placeholder="Film sayısı"
+                                                value={f.filmCount ?? ''}
+                                                onChange={e => updateConfigItem(section.id, 'films', i, { filmCount: e.target.value === '' ? '' : Number(e.target.value) })}
+                                            />
                                             <button onClick={() => removeConfigItem(section.id, 'films', i)} className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors shrink-0"><Trash2 size={14} /></button>
                                         </div>
                                     ))}
