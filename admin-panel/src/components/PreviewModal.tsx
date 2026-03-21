@@ -135,7 +135,7 @@ export default function PreviewModal({ article, onClose, onMinimize, onEdit, get
         setLocalStatus(newStatus);
         const updated = { ...article, status: newStatus };
         fetch(`${API_URL}/articles/${article.id}`, {
-            method: 'PATCH',
+            method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ status: newStatus }),
         }).then(() => onStatusChange?.(updated)).catch(() => setLocalStatus(article.status));
@@ -301,6 +301,18 @@ export default function PreviewModal({ article, onClose, onMinimize, onEdit, get
     // Right panel: content + comments (always shown)
     const RightContent = () => (
         <div className="flex-1 overflow-y-auto p-6">
+            {/* Editor badge — top-right of content area */}
+            {article.editorName && (
+                <div className="float-right ml-4 mb-3 flex items-center gap-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-2 shadow-sm">
+                    <div className="w-9 h-9 rounded-lg flex items-center justify-center text-white font-black text-sm shrink-0" style={{ backgroundColor: editorColor }}>
+                        {editorInitials}
+                    </div>
+                    <div>
+                        <div className="text-[9px] font-black uppercase tracking-widest text-purple-400 mb-0.5">Editör</div>
+                        <div className="text-sm font-semibold text-gray-800 dark:text-gray-200 whitespace-nowrap">{article.editorName}</div>
+                    </div>
+                </div>
+            )}
             <h2 className="text-xl font-black text-gray-900 dark:text-gray-100 leading-tight mb-2">{article.title}</h2>
 
             {article.subheading && (
@@ -404,35 +416,27 @@ export default function PreviewModal({ article, onClose, onMinimize, onEdit, get
     if (windowState === 'maximized') {
         return (
             <div className="fixed inset-0 z-50 bg-white dark:bg-gray-900 flex flex-col">
-                <div className="flex items-center justify-between px-5 py-2 border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 shrink-0">
+                <div className="flex items-center justify-between px-5 py-2.5 border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 shrink-0">
                     <span className="text-sm font-semibold text-gray-600 dark:text-gray-400 truncate pr-4">{article.title}</span>
-                    <div className="flex flex-col items-end gap-1 shrink-0">
-                        <div className="flex items-center gap-3">
-                            {stats.views > 0 && (
-                                <span className="flex items-center gap-1 text-xs text-gray-400"><Eye size={12} /> {stats.views}</span>
-                            )}
-                            {stats.unreadCount > 0 && (
-                                <span className="flex items-center gap-1 text-xs font-medium text-amber-600"><MessageSquare size={12} /> {stats.unreadCount} yeni</span>
-                            )}
-                            <button
-                                onClick={toggleStatus}
-                                className={`px-2.5 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1 transition-colors ${isEdited ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-200' : 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-400 hover:bg-red-200'}`}
-                            >
-                                {isEdited ? <CheckSquare size={12} /> : <Square size={12} />}
-                                {isEdited ? 'Düzenlendi' : 'Düzenlenmedi'}
-                            </button>
-                            <button onClick={() => { onEdit(article); onClose(); }}
-                                className="px-3 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-lg hover:bg-blue-700 flex items-center gap-1">
-                                <Edit3 size={12} /> Düzenle
-                            </button>
-                            <WindowControls />
-                        </div>
-                        {article.editorName && (
-                            <div className="flex items-center gap-1.5">
-                                <div className="w-4 h-4 rounded flex items-center justify-center text-white font-black text-[8px] shrink-0" style={{ backgroundColor: editorColor }}>{editorInitials}</div>
-                                <span className="text-[10px] text-gray-400 dark:text-gray-500 font-medium">{article.editorName}</span>
-                            </div>
+                    <div className="flex items-center gap-3 shrink-0">
+                        {stats.views > 0 && (
+                            <span className="flex items-center gap-1 text-xs text-gray-400"><Eye size={12} /> {stats.views}</span>
                         )}
+                        {stats.unreadCount > 0 && (
+                            <span className="flex items-center gap-1 text-xs font-medium text-amber-600"><MessageSquare size={12} /> {stats.unreadCount} yeni</span>
+                        )}
+                        <button
+                            onClick={toggleStatus}
+                            className={`px-2.5 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1 transition-colors ${isEdited ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-200' : 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-400 hover:bg-red-200'}`}
+                        >
+                            {isEdited ? <CheckSquare size={12} /> : <Square size={12} />}
+                            {isEdited ? 'Düzenlendi' : 'Düzenlenmedi'}
+                        </button>
+                        <button onClick={() => { onEdit(article); onClose(); }}
+                            className="px-3 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-lg hover:bg-blue-700 flex items-center gap-1">
+                            <Edit3 size={12} /> Düzenle
+                        </button>
+                        <WindowControls />
                     </div>
                 </div>
                 <div className="flex flex-1 overflow-hidden">
@@ -455,23 +459,15 @@ export default function PreviewModal({ article, onClose, onMinimize, onEdit, get
                 onClick={e => e.stopPropagation()}
             >
                 {/* Title bar */}
-                <div className="flex items-center justify-between px-4 py-2 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50 shrink-0">
+                <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50 shrink-0">
                     <span className="text-xs text-gray-500 dark:text-gray-400 truncate flex-1 pr-4">{article.title}</span>
-                    <div className="flex flex-col items-end gap-1 shrink-0">
-                        <div className="flex items-center gap-3">
-                            {stats.unreadCount > 0 && (
-                                <span className="flex items-center gap-1 text-[10px] font-medium text-amber-600">
-                                    <MessageSquare size={11} /> {stats.unreadCount} yeni yorum
-                                </span>
-                            )}
-                            <WindowControls />
-                        </div>
-                        {article.editorName && (
-                            <div className="flex items-center gap-1.5">
-                                <div className="w-4 h-4 rounded flex items-center justify-center text-white font-black text-[8px] shrink-0" style={{ backgroundColor: editorColor }}>{editorInitials}</div>
-                                <span className="text-[10px] text-gray-400 dark:text-gray-500 font-medium">{article.editorName}</span>
-                            </div>
+                    <div className="flex items-center gap-3 shrink-0">
+                        {stats.unreadCount > 0 && (
+                            <span className="flex items-center gap-1 text-[10px] font-medium text-amber-600">
+                                <MessageSquare size={11} /> {stats.unreadCount} yeni yorum
+                            </span>
                         )}
+                        <WindowControls />
                     </div>
                 </div>
 
