@@ -70,6 +70,10 @@ export function useAdminData() {
     const [bulkSelected, setBulkSelected] = useState<string[]>([]);
     const [bulkDropdownOpen, setBulkDropdownOpen] = useState(false);
 
+    // Trash
+    const [trashedArticles, setTrashedArticles] = useState<Article[]>([]);
+    const [trashOpen, setTrashOpen] = useState(false);
+
     const showToast = useCallback((message: string, type: 'success' | 'error' = 'success') => {
         const id = ++toastId.current;
         setToasts(prev => [...prev, { id, message, type }]);
@@ -143,7 +147,8 @@ export function useAdminData() {
             fetch(`${API_URL}/init`).then(r => r.json()),
             fetch(`${API_URL}/issues`).then(r => r.json()),
             fetch(`${API_URL}/editors`).then(r => r.json()).catch(() => []),
-        ]).then(([d, issData, editorsData]) => {
+            fetch(`${API_URL}/trash`).then(r => r.json()).catch(() => []),
+        ]).then(([d, issData, editorsData, trashData]) => {
             setSections(d.sections);
             setLoggedArticles(d.articles);
             setCategories(d.categories);
@@ -151,6 +156,7 @@ export function useAdminData() {
             if (Array.isArray(issData)) setIssues(issData);
             if (Array.isArray(editorsData)) setEditors(editorsData);
             else if (d.editors && Array.isArray(d.editors)) setEditors(d.editors);
+            if (Array.isArray(trashData)) setTrashedArticles(trashData);
             setIsLoading(false);
         });
     }, []);
@@ -247,14 +253,44 @@ export function useAdminData() {
     };
 
     const deleteArticle = (id: string) => {
-        if (!confirm('Bu makaleyi silmek istediğinize emin misiniz? Bu işlem geri alınamaz.')) return;
+        const article = loggedArticles.find(a => a.id === id);
         fetch(`${API_URL}/articles/${id}`, { method: 'DELETE' })
             .then(() => {
                 setLoggedArticles(prev => prev.filter(a => a.id !== id));
                 setSections(prev => prev.map(s => ({ ...s, articles: s.articles.filter(a => a.id !== id) })));
-                showToast('Makale silindi');
+                if (article) setTrashedArticles(prev => [{ ...article, deletedAt: Date.now() } as any, ...prev]);
+                showToast('Yazı çöp kutusuna taşındı');
             })
             .catch(() => showToast('Silme başarısız!', 'error'));
+    };
+
+    const restoreArticle = (id: string) => {
+        fetch(`${API_URL}/trash/${id}/restore`, { method: 'POST' })
+            .then(r => r.json())
+            .then(restored => {
+                setTrashedArticles(prev => prev.filter(a => a.id !== id));
+                setLoggedArticles(prev => [restored, ...prev]);
+                showToast('Yazı geri yüklendi');
+            })
+            .catch(() => showToast('Geri yükleme başarısız!', 'error'));
+    };
+
+    const permanentDeleteArticle = (id: string) => {
+        fetch(`${API_URL}/trash/${id}`, { method: 'DELETE' })
+            .then(() => {
+                setTrashedArticles(prev => prev.filter(a => a.id !== id));
+                showToast('Yazı kalıcı olarak silindi');
+            })
+            .catch(() => showToast('Silme başarısız!', 'error'));
+    };
+
+    const emptyTrash = () => {
+        fetch(`${API_URL}/trash`, { method: 'DELETE' })
+            .then(() => {
+                setTrashedArticles([]);
+                showToast('Çöp kutusu boşaltıldı');
+            })
+            .catch(() => showToast('İşlem başarısız!', 'error'));
     };
 
     const updateSectionConfig = (sectionId: string, newConfig: any) => {
@@ -432,6 +468,9 @@ export function useAdminData() {
         // Bulk
         bulkSelected, setBulkSelected,
         bulkDropdownOpen, setBulkDropdownOpen,
+        // Trash
+        trashedArticles, trashOpen, setTrashOpen,
+        restoreArticle, permanentDeleteArticle, emptyTrash,
         // Functions
         showToast,
         recordHistory,
@@ -449,7 +488,7 @@ export function useAdminData() {
         addEditor,
         deleteEditor,
         deleteArticleFromSection,
-        deleteArticle,
+        deleteArticle, restoreArticle, permanentDeleteArticle, emptyTrash,
         updateSectionConfig,
         addConfigItem,
         removeConfigItem,
