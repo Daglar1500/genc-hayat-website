@@ -21,7 +21,7 @@ const SpotifyIcon = () => (
   </svg>
 );
 
-export const SpotifySection = ({ playlists, profileUrl }: { playlists: PlaylistItem[], profileUrl: string }) => {
+export const SpotifySection = ({ playlists, profileUrl, playlistCount }: { playlists: PlaylistItem[], profileUrl: string, playlistCount?: number }) => {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -56,9 +56,9 @@ export const SpotifySection = ({ playlists, profileUrl }: { playlists: PlaylistI
               <span className="text-[#1DB954] font-bold tracking-widest text-xs uppercase block">
                 Genç Hayat Spotify
               </span>
-              {playlists.length > 0 && (
+              {(playlistCount != null && playlistCount > 0) && (
                 <span className="text-[10px] md:text-xs bg-[#1DB954]/10 text-[#1DB954] border border-[#1DB954]/30 px-2 py-0.5 rounded-full font-mono font-bold">
-                  {playlists.length} çalma listesi
+                  {playlistCount} çalma listesi
                 </span>
               )}
             </div>

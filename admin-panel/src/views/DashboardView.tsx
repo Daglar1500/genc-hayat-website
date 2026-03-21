@@ -749,6 +749,17 @@ export default function DashboardView({
                                         onChange={e => updateSectionConfig(section.id, { profileUrl: e.target.value })}
                                     />
                                 </div>
+                                <div className="flex items-center gap-3">
+                                    <label className="text-xs font-semibold text-gray-400 uppercase whitespace-nowrap">Çalma Listesi Sayısı</label>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        className="w-24 p-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        placeholder="0"
+                                        value={section.config?.playlistCount ?? ''}
+                                        onChange={e => updateSectionConfig(section.id, { playlistCount: e.target.value === '' ? '' : Number(e.target.value) })}
+                                    />
+                                </div>
                                 <div className="space-y-2">
                                     <div className="text-xs font-semibold text-gray-400 uppercase">Çalma Listeleri</div>
                                     {(section.config?.playlists || []).map((p: any, i: number) => (
@@ -791,7 +802,7 @@ export default function DashboardView({
                                         onClick={() => addConfigItem(section.id, 'playlists', { id: `p-${Date.now()}`, url: '', title: '', description: '', cover: '', trackCount: '' })}
                                         className="text-sm text-gray-500 font-medium hover:text-green-600 flex items-center gap-1 transition-colors"
                                     >
-                                        <Plus size={14} /> Playlist Ekle
+                                        <Plus size={14} /> Çalma Listesi Ekle
                                     </button>
                                 </div>
                             </div>

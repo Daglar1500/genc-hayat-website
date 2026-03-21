@@ -8,7 +8,7 @@ export const getSectionLabel = (type: SectionType): string => {
         case 'spot-row': return 'SPOT SATIRI';
         case 'article-feed': return 'YAZI AKIŞI';
         case 'video-row': return 'YOUTUBE VİDEOLARI';
-        case 'spotify-row': return 'SPOTİFY LİSTELERİ';
+        case 'spotify-row': return 'SPOTİFY ÇALMA LİSTELERİ';
         case 'letterboxd-row': return 'LETTERBOXD FİLM LİSTELERİ';
         case 'archive-row': return 'ARŞİV';
         default: return type;

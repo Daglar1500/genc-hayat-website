@@ -81,7 +81,7 @@ export const MainContent = () => {
           return <VideoSection key={sec.id} videos={sec.config.videos || []} channelUrl={sec.config.channelUrl || ''} />;
         }
         if (sec.type === 'spotify-row' && sec.config) {
-          return <SpotifySection key={sec.id} playlists={sec.config.playlists || []} profileUrl={sec.config.profileUrl || ''} />;
+          return <SpotifySection key={sec.id} playlists={sec.config.playlists || []} profileUrl={sec.config.profileUrl || ''} playlistCount={sec.config.playlistCount} />;
         }
         if (sec.type === 'letterboxd-row' && sec.config) {
           return <LetterboxdSection key={sec.id} films={sec.config.films || []} profileUrl={sec.config.profileUrl || ''} />;
