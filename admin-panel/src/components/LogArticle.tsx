@@ -187,33 +187,25 @@ const LogArticle = ({
                 onClick={e => e.stopPropagation()}
             >
                 {/* Header */}
-                <div className="relative h-20 shrink-0 bg-linear-to-r from-blue-50 to-indigo-50 border-b">
-                    <div className="flex items-center h-full px-5 gap-3">
-                        <div className="w-8 h-8 rounded-full bg-white border flex items-center justify-center shrink-0">
-                            {isEdit
-                                ? <Edit3 size={14} className="text-blue-500" />
-                                : <Plus size={14} className="text-orange-500" />
-                            }
-                        </div>
-                        <div>
-                            <div className="text-xs text-gray-400 font-medium">{isEdit ? 'Makaleyi Düzenle' : 'Yeni Makale Ekle'}</div>
-                            <div className="text-sm font-bold text-gray-700 truncate max-w-xs">
-                                {formData.title || <span className="text-gray-400 font-normal italic">Başlıksız makale</span>}
-                            </div>
-                        </div>
-                    </div>
-                    {/* Window controls */}
-                    <div className="absolute top-3 right-3 flex items-center gap-1.5">
+                <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-100 bg-gray-50 shrink-0">
+                    <span className="flex items-center gap-2 text-xs text-gray-500 truncate flex-1 pr-4">
+                        {isEdit
+                            ? <Edit3 size={12} className="text-blue-400 shrink-0" />
+                            : <Plus size={12} className="text-orange-400 shrink-0" />
+                        }
+                        <span className="truncate">{formData.title || <span className="italic text-gray-400">Başlıksız makale</span>}</span>
+                    </span>
+                    <div className="flex items-center gap-1.5 shrink-0">
                         <button type="button" onClick={(e) => { e.stopPropagation(); setWindowState('maximized'); }} title="Tam Ekran"
-                            className="w-5 h-5 rounded-full bg-green-400 hover:bg-green-500 transition-colors flex items-center justify-center group shadow">
+                            className="w-5 h-5 rounded-full bg-green-400 hover:bg-green-500 transition-colors flex items-center justify-center group">
                             <Maximize2 size={9} className="opacity-0 group-hover:opacity-100 text-green-900" />
                         </button>
                         <button type="button" onClick={(e) => { e.stopPropagation(); onMinimize(); }} title="Alta Al"
-                            className="w-5 h-5 rounded-full bg-yellow-400 hover:bg-yellow-500 transition-colors flex items-center justify-center group shadow">
+                            className="w-5 h-5 rounded-full bg-yellow-400 hover:bg-yellow-500 transition-colors flex items-center justify-center group">
                             <Minimize2 size={9} className="opacity-0 group-hover:opacity-100 text-yellow-900" />
                         </button>
                         <button type="button" onClick={(e) => { e.stopPropagation(); onClose(); }} title="Kapat"
-                            className="w-5 h-5 rounded-full bg-red-400 hover:bg-red-500 transition-colors flex items-center justify-center group shadow">
+                            className="w-5 h-5 rounded-full bg-red-400 hover:bg-red-500 transition-colors flex items-center justify-center group">
                             <X size={9} className="opacity-0 group-hover:opacity-100 text-red-900" />
                         </button>
                     </div>
