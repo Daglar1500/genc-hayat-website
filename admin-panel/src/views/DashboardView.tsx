@@ -154,6 +154,61 @@ function ArticleCard({
     );
 }
 
+function MainRowArticlePicker({ sectionId: _sectionId, selected, allArticles, onAdd, onRemove, setPreviewArticle }: {
+    sectionId: string;
+    selected: Article[];
+    allArticles: Article[];
+    onAdd: (art: Article) => void;
+    onRemove: (artId: string) => void;
+    setPreviewArticle: (a: Article | null) => void;
+}) {
+    const [search, setSearch] = useState('');
+    const selectedIds = selected.map(a => a.id);
+    const results = search.length > 1
+        ? allArticles.filter(a => !selectedIds.includes(a.id) && (a.title?.toLowerCase().includes(search.toLowerCase()) || a.author?.toLowerCase().includes(search.toLowerCase()))).slice(0, 8)
+        : [];
+
+    return (
+        <div className="space-y-2">
+            {/* Selected list */}
+            {selected.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                    {selected.map(a => (
+                        <div key={a.id} className="flex items-center gap-1.5 bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-800 rounded-lg px-2.5 py-1.5 cursor-pointer hover:bg-purple-100 dark:hover:bg-purple-900/40 transition-colors" onClick={() => setPreviewArticle(a)}>
+                            <span className="text-xs font-medium text-purple-800 dark:text-purple-300 truncate max-w-[180px]">{a.title}</span>
+                            <button type="button" onClick={e => { e.stopPropagation(); onRemove(a.id); }} className="text-purple-300 hover:text-red-500 shrink-0 ml-0.5">
+                                <X size={11} />
+                            </button>
+                        </div>
+                    ))}
+                </div>
+            )}
+            {/* Search */}
+            <div className="relative">
+                <input
+                    type="text"
+                    value={search}
+                    onChange={e => setSearch(e.target.value)}
+                    placeholder="Yazı ara ve ekle..."
+                    className="w-full p-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                />
+                {results.length > 0 && (
+                    <div className="absolute z-30 top-full left-0 right-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg max-h-48 overflow-y-auto mt-0.5">
+                        {results.map(a => (
+                            <button key={a.id} type="button"
+                                onClick={() => { onAdd(a); setSearch(''); }}
+                                className="w-full text-left px-3 py-2 text-xs hover:bg-purple-50 dark:hover:bg-purple-950/30 border-b border-gray-100 dark:border-gray-700 last:border-0 flex items-center gap-2">
+                                <span className="font-medium text-gray-800 dark:text-gray-200 truncate flex-1">{a.title}</span>
+                                <span className="text-gray-400 shrink-0">· {a.author}</span>
+                            </button>
+                        ))}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}
+
 interface DashboardViewProps {
     sections: Section[];
     setSections: React.Dispatch<React.SetStateAction<Section[]>>;
@@ -874,7 +929,7 @@ export default function DashboardView({
                                 {/* Title + Issue Number */}
                                 <div className="grid grid-cols-3 gap-3">
                                     <div className="col-span-2">
-                                        <label className="block text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase mb-1">Manşet Başlığı</label>
+                                        <label className="block text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase mb-1">Bölüm Başlığı</label>
                                         <input
                                             value={section.title ?? ''}
                                             onFocus={() => recordHistory(sections)}
@@ -975,6 +1030,18 @@ export default function DashboardView({
                                         )}
                                     </div>
                                 </div>
+                                {/* Önerilen yazılar picker */}
+                                <div className="mt-4 space-y-2">
+                                    <label className="block text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase">Önerilen Yazılar <span className="font-normal normal-case text-gray-300">({section.articles.length} seçili)</span></label>
+                                    <MainRowArticlePicker
+                                        sectionId={section.id}
+                                        selected={section.articles}
+                                        allArticles={loggedArticles}
+                                        onAdd={(art) => { recordHistory(sections); const ns = [...sections]; const s = ns.find(x => x.id === section.id)!; s.articles = [...s.articles, art]; setSections(ns); }}
+                                        onRemove={(artId) => { recordHistory(sections); const ns = [...sections]; const s = ns.find(x => x.id === section.id)!; s.articles = s.articles.filter(a => a.id !== artId); setSections(ns); }}
+                                        setPreviewArticle={setPreviewArticle}
+                                    />
+                                </div>
                             </div>
                         )}
                     </div>}
@@ -986,7 +1053,7 @@ export default function DashboardView({
                 <span className="text-xs font-semibold text-gray-300 dark:text-gray-600 uppercase tracking-wider">Bölüm Ekle</span>
                 <div className="w-px h-4 bg-gray-200 dark:bg-gray-700" />
                 {[
-                    { type: 'main-row', label: 'Ana Manşet' },
+                    { type: 'main-row', label: 'Ana Bölüm' },
                     { type: 'ordinary-row', label: 'Sıradan Satır' },
                     { type: 'category-row', label: 'Kategori Bölümü' },
                     { type: 'spot-row', label: 'Spot Satırı' },
