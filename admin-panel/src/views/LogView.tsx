@@ -12,6 +12,7 @@ interface LogViewProps {
     setView: (v: 'dashboard' | 'log' | 'read' | 'issues' | 'stats' | 'collections') => void;
     setSelectedArticle: (article: Article | null) => void;
     setPreviewArticle: (article: Article | null) => void;
+    syncPreviewTab: (article: Article) => void;
     onMinimize: () => void;
     externalMinimized: boolean;
     onDirtyChange: (dirty: boolean) => void;
@@ -20,11 +21,12 @@ interface LogViewProps {
 
 export default function LogView({
     selectedArticle, categories, labels, editors, loggedArticles,
-    setLoggedArticles, setView, setSelectedArticle, setPreviewArticle,
+    setLoggedArticles, setView, setSelectedArticle, setPreviewArticle, syncPreviewTab,
     onMinimize, externalMinimized, onDirtyChange, saveTrigger,
 }: LogViewProps) {
     const handleSuccess = (art: Article) => {
         setLoggedArticles(prev => selectedArticle ? prev.map(a => a.id === art.id ? art : a) : [art, ...prev]);
+        syncPreviewTab(art);
         setView('dashboard');
         setSelectedArticle(null);
     };

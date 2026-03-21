@@ -1,7 +1,7 @@
-import { useEffect, useState, useCallback } from 'react';
-import { X, Edit3, Eye, MessageSquare, Check, FileText, CheckSquare, Square, Maximize2, Minimize2, MapPin, RefreshCw, User, Tag, GraduationCap, Hash, Type } from 'lucide-react';
-import type { Article } from '../types';
-import { API_URL } from '../config';
+import { useEffect, useState } from 'react';
+import { X, Edit3, Eye, MessageSquare, Check, FileText, CheckSquare, Square, Maximize2, Minimize2, MapPin, RefreshCw, User, Tag, GraduationCap, Hash, Type, ExternalLink } from 'lucide-react';
+import type { Article, ArticleStat } from '../types';
+import { WEBSITE_URL } from '../config';
 
 interface PreviewModalProps {
     article: Article;
@@ -12,21 +12,11 @@ interface PreviewModalProps {
     allArticles?: Article[];
     onPreview?: (article: Article) => void;
     onStatusChange?: (article: Article) => void;
-}
-
-interface Comment {
-    id: string;
-    articleId: string;
-    text: string;
-    createdAt: number;
-    isRead: boolean;
-}
-
-interface ArticleStats {
-    views: number;
-    commentCount: number;
-    unreadCount: number;
-    comments: Comment[];
+    articleStat?: ArticleStat | null;
+    onMarkRead?: (commentId: string) => void;
+    onRefreshStats?: (quiet?: boolean) => void;
+    statsRefreshing?: boolean;
+    statsLoaded?: boolean;
 }
 
 type WindowState = 'normal' | 'maximized';
@@ -101,29 +91,12 @@ function exportCommentsAsDoc(article: Article, comments: Comment[]) {
     link.click();
 }
 
-const emptyStats: ArticleStats = { views: 0, commentCount: 0, unreadCount: 0, comments: [] };
-
-export default function PreviewModal({ article, onClose, onMinimize, onEdit, getCategoryColor, allArticles, onPreview, onStatusChange }: PreviewModalProps) {
+export default function PreviewModal({ article, onClose, onMinimize, onEdit, getCategoryColor, allArticles, onPreview, onStatusChange, articleStat, onMarkRead, onRefreshStats, statsRefreshing: statsRefreshingProp, statsLoaded: statsLoadedProp }: PreviewModalProps) {
     const [windowState, setWindowState] = useState<WindowState>('normal');
-    const [stats, setStats] = useState<ArticleStats>(emptyStats);
-    const [statsLoaded, setStatsLoaded] = useState(false);
-    const [statsRefreshing, setStatsRefreshing] = useState(false);
 
-    const loadStats = useCallback((quiet = false) => {
-        if (!quiet) setStatsLoaded(false);
-        setStatsRefreshing(true);
-        fetch(`${API_URL}/stats`)
-            .then(r => r.json())
-            .then((data: any[]) => {
-                const found = data.find((s: any) => s.id === article.id);
-                setStats(found || emptyStats);
-                setStatsLoaded(true);
-                setStatsRefreshing(false);
-            })
-            .catch(() => { setStatsLoaded(true); setStatsRefreshing(false); });
-    }, [article.id]);
-
-    useEffect(() => { loadStats(); }, [loadStats]);
+    const stats = articleStat ?? { views: 0, commentCount: 0, unreadCount: 0, comments: [] };
+    const statsLoaded = statsLoadedProp ?? true;
+    const statsRefreshing = statsRefreshingProp ?? false;
 
     const charCount = countChars(article);
     const htmlContent = article.text || (article.content ? renderContent(article.content as any[]) : '');
@@ -155,13 +128,7 @@ export default function PreviewModal({ article, onClose, onMinimize, onEdit, get
     })();
 
     const markRead = (id: string) => {
-        fetch(`${API_URL}/comments/${id}/read`, { method: 'PATCH' }).then(() => {
-            setStats(prev => ({
-                ...prev,
-                comments: prev.comments.map(c => c.id === id ? { ...c, isRead: true } : c),
-                unreadCount: Math.max(0, prev.unreadCount - 1),
-            }));
-        });
+        onMarkRead?.(id);
     };
 
     // Window controls — top-right
@@ -197,13 +164,6 @@ export default function PreviewModal({ article, onClose, onMinimize, onEdit, get
                         </div>
                     )
                 }
-                {stats.unreadCount > 0 && (
-                    <div className="absolute bottom-2 left-2 right-2 flex items-center gap-1.5 flex-wrap">
-                        <span className="flex items-center gap-1 text-[10px] text-white bg-amber-500/90 px-1.5 py-0.5 rounded-full font-medium backdrop-blur-sm">
-                            <MessageSquare size={9} /> {stats.unreadCount} yeni yorum
-                        </span>
-                    </div>
-                )}
             </div>
 
             {/* Meta — tüm fieldlar aynı formatta */}
@@ -314,7 +274,14 @@ export default function PreviewModal({ article, onClose, onMinimize, onEdit, get
                     </div>
                 </div>
             </div>
-            <h2 className="text-2xl font-black text-gray-900 dark:text-gray-100 leading-tight mb-3">{article.title}</h2>
+            <div className="flex items-start gap-2 mb-3">
+                <h2 className="text-2xl font-black text-gray-900 dark:text-gray-100 leading-tight flex-1">{article.title}</h2>
+                <a href={`${WEBSITE_URL}/articles/${article.slug || article.id}`} target="_blank" rel="noopener noreferrer"
+                    className="shrink-0 mt-1 p-1.5 rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950 text-blue-500 hover:bg-blue-100 dark:hover:bg-blue-900 hover:text-blue-700 transition-colors"
+                    title="Websitede Aç">
+                    <ExternalLink size={13} />
+                </a>
+            </div>
 
             {article.subheading && (
                 <p className="text-base italic text-gray-600 dark:text-gray-400 mb-5 border-l-2 border-gray-200 dark:border-gray-700 pl-3 leading-relaxed">{article.subheading}</p>
@@ -378,7 +345,7 @@ export default function PreviewModal({ article, onClose, onMinimize, onEdit, get
                             </button>
                         )}
                         <button
-                            onClick={() => loadStats(true)}
+                            onClick={() => onRefreshStats?.(true)}
                             title="Yorumları yenile"
                             className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors"
                         >
@@ -418,7 +385,14 @@ export default function PreviewModal({ article, onClose, onMinimize, onEdit, get
         return (
             <div className="fixed inset-0 z-50 bg-white dark:bg-gray-900 flex flex-col">
                 <div className="flex items-center justify-between px-5 py-2.5 border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 shrink-0">
-                    <span className="text-sm font-semibold text-gray-600 dark:text-gray-400 truncate pr-4">{article.title}</span>
+                    <div className="flex items-center gap-2 min-w-0 flex-1 pr-4">
+                        <span className="text-sm font-semibold text-gray-600 dark:text-gray-400 truncate">{article.title}</span>
+                        <a href={`${WEBSITE_URL}/articles/${article.slug || article.id}`} target="_blank" rel="noopener noreferrer"
+                            className="shrink-0 p-1 rounded-md border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950 text-blue-500 hover:bg-blue-100 dark:hover:bg-blue-900 hover:text-blue-700 transition-colors"
+                            title="Websitede Aç">
+                            <ExternalLink size={11} />
+                        </a>
+                    </div>
                     <div className="flex items-center gap-3 shrink-0">
                         {stats.views > 0 && (
                             <span className="flex items-center gap-1 text-xs text-gray-400"><Eye size={12} /> {stats.views}</span>

@@ -61,7 +61,10 @@ const LogArticle = ({
 
     const [windowState, setWindowState] = useState<WindowState>('normal');
 
-    const [formData, setFormData] = useState<Partial<Article>>(initialData ? { ...initialData } : {
+    const [formData, setFormData] = useState<Partial<Article>>(initialData ? {
+        ...initialData,
+        slug: initialData.slug || generateSlug(initialData.title || ''),
+    } : {
         labels: [],
         status: 'not-edited',
         editorName: editors[0] || 'Admin',
@@ -226,6 +229,14 @@ const LogArticle = ({
                 {/* Floating action buttons — no background bar */}
                 <div className="absolute bottom-3 right-5 flex gap-2 z-10">
                     <button
+                        type="button"
+                        onClick={() => setFormData(prev => ({ ...prev, status: prev.status === 'edited' ? 'not-edited' : 'edited' }))}
+                        className={`px-3 py-2 text-sm font-bold rounded-lg flex items-center gap-1.5 shadow-sm transition-colors ${formData.status === 'edited' ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200' : 'bg-red-100 text-red-700 hover:bg-red-200'}`}
+                    >
+                        {formData.status === 'edited' ? <CheckSquare size={13} /> : <Square size={13} />}
+                        {formData.status === 'edited' ? 'Düzenlendi' : 'Düzenlenmedi'}
+                    </button>
+                    <button
                         type="submit"
                         form="log-article-form"
                         onClick={() => { submitAction.current = 'close'; }}
@@ -300,10 +311,17 @@ function FormBody({
                             className="w-full py-3 bg-blue-600 text-white font-bold rounded-xl shadow-lg hover:bg-blue-700 transition">
                             Kaydet ve Görüntüle
                         </button>
-                        <button type="submit" onClick={() => { submitAction.current = 'close'; }}
-                            className="w-full py-3 bg-gray-800 text-white font-bold rounded-xl shadow hover:bg-gray-900 transition">
-                            Kaydet ve Kapat
-                        </button>
+                        <div className="flex gap-2">
+                            <button type="button" onClick={() => setFormData(prev => ({ ...prev, status: prev.status === 'edited' ? 'not-edited' : 'edited' }))}
+                                className={`flex-1 py-3 font-bold rounded-xl shadow transition flex items-center justify-center gap-1.5 ${formData.status === 'edited' ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200' : 'bg-red-100 text-red-700 hover:bg-red-200'}`}>
+                                {formData.status === 'edited' ? <CheckSquare size={14} /> : <Square size={14} />}
+                                {formData.status === 'edited' ? 'Düzenlendi' : 'Düzenlenmedi'}
+                            </button>
+                            <button type="submit" onClick={() => { submitAction.current = 'close'; }}
+                                className="flex-1 py-3 bg-gray-800 text-white font-bold rounded-xl shadow hover:bg-gray-900 transition">
+                                Kaydet ve Kapat
+                            </button>
+                        </div>
                     </div>
                 </div>
                 {/* Right column: content */}
