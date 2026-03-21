@@ -34,7 +34,7 @@ USE `genc_hayat`;
 --
 
 CREATE TABLE `kategoriler` (
-  `kategori_id`   int(11)       NOT NULL,
+  `kategori_id`   INT           NOT NULL,
   `kategori_adi`  varchar(100)  NOT NULL COMMENT 'Kategorinin görünen adı (ör. Güncel, Tarih, Kültür-Sanat)',
   `kategori_renk` varchar(20)   NOT NULL DEFAULT '#90CAF9' COMMENT 'Hex renk kodu (ör. #90CAF9)'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -59,7 +59,7 @@ INSERT INTO `kategoriler` (`kategori_id`, `kategori_adi`, `kategori_renk`) VALUE
 --
 
 CREATE TABLE `etiketler` (
-  `etiket_id`  int(11)      NOT NULL,
+  `etiket_id`  INT          NOT NULL,
   `etiket_adi` varchar(150) NOT NULL COMMENT 'Etiketin adı (ör. Marksizm, Kapitalizm)'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -120,7 +120,7 @@ INSERT INTO `etiketler` (`etiket_id`, `etiket_adi`) VALUES
 --
 
 CREATE TABLE `editorler` (
-  `editor_id`  int(11)      NOT NULL,
+  `editor_id`  INT          NOT NULL,
   `editor_adi` varchar(150) NOT NULL COMMENT 'Editörün adı soyadı'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -131,24 +131,24 @@ CREATE TABLE `editorler` (
 --
 
 CREATE TABLE `yazilar` (
-  `yazi_id`          int(11)      NOT NULL,
+  `yazi_id`          INT          NOT NULL,
   `yazi_slug`        varchar(500) DEFAULT NULL COMMENT 'SEO dostu URL (ör. diyalektigin-izinde). Boşsa yazi_id kullanılır.',
   `yazi_turu`        enum('normal','featured','sunu','rota') NOT NULL DEFAULT 'normal'
                      COMMENT 'normal=Standart yazı, featured=Öne çıkan, sunu=Sayı sunusu, rota=Rota yazısı',
   `yazi_baslik`      varchar(500) NOT NULL COMMENT 'Yazının başlığı',
   `yazi_alt_baslik`  varchar(500) DEFAULT NULL COMMENT 'Alt başlık / kısa özet',
   `yazi_yazar`       varchar(200) NOT NULL COMMENT 'Yazarın adı soyadı',
-  `yazi_editor`      varchar(200) DEFAULT NULL COMMENT 'Editörün adı soyadı',
+  `yazi_editor_id`   INT          DEFAULT NULL COMMENT 'editorler tablosuna FK',
   `yazi_sehir`       varchar(150) DEFAULT NULL COMMENT 'Yazarın bulunduğu şehir',
   `yazi_okul`        varchar(200) DEFAULT NULL COMMENT 'Yazarın okulu',
-  `yazi_icerik`      longtext     DEFAULT NULL COMMENT 'JSON formatında içerik blokları (ContentBlock[])',
+  `yazi_icerik`      JSON         DEFAULT NULL COMMENT 'İçerik blokları (ContentBlock[])',
   `yazi_resim`       varchar(500) DEFAULT NULL COMMENT 'Kapak görseli URL',
-  `yazi_kategori_id` int(11)      DEFAULT NULL COMMENT 'kategoriler tablosuna FK',
+  `yazi_kategori_id` INT          DEFAULT NULL COMMENT 'kategoriler tablosuna FK',
   `yazi_sayi_no`     varchar(20)  DEFAULT NULL COMMENT 'Yayımlandığı sayı numarası (ör. 504)',
   `yazi_tarih`       timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Oluşturulma tarihi',
   `yazi_durum`       enum('edited','not-edited') NOT NULL DEFAULT 'not-edited'
                      COMMENT 'Editör onay durumu',
-  `yazi_goruntuleme` int(10)      NOT NULL DEFAULT 0 COMMENT 'Görüntülenme sayısı',
+  `yazi_goruntuleme` INT          NOT NULL DEFAULT 0 COMMENT 'Görüntülenme sayısı',
   `yazi_silindi`     tinyint(1)   NOT NULL DEFAULT 0 COMMENT '0=Aktif, 1=Çöp kutusunda',
   `yazi_silinme_tarihi` timestamp NULL DEFAULT NULL COMMENT 'Çöp kutusuna atılma tarihi'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -161,9 +161,9 @@ CREATE TABLE `yazilar` (
 --
 
 CREATE TABLE `yazi_etiketleri` (
-  `kayit_id` int(11) NOT NULL,
-  `yazi_id`  int(11) NOT NULL COMMENT 'yazilar.yazi_id',
-  `etiket_id` int(11) NOT NULL COMMENT 'etiketler.etiket_id'
+  `kayit_id`  INT NOT NULL,
+  `yazi_id`   INT NOT NULL COMMENT 'yazilar.yazi_id',
+  `etiket_id` INT NOT NULL COMMENT 'etiketler.etiket_id'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -174,10 +174,10 @@ CREATE TABLE `yazi_etiketleri` (
 --
 
 CREATE TABLE `yazi_onerilen` (
-  `kayit_id`       int(11) NOT NULL,
-  `yazi_id`        int(11) NOT NULL COMMENT 'Öneren yazı',
-  `onerilen_yazi_id` int(11) NOT NULL COMMENT 'Önerilen yazı',
-  `sira`           int(4)  NOT NULL DEFAULT 0 COMMENT 'Gösterim sırası'
+  `kayit_id`         INT NOT NULL,
+  `yazi_id`          INT NOT NULL COMMENT 'Öneren yazı',
+  `onerilen_yazi_id` INT NOT NULL COMMENT 'Önerilen yazı',
+  `sira`             INT NOT NULL DEFAULT 0 COMMENT 'Gösterim sırası'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -187,16 +187,16 @@ CREATE TABLE `yazi_onerilen` (
 --
 
 CREATE TABLE `sayilar` (
-  `sayi_id`          int(11)      NOT NULL,
-  `sayi_baslik`      varchar(200) NOT NULL COMMENT 'Sayının başlığı (ör. Sayı 504)',
-  `sayi_no`          int(6)       NOT NULL COMMENT 'Sayı numarası (ör. 504)',
-  `sayi_tarih`       date         NOT NULL COMMENT 'Yayın tarihi',
-  `kapak_tur`        enum('image','video') DEFAULT 'image' COMMENT 'Kapak medya türü',
-  `kapak_src`        varchar(500) DEFAULT NULL COMMENT 'Kapak görseli veya video URL',
-  `kapak_alt`        varchar(300) DEFAULT NULL COMMENT 'Kapak görseli alt metni',
-  `kapak_mizanpaj`   varchar(50)  DEFAULT NULL COMMENT 'Görsel yerleşim stili (ör. cover, contain)',
-  `sunu_yazi_id`     int(11)      DEFAULT NULL COMMENT 'Sayı sunusu yazısı (sunuArticleId)',
-  `rota_yazi_id`     int(11)      DEFAULT NULL COMMENT 'Rota yazısı (rotaArticleId)'
+  `sayi_id`        INT          NOT NULL,
+  `sayi_baslik`    varchar(200) NOT NULL COMMENT 'Sayının başlığı (ör. Sayı 504)',
+  `sayi_no`        INT          NOT NULL COMMENT 'Sayı numarası (ör. 504)',
+  `sayi_tarih`     date         NOT NULL COMMENT 'Yayın tarihi',
+  `kapak_tur`      enum('image','video') DEFAULT 'image' COMMENT 'Kapak medya türü',
+  `kapak_src`      varchar(500) DEFAULT NULL COMMENT 'Kapak görseli veya video URL',
+  `kapak_alt`      varchar(300) DEFAULT NULL COMMENT 'Kapak görseli alt metni',
+  `kapak_mizanpaj` varchar(50)  DEFAULT NULL COMMENT 'Görsel yerleşim stili (ör. cover, contain)',
+  `sunu_yazi_id`   INT          DEFAULT NULL COMMENT 'Sayı sunusu yazısı (sunuArticleId)',
+  `rota_yazi_id`   INT          DEFAULT NULL COMMENT 'Rota yazısı (rotaArticleId)'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -207,12 +207,12 @@ CREATE TABLE `sayilar` (
 --
 
 CREATE TABLE `sayi_yazilari` (
-  `kayit_id` int(11) NOT NULL,
-  `sayi_id`  int(11) NOT NULL COMMENT 'sayilar.sayi_id',
-  `yazi_id`  int(11) NOT NULL COMMENT 'yazilar.yazi_id',
+  `kayit_id` INT NOT NULL,
+  `sayi_id`  INT NOT NULL COMMENT 'sayilar.sayi_id',
+  `yazi_id`  INT NOT NULL COMMENT 'yazilar.yazi_id',
   `tur`      enum('onerilen','diger') NOT NULL DEFAULT 'diger'
              COMMENT 'onerilen=Önerilen kart, diger=Diğer yazılar listesi',
-  `sira`     int(4)  NOT NULL DEFAULT 0 COMMENT 'Gösterim sırası'
+  `sira`     INT NOT NULL DEFAULT 0 COMMENT 'Gösterim sırası'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -223,9 +223,9 @@ CREATE TABLE `sayi_yazilari` (
 --
 
 CREATE TABLE `bolumler` (
-  `bolum_id`       int(11)      NOT NULL,
-  `bolum_kodu`     varchar(50)  NOT NULL COMMENT 'Sabit tekil tanımlayıcı (ör. sec-main, sec-feed)',
-  `bolum_turu`     enum(
+  `bolum_id`        INT         NOT NULL,
+  `bolum_kodu`      varchar(50) NOT NULL COMMENT 'Sabit tekil tanımlayıcı (ör. sec-main, sec-feed)',
+  `bolum_turu`      enum(
     'main-row',
     'category-row',
     'ordinary-row',
@@ -236,15 +236,15 @@ CREATE TABLE `bolumler` (
     'letterboxd-row',
     'archive-row'
   ) NOT NULL COMMENT 'Bölümün render tipi',
-  `bolum_basligi`  varchar(200) DEFAULT NULL COMMENT 'Bölüm başlığı (varsa)',
-  `bolum_sabitlemi` tinyint(1)  NOT NULL DEFAULT 0 COMMENT '1=Sabitlenmiş (isPinned)',
-  `bolum_gorunum`  tinyint(1)   NOT NULL DEFAULT 1 COMMENT '1=Görünür (isVisible)',
-  `bolum_kapak`    varchar(500) DEFAULT NULL COMMENT 'Bölüm kapak görseli URL',
-  `bolum_on_sozu`  text         DEFAULT NULL COMMENT 'Bölüm ön sözü (preface)',
-  `bolum_sayi_no`  varchar(20)  DEFAULT NULL COMMENT 'Arşiv bölümü için sayı numarası',
-  `rota_yazi_id`   int(11)      DEFAULT NULL COMMENT 'Bölümün rota/öne çıkan yazısı (routeArticleId)',
-  `bolum_ayar`     text         DEFAULT NULL COMMENT 'JSON formatında ek ayarlar (video URL, spotify URL vb.)',
-  `bolum_sira`     int(4)       NOT NULL DEFAULT 0 COMMENT 'Bölümlerin ana sayfadaki gösterim sırası'
+  `bolum_basligi`   varchar(200) DEFAULT NULL COMMENT 'Bölüm başlığı (varsa)',
+  `bolum_sabitlemi` tinyint(1)   NOT NULL DEFAULT 0 COMMENT '1=Sabitlenmiş (isPinned)',
+  `bolum_gorunum`   tinyint(1)   NOT NULL DEFAULT 1 COMMENT '1=Görünür (isVisible)',
+  `bolum_kapak`     varchar(500) DEFAULT NULL COMMENT 'Bölüm kapak görseli URL',
+  `bolum_on_sozu`   text         DEFAULT NULL COMMENT 'Bölüm ön sözü (preface)',
+  `bolum_sayi_no`   varchar(20)  DEFAULT NULL COMMENT 'Arşiv bölümü için sayı numarası',
+  `rota_yazi_id`    INT          DEFAULT NULL COMMENT 'Bölümün rota/öne çıkan yazısı (routeArticleId)',
+  `bolum_ayar`      JSON         DEFAULT NULL COMMENT 'Ek ayarlar (video URL, spotify URL vb.)',
+  `bolum_sira`      INT          NOT NULL DEFAULT 0 COMMENT 'Bölümlerin ana sayfadaki gösterim sırası'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -271,10 +271,10 @@ INSERT INTO `bolumler`
 --
 
 CREATE TABLE `bolum_yazilari` (
-  `kayit_id` int(11) NOT NULL,
-  `bolum_id` int(11) NOT NULL COMMENT 'bolumler.bolum_id',
-  `yazi_id`  int(11) NOT NULL COMMENT 'yazilar.yazi_id',
-  `sira`     int(4)  NOT NULL DEFAULT 0 COMMENT 'Bölüm içindeki gösterim sırası'
+  `kayit_id` INT NOT NULL,
+  `bolum_id` INT NOT NULL COMMENT 'bolumler.bolum_id',
+  `yazi_id`  INT NOT NULL COMMENT 'yazilar.yazi_id',
+  `sira`     INT NOT NULL DEFAULT 0 COMMENT 'Bölüm içindeki gösterim sırası'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -284,11 +284,25 @@ CREATE TABLE `bolum_yazilari` (
 --
 
 CREATE TABLE `yorumlar` (
-  `yorum_id`    int(11)    NOT NULL,
-  `yazi_id`     int(11)    NOT NULL COMMENT 'yazilar.yazi_id',
+  `yorum_id`    INT        NOT NULL,
+  `yazi_id`     INT        NOT NULL COMMENT 'yazilar.yazi_id',
   `yorum_metin` text       NOT NULL COMMENT 'Yorumun içeriği',
   `yorum_tarih` timestamp  NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Yorumun oluşturulma tarihi',
   `okundu`      tinyint(1) NOT NULL DEFAULT 0 COMMENT '0=Okunmadı, 1=Okundu'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Tablo için tablo yapısı `sablonlar`
+-- Admin panelindeki kayıtlı düzen şablonları
+--
+
+CREATE TABLE `sablonlar` (
+  `sablon_id`      INT          NOT NULL,
+  `sablon_adi`     varchar(200) NOT NULL COMMENT 'Şablonun adı (admin panelde gösterilir)',
+  `sablon_bolumler` JSON        NOT NULL COMMENT 'Bölüm düzeni (Section[] JSON dizisi)',
+  `sablon_tarih`   timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Oluşturulma tarihi'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ========================================================
@@ -310,6 +324,7 @@ ALTER TABLE `yazilar`
   ADD PRIMARY KEY (`yazi_id`),
   ADD UNIQUE KEY `uq_yazi_slug` (`yazi_slug`(191)),
   ADD KEY `idx_yazi_kategori` (`yazi_kategori_id`),
+  ADD KEY `idx_yazi_editor` (`yazi_editor_id`),
   ADD KEY `idx_yazi_sayi_no` (`yazi_sayi_no`),
   ADD KEY `idx_yazi_tarih` (`yazi_tarih`),
   ADD KEY `idx_yazi_silindi` (`yazi_silindi`);
@@ -356,21 +371,25 @@ ALTER TABLE `yorumlar`
   ADD KEY `idx_yorum_yazi` (`yazi_id`),
   ADD KEY `idx_yorum_okundu` (`okundu`);
 
+ALTER TABLE `sablonlar`
+  ADD PRIMARY KEY (`sablon_id`);
+
 -- ========================================================
 -- AUTO_INCREMENT başlangıç değerleri
 -- ========================================================
 
-ALTER TABLE `kategoriler`    MODIFY `kategori_id`  int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
-ALTER TABLE `etiketler`      MODIFY `etiket_id`    int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
-ALTER TABLE `editorler`      MODIFY `editor_id`    int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
-ALTER TABLE `yazilar`        MODIFY `yazi_id`      int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
-ALTER TABLE `yazi_etiketleri` MODIFY `kayit_id`    int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
-ALTER TABLE `yazi_onerilen`  MODIFY `kayit_id`     int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
-ALTER TABLE `sayilar`        MODIFY `sayi_id`      int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
-ALTER TABLE `sayi_yazilari`  MODIFY `kayit_id`     int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
-ALTER TABLE `bolumler`       MODIFY `bolum_id`     int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
-ALTER TABLE `bolum_yazilari` MODIFY `kayit_id`     int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
-ALTER TABLE `yorumlar`       MODIFY `yorum_id`     int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+ALTER TABLE `kategoriler`     MODIFY `kategori_id` INT NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+ALTER TABLE `etiketler`       MODIFY `etiket_id`   INT NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
+ALTER TABLE `editorler`       MODIFY `editor_id`   INT NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+ALTER TABLE `yazilar`         MODIFY `yazi_id`     INT NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+ALTER TABLE `yazi_etiketleri` MODIFY `kayit_id`    INT NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+ALTER TABLE `yazi_onerilen`   MODIFY `kayit_id`    INT NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+ALTER TABLE `sayilar`         MODIFY `sayi_id`     INT NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+ALTER TABLE `sayi_yazilari`   MODIFY `kayit_id`    INT NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+ALTER TABLE `bolumler`        MODIFY `bolum_id`    INT NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+ALTER TABLE `bolum_yazilari`  MODIFY `kayit_id`    INT NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+ALTER TABLE `yorumlar`        MODIFY `yorum_id`    INT NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+ALTER TABLE `sablonlar`       MODIFY `sablon_id`   INT NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 
 -- ========================================================
 -- FOREIGN KEY kısıtları
@@ -379,6 +398,9 @@ ALTER TABLE `yorumlar`       MODIFY `yorum_id`     int(11) NOT NULL AUTO_INCREME
 ALTER TABLE `yazilar`
   ADD CONSTRAINT `fk_yazi_kategori`
     FOREIGN KEY (`yazi_kategori_id`) REFERENCES `kategoriler` (`kategori_id`)
+    ON DELETE SET NULL ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_yazi_editor`
+    FOREIGN KEY (`yazi_editor_id`) REFERENCES `editorler` (`editor_id`)
     ON DELETE SET NULL ON UPDATE CASCADE;
 
 ALTER TABLE `yazi_etiketleri`
