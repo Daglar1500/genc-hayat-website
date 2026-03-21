@@ -488,7 +488,7 @@ export function useAdminData() {
         addEditor,
         deleteEditor,
         deleteArticleFromSection,
-        deleteArticle, restoreArticle, permanentDeleteArticle, emptyTrash,
+        deleteArticle,
         updateSectionConfig,
         addConfigItem,
         removeConfigItem,
